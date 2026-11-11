@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"9routerx/proxy/internal/handlerutil"
@@ -111,7 +112,27 @@ var defaultClient = &http.Client{
 // byte is written. A variable for the same reason internal/telegram keeps one:
 // the offline test suite sends to loopback httptest servers, which is exactly
 // what the guard exists to refuse.
-var assertPublicURL = handlerutil.AssertPublicURL
+//
+// The swap goes through an atomic pointer rather than a plain assignment: a
+// DispatchAll send runs on its own goroutine, so a finished test's cleanup can
+// restore the real guard while a delivery goroutine is still reading it — the
+// data race the race detector flagged on the dispatch tests. setAssertPublicURL
+// is the only writer.
+var assertPublicURLPtr atomic.Pointer[func(string) error]
+
+func assertPublicURL(dest string) error {
+	if guard := assertPublicURLPtr.Load(); guard != nil {
+		return (*guard)(dest)
+	}
+	return handlerutil.AssertPublicURL(dest)
+}
+
+// setAssertPublicURL swaps the SSRF guard and returns the function that
+// restores whatever was set before. Test-only.
+func setAssertPublicURL(guard func(string) error) (restore func()) {
+	prev := assertPublicURLPtr.Swap(&guard)
+	return func() { assertPublicURLPtr.Store(prev) }
+}
 
 // NewTarget builds the adapter a webhookTargets row describes, or nil when the
 // row's type names no adapter. A telegram URL that does not parse comes back

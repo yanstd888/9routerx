@@ -19,9 +19,7 @@ import (
 // need the REAL guard (the SSRF block cases) leave it alone.
 func pointAtTestServer(t *testing.T) {
 	t.Helper()
-	orig := assertPublicURL
-	assertPublicURL = func(string) error { return nil }
-	t.Cleanup(func() { assertPublicURL = orig })
+	t.Cleanup(setAssertPublicURL(func(string) error { return nil }))
 }
 
 // captureServer is a JSON stand-in that records the bodies it receives.
@@ -357,16 +355,14 @@ func TestRedirectToBlockedHostRefused(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	orig := assertPublicURL
 	// A public destination ("/start") the guard allows, and the internal
 	// address the redirect points at (".../internal") the guard blocks.
-	assertPublicURL = func(raw string) error {
+	t.Cleanup(setAssertPublicURL(func(raw string) error {
 		if strings.HasSuffix(raw, "/internal") {
 			return errors.New("blocked URL: internal host")
 		}
 		return nil
-	}
-	t.Cleanup(func() { assertPublicURL = orig })
+	}))
 
 	target := NewTarget(TargetGeneric, srv.URL+"/start")
 	err := target.Send(Event{Type: EventTestPing, Title: "Ping"})
