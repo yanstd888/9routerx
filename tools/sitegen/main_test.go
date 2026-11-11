@@ -503,3 +503,27 @@ func TestCountWikiPages(t *testing.T) {
 		t.Errorf("countWikiPages on a missing dir = %d, want 0", got)
 	}
 }
+
+// TestRenderSvgCodeSpans proves the Key Features table's backticked SVG icons
+// become real inline icons instead of a wall of escaped markup, and that any
+// other code span is left exactly as goldmark rendered it.
+func TestRenderSvgCodeSpans(t *testing.T) {
+	escaped := `<td><code>&lt;svg width=&quot;16&quot; height=&quot;16&quot;&gt;&lt;path d=&quot;M0 0&quot;/&gt;&lt;/svg&gt;</code> <strong>Row</strong></td>`
+	got := renderSvgCodeSpans(escaped)
+	if strings.Contains(got, "&lt;svg") {
+		t.Errorf("escaped SVG source survived: %s", got)
+	}
+	if !strings.Contains(got, `<svg class="ico" width="16"`) {
+		t.Errorf("the icon was not rendered inline with the shared class: %s", got)
+	}
+	if !strings.Contains(got, "</svg> <strong>Row</strong>") {
+		t.Errorf("the row label was damaged: %s", got)
+	}
+
+	// A code span that merely contains an SVG among other text must not be
+	// rewritten — only a span that is exactly one icon element becomes one.
+	mixed := `<code>&lt;svg&gt;&lt;/svg&gt; trailing</code>`
+	if got := renderSvgCodeSpans(mixed); got != mixed {
+		t.Errorf("a mixed code span was rewritten: %s", got)
+	}
+}

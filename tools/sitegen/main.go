@@ -29,10 +29,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html"
 	"html/template"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -195,7 +197,35 @@ func renderMarkdown(readmePath, outDir, repo string) ([]byte, error) {
 	// emoji-free markdown sources no longer carry (see icons.go): the same
 	// post-render point wrapTables runs at, on the exact markup the browser
 	// gets.
-	return []byte(injectIcons(wrapTables(buf.String()))), nil
+	return []byte(renderSvgCodeSpans(injectIcons(wrapTables(buf.String())))), nil
+}
+
+// svgCodeSpan matches a goldmark code span whose entire body is one inline
+// <svg> element, escaped the way code spans are.
+var svgCodeSpan = regexp.MustCompile(`(?s)<code>(&lt;svg\b.*?&lt;/svg&gt;)</code>`)
+
+// renderSvgCodeSpans turns a code span that contains nothing but an inline
+// <svg> into the real icon. The README's Key Features table writes each row
+// icon as a backticked SVG, and goldmark correctly escapes a code span — so
+// the first table column published a wall of literal markup and every row
+// grew to the height of that text. The page already trusts this repository's
+// own HTML (WithUnsafe), so the span is unescaped and tagged with the same
+// .ico class every injected icon carries, which lets the shared sizing CSS in
+// style.css treat it like the others. A span with any other content is left
+// untouched, and the pass is idempotent: once unescaped, the output no longer
+// matches the escaped form.
+func renderSvgCodeSpans(markup string) string {
+	return svgCodeSpan.ReplaceAllStringFunc(markup, func(span string) string {
+		match := svgCodeSpan.FindStringSubmatch(span)
+		if match == nil {
+			return span
+		}
+		decoded := strings.TrimSpace(html.UnescapeString(match[1]))
+		if !strings.HasPrefix(decoded, "<svg") || !strings.HasSuffix(decoded, "</svg>") {
+			return span
+		}
+		return strings.Replace(decoded, "<svg", `<svg class="ico"`, 1)
+	})
 }
 
 // rewriteRelativeLinks points every repository-relative link at github.com and
