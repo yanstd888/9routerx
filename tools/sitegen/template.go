@@ -1110,6 +1110,30 @@ var readmeTemplate = `<!doctype html>
           padding: 3.5rem 2rem 5rem;
         }
       }
+      /* The nav above the README: this page's plain <nav> gets no rule from
+         style.css (the homepage's links moved to .site-nav), so without this
+         it renders as cramped, underlined, blue links — one sentence, not a
+         bar. Same look as the homepage navbar: muted, spaced, accent hover. */
+      .masthead nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.25rem;
+        font-size: 0.9375rem;
+      }
+      .masthead nav a {
+        display: inline-block;
+        padding: 0.6rem 0;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color var(--ease) 0.2s;
+      }
+      .masthead nav a:hover {
+        color: var(--link);
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+      }
     </style>
     <script>
       // Apply the stored theme before the first paint — the same snippet the
