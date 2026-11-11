@@ -1385,8 +1385,16 @@ a:hover {
 }
 
 .prose > div[align="center"] img {
+  /* Badges live in the centred block and must flow as inline chips: the
+     generic .prose img rule makes every image a centred block, which stacked
+     the eight README badges one per line. Content images keep the block
+     treatment; these are decoration and read as a row. */
+  display: inline-block;
   margin: 0.4rem 0.2rem;
   vertical-align: middle;
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 h1,
