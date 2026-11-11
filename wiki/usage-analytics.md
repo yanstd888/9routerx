@@ -51,6 +51,28 @@ The period selector is not limited to fixed presets — `14d`, `12h`, `7d` all
 work, because the range parser accepts a number plus a unit
 (`internal/analyticsrange/range.go`).
 
+## Where the numbers come from
+
+The window you pick decides which table the aggregates read
+(`internal/handlers/usage_stats.go`):
+
+- **Sub-day windows** — `today` (after local midnight), `24h`, `12h`, `3h` —
+  scan the raw `usageHistory` ledger directly, so the numbers move the moment a
+  request finishes.
+- **Day and longer windows** — `7d`, `30d`, `60d`, `all` — sum the
+  `usageDaily` rollup rows, one JSON aggregate per calendar day. The chart's
+  day buckets read the same rollup.
+
+The split exists so an operator narrowing to `12h` gets a to-the-minute answer
+without a day-granularity rollup having to invent one. One consequence worth
+knowing: a ledger row and its rollup are written together by the same request
+path, so a database that was copied, restored or backfilled **after the fact**
+can carry `usageHistory` rows without matching `usageDaily` rollups. The
+Recent Requests list (reads the raw ledger) then shows those requests while a
+day-window KPI reads 0, and sub-day windows only count rows whose timestamps
+fall inside them. Rollups are written when a request runs — backfilled rows
+never gain one retroactively.
+
 ## Compression analytics
 
 `GET /api/analytics/compression` reports what the token savers actually did:
