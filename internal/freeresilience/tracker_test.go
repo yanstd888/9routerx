@@ -277,7 +277,13 @@ func TestTracker_HealthScoreFeedsChainOrder(t *testing.T) {
 }
 
 func TestTracker_PersistsAndReloads(t *testing.T) {
-	start := time.Date(2026, 11, 10, 23, 30, 0, 0, time.UTC)
+	// Relative to the real clock, and deliberately only 30s back: the 429
+	// cooldown this fixture persists is shortCooldown(1) = 5 minutes, and
+	// NewTracker runs loadFromStore on the real clock before the test can
+	// inject its own — a start further in the past let that load prune the
+	// cooldown as expired, and the reload assertion failed once the calendar
+	// crossed the hardcoded date.
+	start := time.Now().UTC().Add(-30 * time.Second)
 	store := &fakeStore{}
 	tracker, _ := newTestTracker(store, start)
 
