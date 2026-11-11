@@ -1475,6 +1475,15 @@ h4 {
   margin-inline: auto;
 }
 
+/* The README's hero animation is a tall GIF that filled the first viewport.
+   It is capped at a banner height and letterboxed inside that box; ordinary
+   screenshots keep their natural height, and the asset itself is untouched. */
+.prose img[src$=".gif"] {
+  max-height: 480px;
+  object-fit: contain;
+  width: auto;
+}
+
 .prose img[width][height] {
   aspect-ratio: attr(width) / attr(height);
 }
