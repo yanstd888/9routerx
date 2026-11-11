@@ -314,7 +314,7 @@ jobs:
 
       - name: Install Chromium
         working-directory: web
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install chromium
 
       - name: Dashboard E2E
         working-directory: web
