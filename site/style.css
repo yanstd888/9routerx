@@ -1400,6 +1400,13 @@ h4 {
   scroll-margin-top: 5.5rem;
 }
 
+/* The README's long H1 otherwise breaks leaving one orphan word ("Binary)")
+   alone on the second line. Balance packs both lines evenly; browsers that
+   do not know the property simply ignore it. */
+h1 {
+  text-wrap: balance;
+}
+
 .prose > div[align="center"] h2:first-of-type {
   margin-top: 0;
   font-size: clamp(1.75rem, 5vw, 2.4rem);
