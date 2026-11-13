@@ -118,7 +118,7 @@ func nextRotationStamp(previous string) string {
 	if previous == "" || now > previous {
 		return now
 	}
-	prev, ok := parseRotationStamp(previous)
+	prev, ok := ParseRotationStamp(previous)
 	if !ok {
 		return now
 	}
@@ -137,7 +137,7 @@ func nextRotationStamp(previous string) string {
 // the fixed-width rotation format, or the plain second-precision RFC3339 that
 // older rows still carry. Rows left behind by an older build must keep ordering
 // correctly, otherwise one stale stamp would pin the rotation to a single row.
-func parseRotationStamp(value string) (time.Time, bool) {
+func ParseRotationStamp(value string) (time.Time, bool) {
 	if value == "" {
 		return time.Time{}, false
 	}

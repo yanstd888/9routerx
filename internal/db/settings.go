@@ -12,7 +12,13 @@ import (
 type ComboStrategy struct {
 	Strategy    string `json:"strategy,omitempty"`
 	StickyLimit int    `json:"stickyLimit,omitempty"`
-	JudgeModel  string `json:"judgeModel,omitempty"`
+	// StickyMode "count" (default, perilaku lama) atau "ttl". StickyTTLSeconds
+	// hanya berlaku saat mode "ttl": akun yang sama terus dipakai selama
+	// now - lastUsedAt < TTL — meniru window vendor prompt cache
+	// (Claude ~5m, Gemini ~60m) sehingga cache tetap hangat.
+	StickyMode       string `json:"stickyMode,omitempty"`
+	StickyTTLSeconds int    `json:"stickyTTLSeconds,omitempty"`
+	JudgeModel       string `json:"judgeModel,omitempty"`
 	// FirstTokenTimeoutMs bounds every combo candidate except the last until
 	// its first usable response; zero disables it. The last candidate keeps
 	// the global deadline, so the setting never makes a combo fail sooner.
@@ -76,6 +82,8 @@ type ProviderStrategy struct {
 	ProxyPoolID           string `json:"proxyPoolId,omitempty"`
 	RotateStrategy        string `json:"rotateStrategy,omitempty"` // "none", "round-robin", "random", "sticky"
 	StickyLimit           int    `json:"stickyLimit,omitempty"`
+	StickyMode            string `json:"stickyMode,omitempty"`
+	StickyTTLSeconds      int    `json:"stickyTTLSeconds,omitempty"`
 	StrictModelAssignment bool   `json:"strictModelAssignment,omitempty"`
 	ProxyRotateStrategy   string `json:"proxyRotateStrategy,omitempty"`
 	ConnRotateStrategy    string `json:"connRotateStrategy,omitempty"`

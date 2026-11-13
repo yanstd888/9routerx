@@ -33,6 +33,10 @@ func applyComboStrategies(s *SettingsData, raw map[string]any) {
 			StickyLimit: sticky,
 			JudgeModel:  handlerutil.GetString(vm, "judgeModel"),
 		}
+		entry.StickyMode = handlerutil.GetString(vm, "stickyMode")
+		if ttl, ok := vm["stickyTTLSeconds"].(float64); ok && ttl > 0 {
+			entry.StickyTTLSeconds = int(ttl)
+		}
 		if timeout, ok := vm["firstTokenTimeoutMs"].(float64); ok && timeout > 0 && timeout <= float64((1<<63-1)/1000000) && timeout == float64(int64(timeout)) {
 			entry.FirstTokenTimeoutMs = int(timeout)
 		}
@@ -101,8 +105,13 @@ func applyProviderStrategies(s *SettingsData, raw map[string]any) {
 			ProxyPoolID:         handlerutil.GetString(vm, "proxyPoolId"),
 			RotateStrategy:      rotateStrat,
 			StickyLimit:         sticky,
+			StickyMode:          handlerutil.GetString(vm, "stickyMode"),
+			StickyTTLSeconds:    0,
 			ProxyRotateStrategy: handlerutil.GetString(vm, "rotateStrategy"),
 			ConnRotateStrategy:  handlerutil.GetString(vm, "fallbackStrategy"),
+		}
+		if ttl, ok := vm["stickyTTLSeconds"].(float64); ok && ttl > 0 {
+			strat.StickyTTLSeconds = int(ttl)
 		}
 		if sma, ok := vm["strictModelAssignment"].(bool); ok {
 			strat.StrictModelAssignment = sma

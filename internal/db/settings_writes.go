@@ -82,6 +82,12 @@ func (r *Repo) SetProviderStrategy(provider string, strat ProviderStrategy) erro
 			entry["stickyLimit"] = strat.StickyLimit
 			entry["stickyRoundRobinLimit"] = strat.StickyLimit
 		}
+		if strat.StickyMode != "" {
+			entry["stickyMode"] = strat.StickyMode
+		}
+		if strat.StickyTTLSeconds > 0 {
+			entry["stickyTTLSeconds"] = strat.StickyTTLSeconds
+		}
 		entry["strictModelAssignment"] = strat.StrictModelAssignment
 
 		currentMap[provider] = entry
@@ -112,6 +118,12 @@ func (r *Repo) SetComboStrategy(comboName string, strat ComboStrategy) error {
 		if strat.StickyLimit > 0 {
 			entry["stickyLimit"] = strat.StickyLimit
 			entry["stickyRoundRobinLimit"] = strat.StickyLimit
+		}
+		if strat.StickyMode != "" {
+			entry["stickyMode"] = strat.StickyMode
+		}
+		if strat.StickyTTLSeconds > 0 {
+			entry["stickyTTLSeconds"] = strat.StickyTTLSeconds
 		}
 		if strat.JudgeModel != "" {
 			entry["judgeModel"] = strat.JudgeModel

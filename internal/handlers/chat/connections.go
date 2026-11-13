@@ -1243,7 +1243,11 @@ func (h *ChatHandler) applyConnectionStrategy(conns []*models.ProviderConnection
 		if stickyLimit <= 0 {
 			stickyLimit = 1
 		}
-		return h.selectByRecency(conns, stickyLimit)
+		ttlSeconds := 0
+		if strat.StickyMode == "ttl" && strat.StickyTTLSeconds > 0 {
+			ttlSeconds = strat.StickyTTLSeconds
+		}
+		return h.selectByRecency(conns, stickyLimit, ttlSeconds)
 
 	case "random":
 		offset := rand.IntN(len(conns))
@@ -1267,7 +1271,13 @@ func (h *ChatHandler) applyConnectionStrategy(conns []*models.ProviderConnection
 // instead held a positional index keyed only by provider, which reset to the
 // top account on every restart and advanced on every internal selection rather
 // than once per request.
-func (h *ChatHandler) selectByRecency(conns []*models.ProviderConnection, stickyLimit int) []*models.ProviderConnection {
+// A TTL window (StickyTTLSeconds > 0) narrows the sticky condition: the
+// current account keeps serving only while its last-used stamp is younger than
+// the TTL, mirroring vendor prompt-cache windows (Claude ~5m, Gemini ~60m).
+// An expired stamp falls through to the LRU path, so rotation resumes the
+// moment the vendor cache would have gone cold. ttlSeconds == 0 preserves the
+// count-only behaviour exactly.
+func (h *ChatHandler) selectByRecency(conns []*models.ProviderConnection, stickyLimit, ttlSeconds int) []*models.ProviderConnection {
 	// Most recently used wins the tie-break by list order, which is priority
 	// order, so two rows stamped in the same second rotate deterministically.
 	currentIdx := -1
@@ -1287,7 +1297,16 @@ func (h *ChatHandler) selectByRecency(conns []*models.ProviderConnection, sticky
 		if conns[currentIdx].ConsecutiveUseCount != nil {
 			count = *conns[currentIdx].ConsecutiveUseCount
 		}
-		if count < stickyLimit {
+		sticky := count < stickyLimit
+		if sticky && ttlSeconds > 0 {
+			// TTL mode: the stamp must also be young enough. An unparseable
+			// stamp is treated as expired — the LRU path is the safe default.
+			sticky = false
+			if parsed, ok := db.ParseRotationStamp(*conns[currentIdx].LastUsedAt); ok {
+				sticky = time.Since(parsed) < time.Duration(ttlSeconds)*time.Second
+			}
+		}
+		if sticky {
 			// Still inside the sticky window: keep serving the same account.
 			winner = currentIdx
 			consecutive = count + 1
