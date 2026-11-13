@@ -77,6 +77,30 @@
   // label — the field holds a token and calling it a cookie would send the
   // operator to the wrong place in DevTools.
   let isDeepSeekWeb = $derived(providerId === 'deepseek-web')
+  // Dual-column cookie input for providers whose executor reads two named
+  // cookies (gemini-web: __Secure-1PSID + __Secure-1PSIDTS; grok-web: sso +
+  // sso-rw). The combined value lands in formApiKey on submit. Other cookie
+  // providers keep the single textarea.
+  let isDualCookie = $derived(isCookie && (providerId === 'gemini-web' || providerId === 'grok-web'))
+  let cookiePrimary = $state('')
+  let cookieSecondary = $state('')
+  let cookieSplitHint = $state('')
+  // Paste-detection on the primary field: a pasted header containing `;` is
+  // split automatically into both columns.
+  function handleCookiePaste(e: ClipboardEvent) {
+    const text = e.clipboardData?.getData('text') ?? ''
+    if (!text.includes(';')) return
+    const r = splitCookieHeader(text, providerId as 'gemini-web' | 'grok-web')
+    if (!r) return
+    cookiePrimary = r.primary
+    cookieSecondary = r.secondary
+    cookieSplitHint = 'Auto-split from pasted cookie header'
+  }
+  // Combine the two columns into the format the backend executor parses
+  // (`primary=...; secondary=...`), or fall back to the primary alone.
+  function combineDualCookie(): string {
+    return combineCookieFields(cookiePrimary, cookieSecondary)
+  }
   let credentialLabel = $derived(
     isDeepSeekWeb
       ? 'User Token'
@@ -238,6 +262,7 @@
   }
 
   async function runValidation(): Promise<boolean> {
+    if (isDualCookie) formApiKey = combineDualCookie()
     validating = true
     validationNote = ''
     try {
@@ -404,6 +429,9 @@
     try {
       // Validate before saving so the connection gets a real test status.
       const isValid = await runValidation()
+      if (isDualCookie) {
+        formApiKey = combineDualCookie()
+      }
       await onSubmit({
         provider: providerId,
         authType: connectionAuthType,
@@ -582,20 +610,53 @@
                   <label for="connApiKey" class={labelCls}>
                     {credentialLabel}{#if credentialIsOptional}<span class="text-text-muted text-xs font-normal"> (optional in profile mode)</span>{/if}
                   </label>
-                  <input
-                    id="connApiKey"
-                    type={isCookie ? 'text' : 'password'}
-                    required={!credentialIsOptional}
-                    bind:value={formApiKey}
-                    placeholder={credentialPlaceholder}
-                    class="{inputCls} font-mono"
-                  />
+                  {#if isDualCookie}
+                    <div class="flex flex-col gap-2">
+                      <div>
+                        <label for="connCookiePrimary" class="text-[11px] font-medium text-text-muted mb-0.5 block">
+                          {providerId === 'gemini-web' ? 'Session cookie (__Secure-1PSID)' : 'SSO cookie (sso)'}
+                        </label>
+                        <input
+                          id="connCookiePrimary"
+                          type="text"
+                          bind:value={cookiePrimary}
+                          onpaste={handleCookiePaste}
+                          placeholder={providerId === 'gemini-web' ? '__Secure-1PSID value' : 'sso value or full cookie header'}
+                          class="{inputCls} font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label for="connCookieSecondary" class="text-[11px] font-medium text-text-muted mb-0.5 block">
+                          {providerId === 'gemini-web' ? 'Timestamp cookie (__Secure-1PSIDTS)' : 'SSO-RW cookie (sso-rw)'}
+                        </label>
+                        <input
+                          id="connCookieSecondary"
+                          type="text"
+                          bind:value={cookieSecondary}
+                          placeholder={providerId === 'gemini-web' ? '__Secure-1PSIDTS value' : 'sso-rw value'}
+                          class="{inputCls} font-mono"
+                        />
+                        {#if cookieSplitHint}
+                          <p class="text-[11px] text-brand-500 mt-0.5">{cookieSplitHint}</p>
+                        {/if}
+                      </div>
+                    </div>
+                  {:else}
+                    <input
+                      id="connApiKey"
+                      type={isCookie ? 'text' : 'password'}
+                      required={!credentialIsOptional}
+                      bind:value={formApiKey}
+                      placeholder={credentialPlaceholder}
+                      class="{inputCls} font-mono"
+                    />
+                  {/if}
                 </div>
                 <div class="pt-8">
                   <Button
                     variant="secondary"
                     onclick={handleValidate}
-                    disabled={!formApiKey || validating || saving}
+                    disabled={!(isDualCookie ? cookiePrimary : formApiKey) || validating || saving}
                   >
                     {validating ? 'Checking...' : 'Check'}
                   </Button>
