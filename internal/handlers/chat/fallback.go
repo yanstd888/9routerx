@@ -4,6 +4,8 @@ package chat
 import (
 	"9routerx/proxy/internal/db"
 	"9routerx/proxy/internal/handlerutil"
+	"9routerx/proxy/internal/resilience"
+	"9routerx/proxy/internal/securitylog"
 	"9routerx/proxy/internal/headroom"
 	"9routerx/proxy/internal/log"
 	"9routerx/proxy/internal/middleware"
@@ -239,6 +241,8 @@ func (h *ChatHandler) handleAccountFallback(
 			// Free-tier resilience: a success feeds the health score and
 			// lifts any provider-level cooldown early (smart recovery).
 			h.recordFreeResilienceOutcome(provider, model, nil, time.Since(attemptStart).Milliseconds())
+			// Auto-prune: a 2xx resets the permanent-failure counter.
+			resilience.AutoPruneRecord(connObj.ID, 200, nil)
 			if sessionID := handlerutil.GetSessionID(ctx); sessionID != "" && affinityEligible {
 				h.getSessionAffinity().Bind(provider, model, sessionID, connObj.ID)
 			}
@@ -252,6 +256,22 @@ func (h *ChatHandler) handleAccountFallback(
 			// cooldown the fallback chain skips.
 			h.recordFreeResilienceOutcome(provider, model, err, time.Since(attemptStart).Milliseconds())
 			var ue *upstreamError
+			if errors.As(lastErr, &ue) {
+				// Auto-prune: a permanent credential failure increments the
+				// counter; a 2xx-class error would reset it (but errors are never 2xx).
+				if resilience.AutoPruneRecord(connObj.ID, ue.StatusCode, ue.Body) {
+					if err := h.Repo.SetConnectionStatus(connObj.ID, false); err != nil {
+						log.Warn("autoprune", "evict connection failed", "conn", connObj.ID, "error", err)
+					} else {
+						securitylog.Record(securitylog.Entry{
+							Type:     "autoprune_evict",
+							Severity: "warn",
+							Actor:    "autoprune",
+							Detail:   fmt.Sprintf("connection %s deactivated after consecutive permanent failures (HTTP %d)", connObj.ID, ue.StatusCode),
+						})
+					}
+				}
+			}
 			if errors.As(lastErr, &ue) {
 				if ue.StatusCode == http.StatusTooManyRequests || ue.StatusCode == http.StatusUnauthorized || ue.StatusCode == http.StatusForbidden {
 					if sessionID := handlerutil.GetSessionID(ctx); sessionID != "" {
