@@ -14,6 +14,37 @@ Release history up to the fork point is archived in the upstream repo's
   the pending-fragment splice now lands under this Unreleased heading instead
   of above the file title.
 
+## [v1.2.0] - 2026-11-13
+
+### Added
+
+- **Cache-aware sticky TTL** — combo routing gains a `ttl` mode where the same
+  account stays pinned for a configurable window, matching vendor prompt-cache
+  lifetimes so cached tokens are reused instead of re-billed.
+- **Auto-prune dead connections** — connections accumulating consecutive
+  permanent credential failures (401/403-banned/402) are deactivated from
+  rotation automatically. Ships OFF with dry-run ON for observation.
+- **Dual-column cookie input** — Gemini Web and Grok Web session cookies get
+  separate primary/secondary fields with auto-split paste detection.
+- **Burn-in protection** — accounts accumulating 429/5xx failures walk a
+  suspect → heal (1-in-5 throttle) → rescue (out of rotation) cycle. Ships OFF.
+- **Windowed-LRU** — `ROTATION_WINDOW=N` restricts round-robin selection to the
+  top N candidates to prevent pool-wide burn-in. Default 0 (off).
+
+### Fixed
+
+- **Standalone homepage** — the landing page is pure design; the full README
+  renders at `readme.html` instead of being embedded under the hero.
+- **Footer polish** — brand row, link columns, legal line, and the wordmark
+  finale with the dashboard's accent glow.
+- **Responsive navbar** — sticky glass bar with a mobile hamburger menu that
+  closes on Escape, link click, and resize.
+- **Provider catalog** — grid of real registry names with per-auth breakdown.
+- **Security** — dashboard management routes restricted to operator credentials;
+  API keys stored hash-only (plaintext reveal legacy-only); locality guard
+  ignores the Host header; updater archive extraction bounded; A2A fail-closed
+  when enabled without a token.
+
 ## [v1.1.4] - 2026-11-09
 
 ### Security
