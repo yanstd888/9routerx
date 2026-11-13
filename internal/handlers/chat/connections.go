@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
+	"strconv"
 	"slices"
 	"strings"
 	"sync"
@@ -1239,6 +1240,12 @@ func (h *ChatHandler) applyConnectionStrategy(conns []*models.ProviderConnection
 
 	switch strings.ToLower(strings.TrimSpace(strat.RotateStrategy)) {
 	case "round-robin", "roundrobin", "sticky":
+		// Windowed-LRU: ROTATION_WINDOW > 0 restricts the LRU/sticky
+		// selection to the top N candidates (priority order), preventing
+		// the LRU from burning through the entire pool. 0 = off (default).
+		if rw := rotationWindow(); rw > 0 && rw < len(conns) {
+			conns = conns[:rw]
+		}
 		stickyLimit := strat.StickyLimit
 		if stickyLimit <= 0 {
 			stickyLimit = 1
@@ -1364,4 +1371,18 @@ func (h *ChatHandler) selectByRecency(conns []*models.ProviderConnection, sticky
 		}
 	}
 	return rotated
+}
+
+// rotationWindow reads the ROTATION_WINDOW env variable. A value > 0
+// restricts the LRU/sticky selection to the top N candidates; 0 disables it.
+func rotationWindow() int {
+	v := os.Getenv("ROTATION_WINDOW")
+	if v == "" {
+		return 0
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil || n <= 0 {
+		return 0
+	}
+	return n
 }

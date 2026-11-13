@@ -243,6 +243,8 @@ func (h *ChatHandler) handleAccountFallback(
 			h.recordFreeResilienceOutcome(provider, model, nil, time.Since(attemptStart).Milliseconds())
 			// Auto-prune: a 2xx resets the permanent-failure counter.
 			resilience.AutoPruneRecord(connObj.ID, 200, nil)
+			// Burn-in: a success may clear or step down the burn-in state.
+			resilience.BurninRecord(connObj.ID, 200)
 			if sessionID := handlerutil.GetSessionID(ctx); sessionID != "" && affinityEligible {
 				h.getSessionAffinity().Bind(provider, model, sessionID, connObj.ID)
 			}
@@ -259,6 +261,7 @@ func (h *ChatHandler) handleAccountFallback(
 			if errors.As(lastErr, &ue) {
 				// Auto-prune: a permanent credential failure increments the
 				// counter; a 2xx-class error would reset it (but errors are never 2xx).
+				resilience.BurninRecord(connObj.ID, ue.StatusCode)
 				if resilience.AutoPruneRecord(connObj.ID, ue.StatusCode, ue.Body) {
 					if err := h.Repo.SetConnectionStatus(connObj.ID, false); err != nil {
 						log.Warn("autoprune", "evict connection failed", "conn", connObj.ID, "error", err)
