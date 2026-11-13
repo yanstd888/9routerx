@@ -8,6 +8,7 @@
   import { api, type CreateConnectionPayload, type ProxyPool } from '../../api/client'
   import { PROVIDER_CATALOG } from '../../lib/providers'
   import { planBulkAdd } from '../../lib/bulk-add'
+  import { splitCookieHeader, combineCookieFields } from '../../lib/cookieSplit'
 
   interface Props {
     isOpen: boolean
