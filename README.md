@@ -8,6 +8,10 @@
 
 Cut tool-output token consumption by **20–40%**, automate multi-tier failover (**Subscription → Cheap → Free**), and route across **155 AI providers** and **248 free models** with zero Node.js runtime overhead.
 
+**9RouterX is the self-hosted 9router alternative** — one Go binary you own: per-key governance, semantic cache, and 248 free models (24 keyless) running locally on port 20128.
+
+If 9RouterX helps you, please give it a star — it helps other developers find the project.
+
 [![CI](https://github.com/yanstd888/9routerx/actions/workflows/ci.yml/badge.svg)](https://github.com/yanstd888/9routerx/actions/workflows/ci.yml)
 [![Release CI](https://github.com/yanstd888/9routerx/actions/workflows/release.yml/badge.svg)](https://github.com/yanstd888/9routerx/actions/workflows/release.yml)
 [![GitHub release](https://img.shields.io/github/v/release/yanstd888/9routerx?style=flat-square)](https://github.com/yanstd888/9routerx/releases)
