@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"9routerx/proxy/internal/db"
 )
 
 // TestRealApplicationBootAndServesTraffic is the end-to-end smoke test: the
@@ -72,9 +74,20 @@ func TestRealApplicationBootAndServesTraffic(t *testing.T) {
 	}
 
 	t.Run("the request was recorded in usage history", func(t *testing.T) {
-		rows, err := repo.GetRecentUsageHistory(5)
-		if err != nil {
-			t.Fatalf("read usage history: %v", err)
+		// The usage writer persists asynchronously and the HTTP response can
+		// beat the row to the database, so poll briefly instead of racing it.
+		deadline := time.Now().Add(2 * time.Second)
+		var rows []db.UsageHistoryRow
+		for {
+			var err error
+			rows, err = repo.GetRecentUsageHistory(5)
+			if err != nil {
+				t.Fatalf("read usage history: %v", err)
+			}
+			if len(rows) > 0 || time.Now().After(deadline) {
+				break
+			}
+			time.Sleep(25 * time.Millisecond)
 		}
 		if len(rows) != 1 {
 			t.Fatalf("usageHistory rows = %d, want 1", len(rows))
