@@ -595,6 +595,18 @@ func (r *Repo) GetUsageHistoryWatermark() (string, error) {
 	return ts, nil
 }
 
+// GetUsageHistoryOldestTimestamp returns the timestamp of the oldest
+// usageHistory row ("" when the ledger is empty) — the mirror of the
+// watermark read. The all-time chart derives its window span from this
+// when the usageDaily rollup is missing.
+func (r *Repo) GetUsageHistoryOldestTimestamp() (string, error) {
+	var ts string
+	if err := r.db.QueryRow(`SELECT COALESCE(MIN(timestamp), '') FROM usageHistory`).Scan(&ts); err != nil {
+		return "", fmt.Errorf("read usageHistory oldest timestamp: %w", err)
+	}
+	return ts, nil
+}
+
 // GetUsageHistoryBetween returns rows in (since, until] — the delta a cached
 // window aggregate has yet to fold in. The bounds are exclusive on the low end
 // so a row already folded in at the watermark is never counted twice.

@@ -176,3 +176,96 @@ func TestDailyChartBucketsAll(t *testing.T) {
 		t.Fatalf("all-period must cover both seeded days, got %d buckets", len(buckets))
 	}
 }
+
+// setupChartHistoryOnlyDB seeds usageHistory rows at explicit ages (in days
+// back from base) and leaves usageDaily empty — the QA scenario where the
+// rollup is missing but the raw ledger is full. The base clock is captured
+// once so the seeded rows and the window under test share the same instant.
+func setupChartHistoryOnlyDB(t *testing.T, base time.Time, daysAgo []int) *db.Repo {
+	t.Helper()
+	conn, err := db.OpenDatabase(t.TempDir() + "/chart.sqlite")
+	if err != nil {
+		t.Fatalf("OpenDatabase: %v", err)
+	}
+	if err := db.EnsureCoreSchema(conn); err != nil {
+		t.Fatalf("ensure schema: %v", err)
+	}
+	repo := db.NewRepo(conn)
+	t.Cleanup(func() { conn.Close() })
+	for _, d := range daysAgo {
+		ts := base.AddDate(0, 0, -d).Format(time.RFC3339Nano)
+		if _, err := conn.Exec(
+			`INSERT INTO usageHistory (timestamp, provider, model, connectionId, apiKey, endpoint, promptTokens, completionTokens, cost, status, tokens, meta)
+			 VALUES (?, 'deepseek', 'deepseek-chat', 'c1', 'qa-key', '/v1/chat/completions', 1000, 500, 0.25, 'success', '[]', '{}')`,
+			ts); err != nil {
+			t.Fatalf("seed usageHistory row %d days ago: %v", d, err)
+		}
+	}
+	return repo
+}
+
+// TestDailyChartBucketsRollupEmptyFallsBackToHistory proves the 30d chart is
+// nonzero when the usageDaily rollup is empty but usageHistory has rows: the
+// tokens/cost totals must fall back to the history scan instead of reading
+// zero while byModel shows data.
+func TestDailyChartBucketsRollupEmptyFallsBackToHistory(t *testing.T) {
+	now := time.Now().UTC()
+	repo := setupChartHistoryOnlyDB(t, now, []int{0, 2})
+	buckets := dailyChartBuckets(repo, now, 30)
+	if len(buckets) != 30 {
+		t.Fatalf("len(buckets) = %d, want 30", len(buckets))
+	}
+	var total int64
+	var costTotal float64
+	for _, b := range buckets {
+		total += b.Tokens
+		costTotal += b.Cost
+	}
+	if total != 3000 {
+		t.Errorf("chart token total = %d, want the seeded 3000 from history fallback", total)
+	}
+	if costTotal != 0.5 {
+		t.Errorf("chart cost total = %f, want the seeded 0.5 from history fallback", costTotal)
+	}
+	var famTotal int64
+	for _, b := range buckets {
+		famTotal += b.ByModel["deepseek"]
+	}
+	if famTotal != 3000 {
+		t.Errorf("byModel deepseek total = %d, want 3000 (totals and family split must agree)", famTotal)
+	}
+}
+
+// TestDailyChartBucketsAllRollupEmptyUsesOldestHistory proves period=all does
+// not return zero buckets when the rollup is empty: the window span derives
+// from the oldest raw history row.
+func TestDailyChartBucketsAllRollupEmptyUsesOldestHistory(t *testing.T) {
+	// Five distinct calendar days back-to-back ending today → 5 daily buckets.
+	now := time.Now().UTC()
+	repo := setupChartHistoryOnlyDB(t, now, []int{4, 3, 2, 1, 0})
+	buckets := dailyChartBuckets(repo, now, 0)
+	if len(buckets) != 5 {
+		t.Fatalf("len(buckets) = %d, want 5 (one per seeded history day)", len(buckets))
+	}
+	var total int64
+	for _, b := range buckets {
+		total += b.Tokens
+	}
+	if total != 7500 {
+		t.Errorf("chart token total = %d, want the seeded 7500 from history fallback", total)
+	}
+}
+
+// TestDailyChartBucketsRollupPresentDoesNotDoubleCount proves the fallback
+// never stacks history totals on top of a populated rollup.
+func TestDailyChartBucketsRollupPresentDoesNotDoubleCount(t *testing.T) {
+	repo := setupChartTestDB(t) // rollup yesterday = 1500 tokens, history now = 150
+	buckets := dailyChartBuckets(repo, time.Now().UTC(), 7)
+	var total int64
+	for _, b := range buckets {
+		total += b.Tokens
+	}
+	if total != 1500 {
+		t.Errorf("chart token total = %d, want 1500 from the rollup (no history double count)", total)
+	}
+}

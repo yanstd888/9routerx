@@ -259,10 +259,18 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 		return nil
 	}
 	if count == 0 {
-		if len(dayRows) == 0 {
+		earliestKey := ""
+		if len(dayRows) > 0 {
+			earliestKey = dayRows[len(dayRows)-1].DateKey
+		} else if oldest, oerr := repo.GetUsageHistoryOldestTimestamp(); oerr == nil && oldest != "" {
+			if ts, perr := time.Parse(time.RFC3339Nano, oldest); perr == nil {
+				earliestKey = dayKeyFor(ts)
+			}
+		}
+		if earliestKey == "" {
 			return nil
 		}
-		earliest, err := time.Parse("2006-01-02", dayRows[len(dayRows)-1].DateKey)
+		earliest, err := time.Parse("2006-01-02", earliestKey)
 		if err != nil {
 			return nil
 		}
@@ -282,6 +290,7 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 		buckets[i] = chartBucket{Label: d.Format("Jan 2"), ByModel: map[string]int64{}}
 	}
 
+	rollupTokens := int64(0)
 	for _, row := range dayRows {
 		i, ok := index[row.DateKey]
 		if !ok {
@@ -297,6 +306,7 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 		}
 		buckets[i].Tokens = dayData.PromptTokens + dayData.CompletionTokens
 		buckets[i].Cost = dayData.Cost
+		rollupTokens += buckets[i].Tokens
 	}
 
 	rangeStart := now.AddDate(0, 0, -(count - 1))
@@ -304,6 +314,8 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 	if err != nil {
 		return buckets
 	}
+	histTokens := make([]int64, len(buckets))
+	histCost := make([]float64, len(buckets))
 	for _, row := range rows {
 		ts, err := time.Parse(time.RFC3339Nano, row.Timestamp)
 		if err != nil {
@@ -314,7 +326,20 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 			continue
 		}
 		tokens := int64(row.PromptTokens) + int64(row.CompletionTokens)
+		histTokens[i] += tokens
+		histCost[i] += row.Cost
 		addFamily(buckets[i].ByModel, row.Model, tokens)
+	}
+	// The rollup is an optimisation, not the source of truth: an empty or
+	// lost rollup would leave the totals at zero while the family split
+	// (scanned straight from usageHistory) shows data. When the rollup
+	// carries nothing, fall back to the history scan for tokens and cost so
+	// both views tell the same story.
+	if rollupTokens == 0 {
+		for i := range buckets {
+			buckets[i].Tokens = histTokens[i]
+			buckets[i].Cost = histCost[i]
+		}
 	}
 	return buckets
 }
