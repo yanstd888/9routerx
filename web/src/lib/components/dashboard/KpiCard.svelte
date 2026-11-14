@@ -76,7 +76,9 @@
       </span>
     {/if}
   </div>
-  <span class="truncate text-2xl font-bold font-code {accentClass}" {title}>{value}</span>
+  <!-- No truncate on the value: it is the one number the card exists to show;
+       long formats are shortened by the caller instead. -->
+  <span class="text-2xl font-bold font-code {accentClass}" {title}>{value}</span>
   {#if sparkPoints.length > 1}
     <svg
       viewBox="0 0 {SPARK_W} {SPARK_H}"

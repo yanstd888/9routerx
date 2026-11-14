@@ -8,7 +8,8 @@
   // exists — the API exposes no per-bucket in/out split, so the token cards
   // stay clean numbers.
   import { fmtTokens } from '../../lib/compactNumber'
-  import { costIn } from '../../lib/currency.svelte'
+  import { formatCompactCost, formatUsd } from '../../lib/currency'
+  import { costIn, currentCurrency } from '../../lib/currency.svelte'
   import KpiCard from '../../lib/components/dashboard/KpiCard.svelte'
   import { bucketDelta, type TrendBucket } from './trend'
   import { type StatsData } from './types'
@@ -38,6 +39,17 @@
   // The cost delta and its sparkline come straight from the bucket series.
   const costDelta = $derived(bucketDelta(trend.map((b) => b.cost || 0)))
   const costSeries = $derived(trend.map((b) => b.cost || 0))
+  // The cost KPI: the compact form keeps the value inside the card, the full
+  // formatted amount rides in the hover title, and with showBoth the raw USD
+  // stays under the value.
+  const costCurrency = $derived(currentCurrency())
+  const costValue = $derived(`~${formatCompactCost(stats.totalCost ?? 0, costCurrency)}`)
+  const costTitle = $derived(costIn(stats.totalCost ?? 0))
+  const costSub = $derived(
+    costCurrency.showBoth
+      ? `Estimated, not actual · ${formatUsd(stats.totalCost ?? 0, 2)}`
+      : 'Estimated, not actual'
+  )
 </script>
 
 <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 sm:gap-4">
@@ -69,11 +81,11 @@
   />
   <KpiCard
     label="Est. Cost"
-    value="~{costIn(stats.totalCost ?? 0)}"
-    title="Estimated, not actual"
+    value={costValue}
+    title={costTitle}
     accentClass="text-warning"
     delta={costDelta}
     series={costSeries}
-    sub="Estimated, not actual"
+    sub={costSub}
   />
 </div>

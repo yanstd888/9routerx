@@ -168,6 +168,41 @@ export function formatCost(usd: number, currency: DisplayCurrency, decimals = 2)
   return currency.showBoth ? `${primary} (${formatUsd(amount, decimals)})` : primary
 }
 
+/**
+ * The short form a KPI value renders: full formatting stays readable up to
+ * five digits; past that the locale's compact notation (id-ID "rb"/"jt",
+ * en "K"/"M") keeps the card from truncating the number it exists to show.
+ * Below the threshold this is byte-identical to formatCost.
+ */
+export function formatCompactCost(usd: number, currency: DisplayCurrency, decimals = 2): string {
+  const amount = Number.isFinite(usd) ? usd : 0
+  if (currency.code === 'USD') {
+    return compactCost(amount, 'en-US', 'USD', () => formatUsd(amount, decimals))
+  }
+  const converted = convertFromUsd(amount, currency)
+  if (converted === null) return formatCost(amount, currency, decimals)
+  return compactCost(converted, currencyOption(currency.code).locale, currency.code, () =>
+    formatCost(amount, currency, decimals)
+  )
+}
+
+// compactCost renders one display-space amount, compacting only past five
+// digits; the full closure is what small amounts (and every failure) get.
+function compactCost(display: number, locale: string, code: string, full: () => string): string {
+  if (Math.abs(display) < 10_000) return full()
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: code,
+      notation: 'compact',
+      compactDisplay: 'short',
+      maximumFractionDigits: 1,
+    }).format(display)
+  } catch {
+    return full()
+  }
+}
+
 /** A one-line summary of where the rates stand, for the settings panel. */
 export function describeRates(currency: DisplayCurrency): string {
   const codes = Object.keys(currency.rates).length
