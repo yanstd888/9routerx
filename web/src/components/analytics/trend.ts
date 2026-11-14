@@ -57,15 +57,32 @@ export function topFamilies(buckets: TrendBucket[]): TrendFamily[] {
       color: OTHER_COLOR,
     })
   }
+  // The bucket totals can exist without any family split at all (the chart
+  // API falls back to raw history when the daily rollup is empty). Plot a
+  // single synthetic "total" series instead of rendering an empty chart.
+  if (series.length === 0 && buckets.some((b) => (b.tokens || 0) > 0)) {
+    series.push({
+      family: 'total',
+      total: buckets.reduce((sum, b) => sum + (b.tokens || 0), 0),
+      color: FAMILY_VARS[0],
+    })
+  }
   return series
 }
 
 // seriesRows pivots the buckets into one row per label with a column per kept
 // family ("other" = the folded tail), the shape LayerChart's stacked area reads.
+// When no bucket carries a family split, the row carries the bucket total as
+// the synthetic "total" series instead.
 export function seriesRows(buckets: TrendBucket[], families: TrendFamily[]): Record<string, string | number>[] {
   const kept = families.filter((f) => f.family !== 'other').map((f) => f.family)
+  const totalsOnly = !buckets.some((b) => Object.values(b.byModel || {}).some((t) => (t || 0) > 0))
   return buckets.map((b) => {
     const row: Record<string, string | number> = { label: b.label }
+    if (totalsOnly) {
+      row['total'] = b.tokens || 0
+      return row
+    }
     for (const family of kept) {
       row[family] = b.byModel?.[family] || 0
     }

@@ -25,7 +25,11 @@
 
   const families = $derived(topFamilies(buckets))
   const rows = $derived(seriesRows(buckets, families))
-  const hasData = $derived(buckets.length >= 2 && rows.some((r) => families.some((f) => (r[f.family] as number) > 0)))
+  const hasData = $derived(
+    buckets.length >= 2 &&
+      (rows.some((r) => families.some((f) => (r[f.family] as number) > 0)) ||
+        buckets.some((b) => (b.tokens || 0) > 0))
+  )
 
   // Reactive: the families are derived from the buckets, and the config must
   // carry a color for each key the stacked series names (Chart.Style writes
