@@ -25,12 +25,7 @@ describe('topFamilies', () => {
   })
 
   test('without a real "other" the tail still folds into one', () => {
-    const buckets: TrendBucket[] = [
-      { label: 'a', tokens: 30, cost: 0, byModel: { alpha: 10, beta: 10, gamma: 10 } },
-      { label: 'b', tokens: 30, cost: 0, byModel: { alpha: 10, beta: 10, gamma: 10 } },
-    ]
-    const families = topFamilies(buckets)
-    // MAX_FAMILIES is 6; with three families nothing folds — force it small
+    // MAX_FAMILIES is 6; eight single-family buckets force a fold.
     const many: TrendBucket[] = Array.from({ length: 8 }, (_, i) => ({
       label: `b${i}`,
       tokens: 10,
