@@ -1,0 +1,45 @@
+# 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id
+name: Network smoke
+
+# Tests tagged //go:build network (AGENTS.md §5.E) smoke real upstreams, so
+# their verdict depends on services nobody here operates. They run weekly and
+# on demand — never on a push, where a rate limiter would read as a regression
+# and block unrelated work. A separate workflow (rather than a job in ci.yml)
+# keeps the schedule from waking every other job.
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  network:
+    name: Real-upstream smoke (network tag)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # web/dist must exist before any Go package compiles (web/embed.go).
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Build Web SPA
+        run: |
+          cd web
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+          cache: true
+
+      # Deliberately no ROUTERX_BLOCK_NET here: reaching real upstreams is the
+      # point of this job. Push-triggered jobs keep the seal and stay offline.
+      - name: Test network-tagged suites
+        run: go test -tags=network ./... -count=1 -timeout 20m

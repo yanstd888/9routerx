@@ -274,6 +274,14 @@ Unit tests call handlers directly or mount a hand-built router, so they cannot s
 5. **Do not boot `app.DatabaseModule` outside `bootfx/`, and boot it only once there.** `db.InitGlobalDatabase` is a process-wide `sync.Once` and `fxApp.Stop()` closes that handle for good, so a second boot in the same binary would reuse a closed database and an already-cancelled shutdown context.
 6. **Assert observable behaviour, not wiring.** A useful case pins a contract a client depends on (the status a client sees, the model the provider receives, the row written to `usageHistory`). Testing that a route exists, or that a handler forwards to itself, proves nothing. When a subtest looks for one row in a listed collection, select it by id and fail when it is absent — a loop that only errors on a match passes vacuously when the list comes back empty.
 
+### E. Real-Upstream Smoke Tests (`network` build tag)
+
+A test that dials a real provider is not a unit test: its result depends on the service's mood, its rate limiter, and the network between them. `go test ./...` — and therefore CI's `test` job — must stay offline. CI sets `ROUTERX_BLOCK_NET=1`, which seals outbound dials in every package whose tests import `internal/testnet`, so an un-stubbed call fails with "network disabled for tests — stub your upstream" instead of a mystery 403 from the real service.
+
+1. **Tag any file that needs real egress `//go:build network`** on its first line. Tagged files do not compile into `go test ./...`, `go vet ./...`, or any push-triggered CI job.
+2. **They run weekly** in the scheduled `network-smoke.yml` workflow (and on demand via its `workflow_dispatch`). A failing smoke there signals an upstream contract change, not a broken PR.
+3. **Prefer a stub.** If the behaviour under test can be exercised against an `httptest` fake, it does not belong behind the tag: write the fake, keep the test in the normal suite, and let the weekly job stay for what only a real upstream can answer (live model catalogs, real credential flows).
+
 ---
 
 ## 6. Frontend Engineering & Svelte 5 Standards (`web/`)
