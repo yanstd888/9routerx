@@ -611,7 +611,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {@render sectionMenu()}
 
-      <PeriodSelect value={period} busy={isFetching} onChange={(next) => (period = next)} />
+      <PeriodSelect value={period} onChange={(next) => (period = next)} />
     </div>
   {/if}
 
