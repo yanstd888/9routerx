@@ -19,6 +19,45 @@
 
   let { label, value, title = '', sub = '', delta = null, series = [], accentClass = 'text-text-main' }: Props = $props()
 
+  // fitText steps the value's font down (2xl → xl → lg) until it fits the
+  // card: the value is the one number the card exists to show, so it is
+  // never truncated and never clipped — a long IDR/EUR amount renders a
+  // size smaller instead. The class starts at text-2xl for the SSR render;
+  // the action takes over on mount and on every value change.
+  const VALUE_SIZES = ['text-2xl', 'text-xl', 'text-lg']
+  function fitText(node: HTMLElement, text: string) {
+    let idx = 0
+    let pending = 0
+    function apply() {
+      node.classList.remove(...VALUE_SIZES)
+      node.classList.add(VALUE_SIZES[idx])
+    }
+    function fit() {
+      cancelAnimationFrame(pending)
+      pending = requestAnimationFrame(() => {
+        while (node.scrollWidth > node.clientWidth && idx < VALUE_SIZES.length - 1) {
+          idx++
+          apply()
+        }
+      })
+    }
+    apply()
+    fit()
+    document.fonts?.ready.then(fit)
+    return {
+      update(next: string) {
+        if (next === text) return
+        text = next
+        idx = 0
+        apply()
+        fit()
+      },
+      destroy() {
+        cancelAnimationFrame(pending)
+      },
+    }
+  }
+
   const hasDelta = $derived(delta !== null && delta !== undefined && Number.isFinite(delta))
   const deltaUp = $derived((delta ?? 0) >= 0)
   // The badge rounds away vanishing changes: |Δ| < 0.05% renders as flat.
@@ -77,8 +116,8 @@
     {/if}
   </div>
   <!-- No truncate on the value: it is the one number the card exists to show;
-       long formats are shortened by the caller instead. -->
-  <span class="text-2xl font-bold font-code {accentClass}" {title}>{value}</span>
+       long formats shrink a font step instead (fitText above). -->
+  <span class="text-2xl font-bold font-code {accentClass}" use:fitText={value} {title}>{value}</span>
   {#if sparkPoints.length > 1}
     <svg
       viewBox="0 0 {SPARK_W} {SPARK_H}"
