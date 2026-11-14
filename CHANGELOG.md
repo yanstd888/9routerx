@@ -14,6 +14,43 @@ Release history up to the fork point is archived in the upstream repo's
   the pending-fragment splice now lands under this Unreleased heading instead
   of above the file title.
 
+## [v1.2.1] - 2026-11-14
+
+### Added
+
+- **Three-way comparison docs** — a `9RouterX vs 9Router vs OmniRoute` section in the
+  README (facts-first table with live-checked star counts, on-paper wording where no
+  public benchmark exists) and a matching wiki page with the OmniRoute column.
+
+### Fixed
+
+- **Usage analytics batch** — the period picker no longer locks up while the 5-second
+  usage polls run; request-details pagination uses one page size everywhere and resets
+  on a period switch (a stale page no longer strands an empty list); the usage chart
+  falls back to raw usage history when the daily rollup is empty (tokens, cost and the
+  all-time window span), so the chart no longer draws zeros next to real data; buckets
+  that carry totals without a model split render as a single series; the Est. Cost card
+  renders a compact amount (`Rp 25,3 rb`, `$25.3K`) instead of truncating, with the full
+  figure on hover.
+- **Usage stats fallback** — day+ windows (7d/30d/60d/90d/all/custom Nd) recompute from
+  raw history when the `usageDaily` rollup carries nothing, so the stats cards agree
+  with the chart instead of reading zero. A populated rollup still wins; an empty
+  window stays empty.
+- **Test stability** — the elevenlabs voices test stubs its upstream URL instead of
+  calling the real API; the CI test job runs with outbound network sealed
+  (`ROUTERX_BLOCK_NET=1`), so an un-stubbed upstream fails with an explicit message;
+  the bootfx integration test polls briefly for asynchronously written usage rows;
+  real-upstream smoke tests get a `//go:build network` tag run weekly instead of on
+  every push.
+
+### Notes
+
+- The Details tab reads `requestDetails` after the retention pruner has kept the newest
+  5,000 rows, so very long windows report the retained total rather than everything the
+  ledger ever wrote; `usageHistory` retention is separate.
+- "Today" on the dashboard is the server's local calendar day (local midnight), not a
+  UTC day — comparisons against a UTC-range SQL query will differ by the UTC offset.
+
 ## [v1.2.0] - 2026-11-13
 
 ### Added
