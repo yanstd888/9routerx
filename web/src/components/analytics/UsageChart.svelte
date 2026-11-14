@@ -112,11 +112,17 @@
       color: FAMILY_COLORS[i % FAMILY_COLORS.length],
     }))
     if (tail.length > 0) {
-      series.push({
-        family: 'other',
-        total: tail.reduce((sum, [, t]) => sum + t, 0),
-        color: OTHER_COLOR,
-      })
+      // "other" can already sit in the kept series (the backend folds tail
+      // families into an "other" bucket of its own). Merge into it instead of
+      // pushing a second entry — a duplicate family name hands the chart's
+      // keyed each two identical keys and kills the page's reactivity.
+      const tailTotal = tail.reduce((sum, [, t]) => sum + t, 0)
+      const existing = series.find((s) => s.family === 'other')
+      if (existing) {
+        existing.total += tailTotal
+      } else {
+        series.push({ family: 'other', total: tailTotal, color: OTHER_COLOR })
+      }
     }
     return series
   })

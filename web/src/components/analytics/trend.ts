@@ -51,11 +51,17 @@ export function topFamilies(buckets: TrendBucket[]): TrendFamily[] {
     color: FAMILY_VARS[i % FAMILY_VARS.length],
   }))
   if (tail.length > 0) {
-    series.push({
-      family: 'other',
-      total: tail.reduce((sum, [, t]) => sum + t, 0),
-      color: OTHER_COLOR,
-    })
+    // The backend can fold tail families into an "other" bucket of its own,
+    // so "other" may already sit in the kept series. Merging into it keeps
+    // the family list unique: a duplicate would hand the chart's keyed each
+    // two entries with the same key and kill the page's reactivity.
+    const tailTotal = tail.reduce((sum, [, t]) => sum + t, 0)
+    const existing = series.find((s) => s.family === 'other')
+    if (existing) {
+      existing.total += tailTotal
+    } else {
+      series.push({ family: 'other', total: tailTotal, color: OTHER_COLOR })
+    }
   }
   // The bucket totals can exist without any family split at all (the chart
   // API falls back to raw history when the daily rollup is empty). Plot a
