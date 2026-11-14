@@ -308,6 +308,10 @@ func TestHandleAudioVoices_elevenlabs(t *testing.T) {
 	}))
 	defer upstream.Close()
 
+	origVoicesURL := elevenVoicesURL
+	elevenVoicesURL = upstream.URL + "/v1/voices"
+	defer func() { elevenVoicesURL = origVoicesURL }()
+
 	handler := chat.NewChatHandler(nil)
 	req := httptest.NewRequest("GET", "/v1/audio/voices?provider=elevenlabs", nil)
 	rec := httptest.NewRecorder()

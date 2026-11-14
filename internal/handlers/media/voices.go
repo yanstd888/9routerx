@@ -24,13 +24,18 @@ import (
 // local-device | elevenlabs | gemini, ?lang=<code> filter, ?apiKey for elevenlabs.
 
 const (
+	edgeUA         = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+	voicesCacheTTL = 24 * time.Hour
+)
+
+// Upstream listing endpoints are vars so tests can stub the upstream (the
+// same pattern as edgeVoicesURL below); the defaults are the production URLs.
+var (
 	elevenVoicesURL   = "https://api.elevenlabs.io/v1/voices"
 	deepgramModelsURL = "https://api.deepgram.com/v1/models"
 	inworldVoicesURL  = "https://api.inworld.ai/tts/v1/voices"
 	minimaxVoiceURL   = "https://api.minimax.io/v1/get_voice"
 	minimaxCNVoiceURL = "https://api.minimaxi.com/v1/get_voice"
-	edgeUA            = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
-	voicesCacheTTL    = 24 * time.Hour
 )
 
 // edgeVoicesURL is a var so tests can stub the upstream.
