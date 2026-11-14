@@ -21,7 +21,7 @@ If 9RouterX helps you, please give it a star — it helps other developers find 
 [![Telegram Community](https://img.shields.io/badge/Telegram-%40aiclub__id-26A5E4?style=flat-square&logo=telegram)](https://t.me/aiclub_id)
 [![Source port](https://img.shields.io/badge/port-20128-2563EB?style=flat-square)](https://yanstd888.github.io/9routerx/)
 
-[Quick Start](#quick-start) • [Why 9RouterX?](#why-9routerx) • [Key Features](#key-features) • [Supported Clients](#supported-ai-coding-clients) • [Free Providers](#free-ai-providers-and-keyless-models-catalog) • [Database Sharing](#sharing-a-database-with-9router) • [Screenshots](#screenshots) • [Setup Guide](#setup-guide-summary-and-wiki-documentation) • [Comparison](#architecture-comparison) • [FAQ](#frequently-asked-questions-faq) • [Docs](#docs) • [Wiki](https://yanstd888.github.io/9routerx/)
+[Quick Start](#quick-start) • [Why 9RouterX?](#why-9routerx) • [Key Features](#key-features) • [Supported Clients](#supported-ai-coding-clients) • [Free Providers](#free-ai-providers-and-keyless-models-catalog) • [Database Sharing](#sharing-a-database-with-9router) • [Screenshots](#screenshots) • [Setup Guide](#setup-guide-summary-and-wiki-documentation) • [Comparison](#9routerx-vs-9router-vs-omniroute) • [Architecture Comparison](#architecture-comparison) • [FAQ](#frequently-asked-questions-faq) • [Docs](#docs) • [Wiki](https://yanstd888.github.io/9routerx/)
 
 **155** Providers · **28** OAuth One-Click · **29** Free-Tier · **248** Free Models (**24** Keyless) · **20–40%** Token Saved · **5** Platforms · **1** Binary
 
@@ -43,6 +43,40 @@ AI-assisted software engineering workflows suffer from fragmented monthly subscr
 * **Silent Endpoint Failures & Broken Tool Calls → Active Health Probing & Auto-Repair:** Upstream LLM providers frequently return malformed JSON tool-call arguments, truncated schemas, or suffer silent latency degradation. 9RouterX repairs broken tool-call structures in transit (`tool-call repair fallback`), guards against SSRF dispatch and leaks via PII masking, and continuously tracks live endpoint health (`internal/modelhealth`, `internal/resilience`) with a 3-tier circuit breaker to bypass degraded nodes automatically.
 * **Redundant Repeated Prompts → Semantic & Prompt Caching:** Reduce round-trip latency and API token billing through local vector-similarity semantic caching (`internal/semanticcache`) combined with automatic upstream prompt cache header passthrough (`internal/promptcache`) and zero-allocation FastJSON parsing (`internal/fastjson`).
 * **Heavy Runtime Dependencies → Single Self-Contained Go Binary:** No Node.js runtime memory bloat, no Python virtual environments, and no external PostgreSQL or Redis containers required. Everything—including the reactive Svelte 5 dashboard, SQLite storage engine, MCP server, and MITM inspector—runs from a single native binary across Linux (`x64`/`arm64`), macOS (`x64`/`arm64`), and Windows (`x64`).
+
+## 9RouterX vs 9Router vs OmniRoute
+
+9RouterX is a Go port of 9Router (decolua) that grew its own feature set, and sits in the same self-hosted gateway space as OmniRoute (cheaper-inference). Everything in the table below is a verifiable fact — where a claim has no public benchmark behind it, it is marked *on paper* rather than given a number. Star counts were checked live on **Nov 14, 2026** and move constantly; judge the projects by the feature rows, not the star rows.
+
+| Metric | **9RouterX** (this repo) | **9Router** (decolua) | **OmniRoute** (cheaper-inference) |
+| :--- | :--- | :--- | :--- |
+| GitHub stars (Nov 14, 2026) | 68 | 32,422 | 87,366 |
+| Language / runtime | Go, single native binary + Svelte 5 dashboard | JavaScript / Node.js + Next.js | TypeScript / Node.js |
+| Install | One native binary (~48 MB linux-amd64), zero runtime dependencies | `npm i -g 9router` (6 deps, requires Node.js) | npm (~105 deps) / Docker / pnpm |
+| Providers | 155 (91 API · 28 OAuth · 29 free · 4 cookie) | 40+ | 375–380 (150+ free) |
+| Free models | 248 across 36 providers (24 keyless) | 100+ | 1,400+ models, ~1.62B free tokens/mo |
+| Dashboard | Svelte 5 + Vite + Tailwind 4, embedded (1 dashboard dependency) | Next.js React app | Desktop / PWA |
+| Database | Embedded SQLite, drop-in schema-compatible | Same SQLite schema | SQLite |
+| Usage under heavy traffic | *On paper:* a compiled native process — one process for the gateway, the dashboard and the SQLite engine, no V8 heap or GC pauses growing with the request queue. No public benchmark yet; measure on your workload. | *On paper:* Node.js runtime (V8 + event loop); sustained throughput depends on the Node version and warm-up state | *On paper:* Node.js runtime, same caveats |
+| Latency profile | *On paper:* no cold-start tax after boot; hot paths are allocation-conscious Go | *On paper:* first-request warm-up on the Node side | *On paper:* first-request warm-up on the Node side |
+
+### What 9RouterX adds on top of 9Router
+
+9RouterX started as a Go port of 9Router and then built its own layer on top. Against upstream 9Router, this repository adds: **full per-key governance** (daily USD cutoffs, request limits, IP whitelists, plan templates, PII masking — vs basic key auth), a **semantic cache + prompt cache** layer (vs passthrough), the **Token Saver suite** (20–40% RTK compression, 50+ per-tool output filters, GCF headroom compression, context squeezer, tool-call repair — vs not included), a **catalog of 248 free models across 36 providers (24 keyless)**, and the **MCP server, A2A, TLS stealth, MITM inspector, multi-target webhooks, Telegram bot and Vault** modules. Both share the same SQLite schema — an existing 9Router database drops straight into 9RouterX.
+
+### Where OmniRoute is bigger
+
+OmniRoute's catalog is larger, stated plainly: roughly 375–380 providers (150+ of them free), 1,400+ models, a pooled ~1.62B free tokens/month allowance, 20 routing strategies, and quota-aware fallback. That breadth is their strength. Where 9RouterX differs: it ships as **one Go binary with zero runtime dependencies** (vs an npm install pulling ~105 packages), stays light enough for **small self-hosted machines**, offers **deeper per-key financial governance**, and embeds the **Svelte 5 dashboard in the same binary**. Compare features against what you host — neither replaces the other.
+
+### Go + Svelte vs a Node stack
+
+The architecture choice shows up in operations, not in synthetic benchmarks (*on paper throughout — no public benchmark; measure on your own workload*):
+
+- **Distribution:** one native binary per platform (`linux-x64`, `linux-arm64`, `win32-x64`, `darwin-x64`, `darwin-arm64`) vs `npm install` bringing the Node runtime and `node_modules` with it.
+- **Cold start:** the Go gateway serves its first request right after boot; a Node service warms up its runtime and module graph first.
+- **Baseline memory:** Go processes of comparable scope typically idle lower than Node processes — actual numbers depend on traffic shape and cache sizes.
+- **Sustained load:** no V8 GC pauses or event-loop saturation on the gateway side; the traffic pattern that queues a Node event loop is handled by Go goroutines.
+- **Updates:** a self-update swaps one binary (`9routerx update`); a Node project updates through its package manager and restarts.
 
 ## System Architecture
 
