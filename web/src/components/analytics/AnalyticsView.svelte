@@ -251,17 +251,25 @@
     }
   }
 
+  const DETAILS_PAGE_SIZE = 20
+
   async function loadDetails(page = 1, window: Period = period) {
     detailsLoading = true
     detailsError = ''
     try {
-      const limit = 20
+      const limit = DETAILS_PAGE_SIZE
       const offset = (page - 1) * limit
       const res = await api.getRequestDetails(limit, offset, window)
       if (res && Array.isArray(res.details)) {
         details = res.details
         detailsTotal = res.total || 0
         detailsPage = page
+        // A period switch can leave the page pointing past the end of the
+        // new window; fall back to the last page that actually has rows.
+        if (details.length === 0 && detailsPage > 1 && detailsTotal > 0) {
+          const last = Math.ceil(detailsTotal / DETAILS_PAGE_SIZE)
+          if (last < detailsPage) return loadDetails(last, window)
+        }
       }
     } catch (err) {
       detailsError = normalizeLastError(err) || 'Request details could not be loaded.'
@@ -611,7 +619,13 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {@render sectionMenu()}
 
-      <PeriodSelect value={period} onChange={(next) => (period = next)} />
+      <PeriodSelect
+      value={period}
+      onChange={(next) => {
+        period = next
+        detailsPage = 1
+      }}
+    />
     </div>
   {/if}
 
@@ -794,6 +808,7 @@
       {details}
       {detailsTotal}
       {detailsPage}
+      pageSize={DETAILS_PAGE_SIZE}
       {detailsLoading}
       {detailsError}
       onPageChange={loadDetails}

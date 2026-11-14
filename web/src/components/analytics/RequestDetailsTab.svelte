@@ -27,6 +27,8 @@
     details?: RequestDetailItem[]
     detailsTotal?: number
     detailsPage?: number
+    /** Rows per page; must match the limit AnalyticsView loads with. */
+    pageSize?: number
     detailsLoading?: boolean
     onPageChange: (page: number) => void
     /** Set when the read failed, so the table below is not read as current. */
@@ -41,6 +43,7 @@
     details = [],
     detailsTotal = 0,
     detailsPage = 1,
+    pageSize = 20,
     detailsLoading = false,
     detailsError = '',
     onPageChange,
@@ -302,7 +305,7 @@
     </div>
 
     <!-- Pagination -->
-    {#if detailsTotal > 50}
+    {#if detailsTotal > pageSize}
       <div class="px-4 py-3 border-t border-border flex items-center justify-between text-xs text-text-muted bg-surface-2 font-body">
         <div>
           Showing {details.length} of {detailsTotal.toLocaleString()} requests (Page {detailsPage})
@@ -319,7 +322,7 @@
           <Button
             variant="secondary"
             size="sm"
-            disabled={detailsPage * 50 >= detailsTotal}
+            disabled={detailsPage * pageSize >= detailsTotal}
             onclick={() => onPageChange(detailsPage + 1)}
           >
             Next
