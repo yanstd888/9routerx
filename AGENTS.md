@@ -281,6 +281,7 @@ A test that dials a real provider is not a unit test: its result depends on the 
 1. **Tag any file that needs real egress `//go:build network`** on its first line. Tagged files do not compile into `go test ./...`, `go vet ./...`, or any push-triggered CI job.
 2. **They run weekly** in the scheduled `network-smoke.yml` workflow (and on demand via its `workflow_dispatch`). A failing smoke there signals an upstream contract change, not a broken PR.
 3. **Prefer a stub.** If the behaviour under test can be exercised against an `httptest` fake, it does not belong behind the tag: write the fake, keep the test in the normal suite, and let the weekly job stay for what only a real upstream can answer (live model catalogs, real credential flows).
+4. **Jangan andalkan transport bawaan upstream — do not rely on an upstream-provided transport.** The seal replaces the dialer on `http.DefaultTransport` only, so a transport a test builds fresh (`httptest.Server.Client()`) is invisible to it. When the code under test owns an `*http.Client`, inject that client in the test *and* point the URL at the stub: the elevenlabs voices test failed in CI for exactly this combination (a real URL plus a client the seal never wrapped).
 
 ---
 
