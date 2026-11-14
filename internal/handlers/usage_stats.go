@@ -76,6 +76,17 @@ func resolveUsagePeriod(raw string, now time.Time) usagePeriod {
 	return usagePeriod{daily: true, days: 7}
 }
 
+// fallbackRawWindow mirrors the calendar-day span the daily rollup read
+// covered: local midnight, (days-1) days back — the same seven calendar days
+// the usageDaily rows would have summed for "7d". The anchored shape shares
+// the raw-window cache with the sub-day windows, so repeated polls of a
+// fallback window advance by delta instead of rescanning.
+func fallbackRawWindow(window usagePeriod, now time.Time) usagePeriod {
+	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).
+		AddDate(0, 0, -(window.days - 1))
+	return usagePeriod{since: start, shape: anchoredShape(start)}
+}
+
 // usagePeriodCount parses the "<n><unit>" shorthand, accepting only a positive
 // count with no sign or decimal part.
 func usagePeriodCount(raw, unit string) (int, bool) {
@@ -244,7 +255,8 @@ func parseUsageStatsViews(raw string) usageStatsViews {
 
 func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		window := resolveUsagePeriod(r.URL.Query().Get("period"), time.Now())
+		now := time.Now()
+		window := resolveUsagePeriod(r.URL.Query().Get("period"), now)
 		views := parseUsageStatsViews(r.URL.Query().Get("views"))
 
 		tracker := usagetracker.GetTracker()
@@ -513,6 +525,35 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 							resp.ByEndpoint[epKey] = cur
 						}
 					}
+				}
+			}
+
+			// The rollup is an optimisation, not the source of truth: an empty
+			// or lost usageDaily table would leave the cards at zero while the
+			// chart — which falls back to raw history — shows real usage. When
+			// the fold contributed nothing, recompute over the same calendar
+			// span from raw history. A populated rollup keeps its numbers and
+			// the fallback never runs.
+			rollupEmpty := true
+			for _, p := range resp.ByProvider {
+				if p.Requests != 0 || p.PromptTokens != 0 || p.CompletionTokens != 0 || p.Cost != 0 {
+					rollupEmpty = false
+					break
+				}
+			}
+			if rollupEmpty {
+				fb := fallbackRawWindow(window, now)
+				agg, err := rawWindows.getRawWindow(repo, fb)
+				if err != nil {
+					handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
+					return
+				}
+				applyRawAggregate(&resp, agg, nodeNameMap, connMap, keyNames, views)
+				// Mirror the sub-day branch: errors that only exist in
+				// requestDetails (a failure that never wrote a usage row) are
+				// counted on top of the ledger rows.
+				if errCount, err := repo.GetRequestDetailsErrorCountSince(r.Context(), fb.since.UTC().Format("2006-01-02T15:04:05.000Z")); err == nil {
+					resp.TotalErrors = errCount
 				}
 			}
 		} else {
