@@ -14,6 +14,19 @@ Release history up to the fork point is archived in the upstream repo's
   the pending-fragment splice now lands under this Unreleased heading instead
   of above the file title.
 
+## [v1.2.2] - 2026-11-15
+
+### Fixed
+
+- **Usage page froze on real data** — a 30-day window whose live data carried a real
+  `other` model family inside the top six, plus smaller families below the cutoff,
+  produced two chart series named `other` once the tail fold ran. The duplicate key
+  crashed the chart render mid-update, which froze every reactive update on the page:
+  the period picker and the section menu stopped responding until a hard reload, and
+  the remembered period made it look permanently stuck on Last 30 days. Both the
+  analytics trend chart and the overview usage chart now merge the tail total into the
+  existing `other` entry instead of pushing a second one.
+
 ## [v1.2.1] - 2026-11-14
 
 ### Added

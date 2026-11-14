@@ -1,12 +1,12 @@
 {
-  "latestVersion": "1.2.1",
+  "latestVersion": "1.2.2",
   "downloadUrl": "https://github.com/yanstd888/9routerx/releases/latest",
   "downloadUrls": {
-    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.1/9routerx-linux-amd64",
-    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.1/9routerx-linux-arm64",
-    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.1/9routerx-darwin-amd64",
-    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.1/9routerx-darwin-arm64",
-    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.1/9routerx-windows-amd64.exe"
+    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.2/9routerx-linux-amd64",
+    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.2/9routerx-linux-arm64",
+    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.2/9routerx-darwin-amd64",
+    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.2/9routerx-darwin-arm64",
+    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.2.2/9routerx-windows-amd64.exe"
   },
   "sha256s": {
     "darwin_amd64": "28f2b86c5d3ef687ebcb6b0361502df5d1031ec18357ba598d4e79b4f4337716",
