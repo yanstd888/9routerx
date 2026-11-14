@@ -281,7 +281,14 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      # ROUTERX_BLOCK_NET=1 boots every package whose tests import
+      # internal/testnet with outbound network sealed: a test that forgot to
+      # stub its upstream fails with "network disabled for tests — stub your
+      # upstream" instead of whatever the real service's rate limiter answers
+      # that day. httptest servers are loopback and stay reachable.
       - name: Test
+        env:
+          ROUTERX_BLOCK_NET: "1"
         run: go test ./... -v
 
       # The binary is built with Go's default -pgo=auto, which silently stops

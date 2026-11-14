@@ -24,6 +24,16 @@ import (
 	"syscall"
 )
 
+func init() {
+	// The CI test job sets ROUTERX_BLOCK_NET=1 so every package whose tests
+	// blank-import this one boots sealed; packages whose TestMain calls Seal
+	// explicitly are sealed either way (Seal is idempotent). Without the env
+	// the import is inert and local runs behave exactly as before.
+	if os.Getenv("ROUTERX_BLOCK_NET") == "1" {
+		Seal()
+	}
+}
+
 // dialer is the loopback-only replacement for the transport dialer.
 var dialer = &net.Dialer{
 	Control: func(network, address string, _ syscall.RawConn) error {
@@ -33,7 +43,7 @@ var dialer = &net.Dialer{
 		}
 		ip := net.ParseIP(host)
 		if ip == nil || (!ip.IsLoopback() && !ip.IsUnspecified()) {
-			return fmt.Errorf("testnet: outbound blocked to %s", address)
+			return fmt.Errorf("network disabled for tests — stub your upstream (outbound blocked to %s)", address)
 		}
 		return nil
 	},
