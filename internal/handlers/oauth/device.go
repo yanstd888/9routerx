@@ -22,7 +22,7 @@ import (
 // deviceProviders lists providers supporting the device-code family.
 // kimi-coding aliases to kimi (dual-auth merge, like upstream).
 var deviceProviders = []string{
-	"qoder", "qoder-cn", "kilocode", "megabrain", "workbuddy", "grok-cli", "github", "kiro", "amazon-q", "kimi", "kimi-coding",
+	"qoder", "qoder-cn", "kilocode", "megabrain", "workbuddy", "grok-cli", "github", "ghe-copilot", "kiro", "amazon-q", "kimi", "kimi-coding",
 	"codebuddy-cn", "codebuddy-intl", "muse", "minimax-code", "minimax-code-global", "nous",
 	"glm", "zcode",
 }
@@ -167,6 +167,7 @@ func (h *OAuthHandler) HandleDeviceStart(w http.ResponseWriter, r *http.Request)
 		Region     string `json:"region"`
 		StartURL   string `json:"startUrl"`
 		AuthMethod string `json:"authMethod"`
+		GHEURL     string `json:"gheUrl"`
 	}
 	if raw, err := io.ReadAll(io.LimitReader(r.Body, 1<<20)); err == nil && len(raw) > 0 {
 		_ = json.Unmarshal(raw, &body)
@@ -176,7 +177,13 @@ func (h *OAuthHandler) HandleDeviceStart(w http.ResponseWriter, r *http.Request)
 		handlerutil.WriteJSONError(w, http.StatusBadRequest, "unsupported provider for device flow")
 		return
 	}
-	out, err := deviceStart(r.Context(), provider, body.Region, body.StartURL, body.AuthMethod)
+	var out map[string]any
+	var err error
+	if provider == "ghe-copilot" {
+		out, err = gheStart(r.Context(), body.GHEURL)
+	} else {
+		out, err = deviceStart(r.Context(), provider, body.Region, body.StartURL, body.AuthMethod)
+	}
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		return
@@ -361,10 +368,9 @@ func grokcliStart(ctx context.Context) (map[string]any, error) {
 // --- github: standard device flow ---
 
 func githubStart(ctx context.Context) (map[string]any, error) {
-	form := url.Values{"client_id": {"Iv1.b507a08c87ecfe98"}, "scope": {"read:user"}}
-	data, status, err := postForm(ctx, "https://github.com/login/device/code", form, nil)
-	if err != nil || status != http.StatusOK {
-		return nil, fmt.Errorf("device code request failed: %v status=%d", err, status)
+	data, err := (githubDeviceFlow{"Iv1.b507a08c87ecfe98", "https://github.com/login/device/code", "https://github.com/login/oauth/access_token", postForm}).start(ctx)
+	if err != nil {
+		return nil, err
 	}
 	data["session"] = map[string]any{}
 	return data, nil
@@ -546,6 +552,8 @@ func devicePoll(ctx context.Context, provider, code string, session map[string]a
 		t, err = grokcliPoll(ctx, code)
 	case "github":
 		t, err = githubPoll(ctx, code)
+	case "ghe-copilot":
+		t, err = ghePoll(ctx, code, session)
 	case "kiro":
 		t, err = kiroPoll(ctx, session, code)
 	case "amazon-q":
@@ -592,7 +600,7 @@ func (h *OAuthHandler) saveDeviceConnection(provider string, t deviceTokens) sav
 	}
 	name := connectionDisplayName(provider, t.name, email, map[string]string{
 		"qoder": "Qoder", "qoder-cn": "Qoder CN", "kilocode": "KiloCode", "megabrain": "MegaBrain", "workbuddy": "WorkBuddy", "grok-cli": "Grok CLI",
-		"github": "GitHub", "kiro": "Kiro", "amazon-q": "Amazon Q", "kimi": "Kimi", "muse": "Muse",
+		"github": "GitHub", "ghe-copilot": "GHE Copilot", "kiro": "Kiro", "amazon-q": "Amazon Q", "kimi": "Kimi", "muse": "Muse",
 		"codebuddy-cn": "CodeBuddy", "codebuddy-intl": "CodeBuddy",
 		"zcode": "ZCode",
 		"nous":  "Nous Research", "glm": "Zai GLM Coding",
@@ -890,11 +898,7 @@ func grokcliPoll(ctx context.Context, code string) (deviceTokens, error) {
 
 func githubPoll(ctx context.Context, code string) (deviceTokens, error) {
 	var t deviceTokens
-	form := url.Values{
-		"client_id": {"Iv1.b507a08c87ecfe98"}, "device_code": {code},
-		"grant_type": {"urn:ietf:params:oauth:grant-type:device_code"},
-	}
-	data, _, err := postForm(ctx, "https://github.com/login/oauth/access_token", form, nil)
+	data, _, err := (githubDeviceFlow{"Iv1.b507a08c87ecfe98", "https://github.com/login/device/code", "https://github.com/login/oauth/access_token", postForm}).poll(ctx, code)
 	if err != nil {
 		return t, fmt.Errorf("poll_failed: %v", err)
 	}

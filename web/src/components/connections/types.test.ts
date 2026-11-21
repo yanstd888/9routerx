@@ -94,6 +94,7 @@ describe('getIconPath', () => {
     // the alias too, which is why no second copy of glm.png is committed: a
     // duplicate would never be requested and would silently drift.
     expect(getIconPath('zcode')).toBe('/providers/glm.png')
+    expect(getIconPath('ghe-copilot')).toBe('/providers/github.png')
   })
 
   test('keeps the generic glyphs for compatible nodes and unknown ids', () => {

@@ -2417,7 +2417,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
-  deviceStart: (provider: string, opts?: { region?: string; startUrl?: string; authMethod?: string }) =>
+  deviceStart: (provider: string, opts?: { region?: string; startUrl?: string; authMethod?: string; gheUrl?: string }) =>
     request<{ device_code: string; user_code: string; verification_uri: string; verification_uri_complete: string; expires_in: number; interval: number; session: Record<string, unknown> }>(
       '/api/oauth/device/start',
       { method: 'POST', body: JSON.stringify({ provider, ...opts }) }

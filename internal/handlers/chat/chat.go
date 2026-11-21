@@ -360,7 +360,8 @@ func (h *ChatHandler) HandleMessages(w http.ResponseWriter, r *http.Request) {
 	// instead of being converted to OpenAI first. Anthropic itself is the
 	// historical case; minimax-code serves the same wire on MiniMax's mavis
 	// gateway (open-sse/config/providers.js transport.format).
-	claudeNative := modelInfo.Provider == "claude" || modelInfo.Provider == "anthropic"
+	claudeNative := modelInfo.Provider == "claude" || modelInfo.Provider == "anthropic" ||
+		(modelInfo.Provider == "ghe-copilot" && h.gheTargetFormat(modelInfo.Model, modelInfo.ConnectionID) == providers.FormatClaude)
 	var providerCfg *providers.ProviderConfig
 	if cfg, err := h.GetProviderConfig(modelInfo.Provider, nil); err == nil {
 		providerCfg = cfg

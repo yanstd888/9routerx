@@ -15,6 +15,7 @@ export interface ProviderModel {
 }
 
 export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
+  "ghe-copilot": "ghe-copilot",
   "devin-desktop": "devin-desktop",
   "volcengine-agent-plan": "veap",
   "volcengine-coding-plan": "vecp",
@@ -347,6 +348,11 @@ const FREEBUFF_MODELS: ProviderModel[] = [
 ];
 
 export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
+  "ghe-copilot": [
+    "claude-fable-5", "claude-opus-5", "claude-opus-4.8-fast", "claude-opus-4.8", "claude-opus-4.7", "claude-sonnet-4.6", "claude-opus-4.5", "claude-sonnet-5", "claude-sonnet-5-5", "claude-sonnet-4.5", "claude-haiku-4.5",
+    "gemini-3.1-pro-preview", "gemini-3.7-flash", "gpt-6.1-terra", "gpt-6.1-sol", "gpt-6-luna", "gpt-6-sol", "gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5-mini",
+    "gpt-4o-2024-11-20", "gpt-4o-mini", "gpt-4-0125-preview", "kimi-k2.7-code", "mai-code-1-flash", "oswe-vscode-prime",
+  ].map((id) => ({ id, name: id })),
   "devin-desktop": [
   {
     "id": "claude-fable-5-1-max",

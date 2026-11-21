@@ -15,6 +15,7 @@ import (
 	"9routerx/proxy/internal/handlerutil"
 	"9routerx/proxy/internal/log"
 	"9routerx/proxy/internal/middleware"
+	"9routerx/proxy/internal/providers"
 	internalproxy "9routerx/proxy/internal/proxy"
 	"9routerx/proxy/internal/proxy/executor"
 	"9routerx/proxy/internal/thinking"
@@ -189,7 +190,8 @@ func (h *ChatHandler) newResponsesContext(r *http.Request, requestedModel string
 	ctx = withGuardrailKey(ctx, requestKeyID(r))
 
 	providerCfg, err := h.getProviderConfig(modelInfo.Provider, nil)
-	if err == nil && executor.UpstreamSpeaksResponses(modelInfo.Provider, modelInfo.Model, providerCfg) {
+	if (modelInfo.Provider == "ghe-copilot" && h.gheTargetFormat(modelInfo.Model, modelInfo.ConnectionID) == providers.FormatOpenAIResponses) ||
+		(err == nil && executor.UpstreamSpeaksResponses(modelInfo.Provider, modelInfo.Model, providerCfg)) {
 		log.Debug("chat", "responses passthrough", "provider", modelInfo.Provider, "model", modelInfo.Model)
 		return ctx
 	}

@@ -19,6 +19,7 @@ const (
 // with more than one transport declare it; everything else routes on the
 // transport its base URL already names.
 var ProviderModelFormats = map[string]map[string]ModelFormats{
+	"ghe-copilot": gheCopilotFormats,
 	"muse":         museModelFormats,
 	"kimi":         kimiModelFormats,
 	"kimi-coding":  kimiModelFormats,

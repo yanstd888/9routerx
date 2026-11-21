@@ -300,6 +300,12 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:      "https://cursor.com",
 		Notice:       &Notice{SignupURL: "https://cursor.com"},
 	},
+	"ghe-copilot": {
+		ID: "ghe-copilot", Name: "GHE Copilot", Alias: "ghe-copilot",
+		Category: CategoryOAuth, AuthType: "oauth", Color: "#333333", Icon: "code",
+		ServiceKinds: []string{"llm"}, Website: "https://github.com/features/copilot",
+		AuthHint: "Enter your GitHub Enterprise HTTPS instance URL, then sign in with a device code. The instance issues a separate short-lived Copilot token for inference.",
+	},
 	"github": {
 		ID:           "github",
 		Name:         "GitHub Copilot",

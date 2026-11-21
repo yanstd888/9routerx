@@ -164,7 +164,7 @@
   )
   let isDeviceOAuth = $derived(
     providerId === 'qoder' || providerId === 'kilocode' || providerId === 'grok-cli' ||
-    providerId === 'github' || providerId === 'kiro' || providerId === 'kimi' ||
+    providerId === 'github' || providerId === 'ghe-copilot' || providerId === 'kiro' || providerId === 'kimi' ||
     providerId === 'kimi-coding' || providerId === 'codebuddy-cn' || providerId === 'codebuddy-intl' ||
     providerId === 'minimax-code' || providerId === 'minimax-code-global' || providerId === 'muse' ||
     providerId === 'nous' || providerId === 'glm' ||
@@ -1514,6 +1514,12 @@
       openCustomOAuth()
     } else if (providerId === 'kiro') {
       openKiroOAuth()
+    } else if (providerId === 'ghe-copilot') {
+      stopDevicePoll()
+      oauthError = null
+      oauthAuthUrl = ''
+      gheInstanceUrl = ''
+      showOAuthModal = true
     } else if (isDeviceOAuth) {
       // Device-code providers (qoder, grok-cli, github, kilocode, kimi,
       // codebuddy-*) have no authorize endpoint to redirect to: the backend
@@ -1953,14 +1959,31 @@
 
 
   let isPollingDevice = $state(false)
+  let gheInstanceUrl = $state('')
 
-  async function openDeviceOAuth() {
+  async function startGHEDeviceOAuth() {
+    oauthError = null
+    try {
+      const instance = new URL(gheInstanceUrl.trim())
+      if (instance.protocol !== 'https:' || instance.username || instance.password || instance.search || instance.hash || instance.pathname.replace(/\/+$/, '')) {
+        throw new Error('Enter an HTTPS instance origin without a path, credentials, query, or fragment.')
+      }
+      isConnecting = true
+      await openDeviceOAuth(instance.origin)
+    } catch (err) {
+      oauthError = err instanceof Error ? err.message : String(err)
+    } finally {
+      isConnecting = false
+    }
+  }
+
+  async function openDeviceOAuth(gheUrl?: string) {
     oauthError = null
     callbackInput = ''
     copiedAuthUrl = false
     stopDevicePoll()
     try {
-      const res = await api.deviceStart(providerId)
+      const res = await api.deviceStart(providerId, gheUrl ? { gheUrl } : undefined)
       oauthAuthUrl = res.verification_uri_complete || res.verification_uri || ''
       deviceUserCode = res.user_code || ''
       deviceCode = res.device_code || ''
@@ -4832,7 +4855,7 @@
         Add Model
       </button>
 
-      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter' || providerId === 'devin-desktop') && providerConnections.some((c) => c.isActive !== 0)}
+      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter' || providerId === 'devin-desktop' || providerId === 'ghe-copilot') && providerConnections.some((c) => c.isActive !== 0)}
         <button
           type="button"
           onclick={handleImportLiveCatalogModels}
@@ -5039,6 +5062,15 @@
           <button type="button" onclick={startDevinBrowserLogin} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">Sign in with Devin in the browser</button>
         </div>
       {/if}
+      {#if providerId === 'ghe-copilot' && !deviceCode}
+        <form class="space-y-3 mb-4" onsubmit={(event) => { event.preventDefault(); startGHEDeviceOAuth() }}>
+          <label for="ghe-instance-url" class="block text-sm font-medium text-text-main">GitHub Enterprise instance URL</label>
+          <input id="ghe-instance-url" type="url" required bind:value={gheInstanceUrl} placeholder="https://ghe.company.com" disabled={isConnecting} aria-describedby="ghe-instance-help" class="w-full min-h-[44px] px-3 border border-border rounded-md bg-surface text-text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50" />
+          <p id="ghe-instance-help" class="text-sm text-text-main">Use your organization's HTTPS instance origin. Sign-in and token renewal use this instance, not github.com.</p>
+          {#if oauthError}<p role="alert" class="text-sm text-red-700 dark:text-red-400">{oauthError}</p>{/if}
+          <button type="submit" disabled={isConnecting || !gheInstanceUrl.trim()} class="min-h-[44px] px-4 rounded-md border border-border bg-surface-2 text-text-main hover:bg-surface-3 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">{isConnecting ? 'Requesting device code...' : 'Request device code'}</button>
+        </form>
+      {/if}
       {#if providerId === 'kiro' && !kiroMethod && !deviceUserCode}
         <p class="text-sm text-text-muted mb-3">Choose your authentication method:</p>
         <div class="space-y-2 mb-4">
@@ -5147,7 +5179,7 @@
           </div>
         </div>
       {/if}
-      {#if providerId !== 'kiro' || kiroMethod || deviceUserCode}
+      {#if (providerId !== 'kiro' || kiroMethod || deviceUserCode) && (providerId !== 'ghe-copilot' || deviceCode)}
       <div class="flex items-center gap-2 px-3 py-2 border border-border rounded-lg bg-sidebar/50 mb-4">
         <span class="material-symbols-outlined text-base text-primary animate-spin">progress_activity</span>
         <span class="text-sm">

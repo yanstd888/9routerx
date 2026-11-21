@@ -382,6 +382,12 @@ func ApplyHeaderOverrides(headers, overrides map[string]string) map[string]strin
 
 // KnownProviders maps provider IDs to their upstream configuration.
 var KnownProviders = map[string]ProviderConfig{
+	"ghe-copilot": {
+		BaseURL: "https://api.githubcopilot.com/chat/completions",
+		AuthHeader: "Authorization", AuthScheme: "bearer", Format: FormatOpenAI,
+		StaticHeaders: GitHubCopilotChatHeaders("text/event-stream", "user"),
+		PreserveCacheControl: true,
+	},
 	"devin-desktop": {
 		BaseURL: "https://server.codeium.com",
 	},
