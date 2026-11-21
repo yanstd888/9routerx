@@ -1087,6 +1087,10 @@ func (h *DashboardHandler) writeConnectionModels(w http.ResponseWriter, r *http.
 		handlerutil.WriteJSONError(w, http.StatusNotFound, "connection not found")
 		return
 	}
+	if conn.Provider == "devin-desktop" {
+		h.writeDevinConnectionModels(w, r, conn)
+		return
+	}
 	var connData struct {
 		APIKey               string         `json:"apiKey"`
 		AccessToken          string         `json:"accessToken"`

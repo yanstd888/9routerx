@@ -67,6 +67,19 @@ type Region struct {
 
 // ProviderRegistry maps canonical provider IDs to their display metadata.
 var ProviderRegistry = map[string]ProviderMeta{
+	"devin-desktop": {
+		ID: "devin-desktop",
+		Name: "Devin Desktop",
+		Alias: "devin-desktop",
+		Category: CategoryOAuth,
+		AuthType: "oauth",
+		Color: "#2563EB",
+		Icon: "desktop_windows",
+		ServiceKinds: []string{"llm"},
+		Website: "https://devin.ai",
+		AuthHint: "Import a Devin Desktop credential, or sign in with Devin using the browser. Browser sign-in uses a fixed callback on port 59653; remote browsers can paste the full callback URL. The account must have access to the selected model.",
+		Notice: &Notice{SignupURL: "https://devin.ai"},
+	},
 	"volcengine-agent-plan": {
 		ID: "volcengine-agent-plan",
 		Name: "Volcengine Ark Agent Plan",

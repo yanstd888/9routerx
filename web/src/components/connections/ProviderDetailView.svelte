@@ -1498,6 +1498,12 @@
       }
     } else if (providerId === 'freebuff') {
       startFreebuffFlow()
+    } else if (providerId === 'devin-desktop') {
+      oauthError = null
+      callbackInput = ''
+      oauthAuthUrl = ''
+      pkceState = ''
+      showOAuthModal = true
     } else if (isClineOAuth) {
       openClineOAuth()
     } else if (isPKCEOAuth) {
@@ -1670,6 +1676,34 @@
     }
   }
 
+  async function startDevinBrowserLogin() {
+    oauthError = null
+    try {
+      const res = await api.devinAuthorize()
+      oauthAuthUrl = res.url
+      pkceState = res.state
+      pkceCodeVerifier = res.codeVerifier
+      pkceRedirectUri = res.redirectUri
+      rememberPending({ state: pkceState, verifier: pkceCodeVerifier, redirectUri: pkceRedirectUri, extra: { state: pkceState } })
+      const listener = await api.devinStartProxy({ appPort: window.location.port || (window.location.protocol === 'https:' ? '443' : '80'), state: pkceState, codeVerifier: pkceCodeVerifier, redirectUri: pkceRedirectUri })
+      if (listener.success) {
+        stopCodexPoll()
+        codexPollTimer = setInterval(pollDevinStatus, 1500)
+      } else {
+        oauthError = 'Port 59653 is unavailable. After signing in, paste the full callback URL here.'
+      }
+      window.open(oauthAuthUrl, '_blank', 'width=600,height=700')
+    } catch (err) { oauthError = err instanceof Error ? err.message : String(err) }
+  }
+
+  async function pollDevinStatus() {
+    try {
+      const res = await api.devinPollStatus(pkceState)
+      if (res.status === 'done') { stopCodexPoll(); showOAuthModal = false; onRefresh() }
+      else if (res.status === 'error' || res.status === 'unknown') { stopCodexPoll(); oauthError = res.error || 'The local login listener is unavailable. Retry or paste the callback URL.' }
+    } catch { /* Manual exchange remains available if a polling request fails. */ }
+  }
+
   function stopCodexPoll() {
     if (codexPollTimer) {
       clearInterval(codexPollTimer)
@@ -1687,6 +1721,8 @@
       void api.codexStopProxy().catch(() => {})
     } else if (providerId === 'openference') {
       void api.openferenceStopProxy().catch(() => {})
+    } else if (providerId === 'devin-desktop') {
+      void api.devinStopProxy(pkceState).catch(() => {})
     }
   }
 
@@ -2133,6 +2169,16 @@
         return
       }
 
+      if (providerId === 'devin-desktop') {
+        try {
+          if (pkceState) await api.devinExchange(raw, pkceState, pkceCodeVerifier)
+          else await api.devinImport(raw.trim())
+          stopCodexPoll()
+          showOAuthModal = false
+          onRefresh()
+        } catch (err) { oauthError = err instanceof Error ? err.message : String(err) }
+        return
+      }
       if (!raw) return
       let code = raw.trim()
       let redirectUri: string | undefined
@@ -4786,7 +4832,7 @@
         Add Model
       </button>
 
-      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter') && providerConnections.some((c) => c.isActive !== 0)}
+      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter' || providerId === 'devin-desktop') && providerConnections.some((c) => c.isActive !== 0)}
         <button
           type="button"
           onclick={handleImportLiveCatalogModels}
@@ -4987,6 +5033,12 @@
           <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
+      {#if providerId === 'devin-desktop'}
+        <div class="space-y-2 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
+          <p class="text-xs text-text-muted">Paste a Devin Desktop credential to import it unchanged, or start browser sign-in. Browser callbacks use port 59653; for a remote gateway, paste the complete callback URL manually.</p>
+          <button type="button" onclick={startDevinBrowserLogin} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">Sign in with Devin in the browser</button>
+        </div>
+      {/if}
       {#if providerId === 'kiro' && !kiroMethod && !deviceUserCode}
         <p class="text-sm text-text-muted mb-3">Choose your authentication method:</p>
         <div class="space-y-2 mb-4">

@@ -382,6 +382,9 @@ func ApplyHeaderOverrides(headers, overrides map[string]string) map[string]strin
 
 // KnownProviders maps provider IDs to their upstream configuration.
 var KnownProviders = map[string]ProviderConfig{
+	"devin-desktop": {
+		BaseURL: "https://server.codeium.com",
+	},
 	"volcengine-agent-plan": {
 		BaseURL: "https://ark.cn-beijing.volces.com/api/plan/v3/chat/completions",
 		AuthHeader: "Authorization",

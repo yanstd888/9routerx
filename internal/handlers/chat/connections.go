@@ -693,6 +693,10 @@ func (h *ChatHandler) getProviderConfig(provider string, connData *ConnectionDat
 		// A custom node's baseUrl is a PREFIX rather than an endpoint the
 		// operator named, so it is completed by a different rule (#768).
 		baseURL := compatibleNodeLaneURL(provider, connectionAPIType(connData), connData.BaseURL)
+		if provider == "devin-desktop" {
+			// Native Connect service roots are not OpenAI API roots.
+			baseURL = strings.TrimRight(strings.TrimSpace(connData.BaseURL), "/")
+		}
 		if cfg, ok := providers.KnownProviders[provider]; ok {
 			cloned := cfg
 			cloned.BaseURL = baseURL
