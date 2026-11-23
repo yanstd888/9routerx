@@ -67,6 +67,13 @@ type Region struct {
 
 // ProviderRegistry maps canonical provider IDs to their display metadata.
 var ProviderRegistry = map[string]ProviderMeta{
+	"moonshot": {
+		ID: "moonshot", Name: "Kimi", Alias: "moonshot",
+		Category: CategoryAPIKey, AuthType: "apikey",
+		Color: "#1E40AF", Icon: "rocket_launch", ServiceKinds: []string{"llm"},
+		Website: "https://platform.kimi.ai",
+		AuthHint: "Use a Moonshot API platform key, not a Kimi Code subscription credential.",
+	},
 	"devin-desktop": {
 		ID: "devin-desktop",
 		Name: "Devin Desktop",

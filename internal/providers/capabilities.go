@@ -439,6 +439,7 @@ var qoderCapabilities = map[string]Capabilities{
 }
 
 var providerCapabilities = map[string]map[string]Capabilities{
+	"moonshot": moonshotCapabilities,
 	"qoder": qoderCapabilities,
 	// Qoder CN serves the identical model catalog from the CN gateway, so it
 	// shares the intl Qoder capability table verbatim.

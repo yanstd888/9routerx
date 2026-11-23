@@ -1,0 +1,3 @@
+# Moonshot native API
+
+Add the isolated `moonshot` API-key provider from OmniRoute pin `632d84f569f72893ed148e5b19dd05e2fff1a52a`, with six curated Kimi models and the native Chat Completions endpoint. Preserve strict K3.1 effort rejection semantics, family-specific thinking and token limits, tool schemas and result names, authentic reasoning, video input, and partial assistant prefixes. Reuse the existing Claude and Responses client bridges and flat cached-token usage mapping. The Kimi Code providers and their credentials remain separate; artwork shares only the existing Kimi brand mark. No live provider or quota validation was performed.

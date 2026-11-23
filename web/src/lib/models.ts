@@ -245,6 +245,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "kilo-gateway": "kgw",
   "kilocode": "kc",
   "kimchi": "kimchi",
+  "moonshot": "moonshot",
   "kimi": "kimi",
   "kiro": "kr",
   "llm7": "llm7",
@@ -348,6 +349,14 @@ const FREEBUFF_MODELS: ProviderModel[] = [
 ];
 
 export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
+  "moonshot": [
+    { id: "kimi-k3.1-pro", name: "Kimi K3.1 Pro", contextLength: 1048576, maxOutputTokens: 1048576, capabilities: ["vision", "video", "reasoning", "tools"], supportedThinkingEfforts: ["low", "high", "max"] },
+    { id: "kimi-k3.1-pro-highspeed", name: "Kimi K3.1 Pro Highspeed", contextLength: 1048576, maxOutputTokens: 1048576, capabilities: ["vision", "video", "reasoning", "tools"], supportedThinkingEfforts: ["low", "high", "max"] },
+    { id: "kimi-k3", name: "Kimi K3", contextLength: 1048576, maxOutputTokens: 1048576, capabilities: ["vision", "reasoning", "tools"] },
+    { id: "kimi-k2.7-code", name: "Kimi K2.7 Code", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
+    { id: "kimi-k2.7-code-highspeed", name: "Kimi K2.7 Code (High Speed)", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
+    { id: "kimi-k2.6", name: "Kimi K2.6", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
+  ],
   "ghe-copilot": [
     "claude-fable-5", "claude-opus-5", "claude-opus-4.8-fast", "claude-opus-4.8", "claude-opus-4.7", "claude-sonnet-4.6", "claude-opus-4.5", "claude-sonnet-5", "claude-sonnet-5-5", "claude-sonnet-4.5", "claude-haiku-4.5",
     "gemini-3.1-pro-preview", "gemini-3.7-flash", "gpt-6.1-terra", "gpt-6.1-sol", "gpt-6-luna", "gpt-6-sol", "gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5-mini",

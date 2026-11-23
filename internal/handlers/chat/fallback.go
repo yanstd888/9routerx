@@ -655,6 +655,9 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	connectionID, connData := f.ConnectionID, f.ConnData
 	body, isStream := f.Body, f.IsStream
 	translateResponse, endpoint := f.TranslateResponse, f.Endpoint
+	if provider == "moonshot" {
+		body = restoreMoonshotOriginal(ctx, body)
+	}
 	// Unified thinking normalisation, inbound half: capture the client's
 	// reasoning intent before any converter rewrites the body. model stays
 	// the requested id for logs/usage; wireModel is suffix-free.
@@ -862,7 +865,7 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 
 	// Sanitize tool schemas for all OpenAI-compatible providers (opencode, gemini-openai, etc.)
 	// Fixes misplaced `required` inside `properties` and missing `items` for arrays.
-	if sanitized, err := translator.SanitizeOpenAITools(pipedBody); err == nil && sanitized != nil && string(sanitized) != string(pipedBody) {
+	if sanitized, err := sanitizeProviderTools(pipedBody, provider); err == nil && sanitized != nil && string(sanitized) != string(pipedBody) {
 		log.Debug("fallback", "sanitized tools", "provider", provider, "model", model, "conn", connectionID[:min(8, len(connectionID))], "beforeBytes", len(pipedBody), "afterBytes", len(sanitized))
 		pipedBody = sanitized
 	} else if err != nil {
@@ -888,7 +891,7 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	// dispatch stage as the tool collapse above. Internal provider/model rules
 	// decide applicability (any provider serving a deepseek/kimi model id), so
 	// the call itself is unconditional on non-Claude lanes.
-	if !upstreamClaude {
+	if !upstreamClaude && provider != "moonshot" {
 		pipedBody = executor.InjectReasoningContent(pipedBody, provider)
 		if provider == "deepseek" {
 			// DeepSeek V4 models think by default and reject required/named
@@ -959,10 +962,14 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 			// API rejects.
 			target = "claude"
 		}
-		pipedBody = thinking.ApplyJSON(pipedBody, target, provider, wireModel, thinkingIntent)
+		if provider != "moonshot" {
+			pipedBody = thinking.ApplyJSON(pipedBody, target, provider, wireModel, thinkingIntent)
+		}
 		if target == "openai" && !providerCfg.IsGeminiNative() {
 			filtered, filterErr := translator.FilterToOpenAIFormatJSON(pipedBody, translator.FilterOptions{
-				PreserveCacheControl: providers.PreservesCacheControl(provider),
+				PreserveCacheControl:     providers.PreservesCacheControl(provider),
+				PreserveVideoURL:         provider == "moonshot",
+				PreservePartialAssistant: provider == "moonshot",
 			})
 			if filterErr != nil {
 				// The request lost every message. The upstream answers an

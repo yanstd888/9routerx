@@ -31,6 +31,9 @@ func (h *ChatHandler) prepareInboundThinking(ctx context.Context, provider, mode
 	} else if carried := thinking.ModelSuffixIntent(body); carried != nil {
 		suffixIntent = carried
 	}
+	if provider == "moonshot" {
+		return h.prepareMoonshotThinking(ctx, wireModel, body, suffixIntent)
+	}
 	needsWire := wireModel != model
 	// The operator override is read once and reused below: the fast path
 	// needs it to know whether the body has to be decoded at all.

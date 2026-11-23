@@ -1915,6 +1915,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme:            "bearer",
 		RequireClaudeToolType: true,
 	},
+	"moonshot": {
+		BaseURL:    "https://api.moonshot.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"kimi": {
 		BaseURL:    "https://api.kimi.com/coding/v1/chat/completions",
 		AuthHeader: "Authorization",

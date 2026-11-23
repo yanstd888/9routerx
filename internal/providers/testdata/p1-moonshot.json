@@ -1,0 +1,17 @@
+{
+  "sha": "632d84f569f72893ed148e5b19dd05e2fff1a52a",
+  "provider": "moonshot",
+  "name": "Kimi",
+  "endpoint": "https://api.moonshot.ai/v1/chat/completions",
+  "models": ["kimi-k3.1-pro", "kimi-k3.1-pro-highspeed", "kimi-k3", "kimi-k2.7-code", "kimi-k2.7-code-highspeed", "kimi-k2.6"],
+  "sources": ["open-sse/config/providers/registry/moonshot/index.ts", "open-sse/executors/moonshot.ts", "src/shared/constants/providers/apikey/regional.ts"],
+  "artwork": {
+    "sha256": "a5ea733e50ec5cdc8d95263e21d0c04227fd192fd251a00ef106ea327170ecaf",
+    "served": "web/public/providers/kimi.png",
+    "scope": "brand only; no routing or credential alias",
+    "reference": "existing shipped Kimi brand asset; not re-rendered from the OmniRoute SVG",
+    "reference_brand": "public/providers/kimi.svg",
+    "reference_brand_sha256": "2642bcb2e5b420ab66fefaf68b2e4c63cf88065780458014c3c6923aeee593f6",
+    "reference_ui": "src/shared/components/ProviderIcon.tsx:317-339"
+  }
+}

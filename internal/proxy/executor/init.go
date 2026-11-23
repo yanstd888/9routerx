@@ -4,6 +4,7 @@ package executor
 // RegisterAll registers all known executor factories.
 // Called once at init or server startup.
 func RegisterAll() {
+	Register("moonshot", func() Executor { return ForwardMoonshot })
 	Register("devin-desktop", func() Executor { return ForwardDevinDesktop })
 	Register("volcengine-agent-plan", func() Executor { return ForwardOpenAI })
 	Register("volcengine-coding-plan", func() Executor { return ForwardOpenAI })

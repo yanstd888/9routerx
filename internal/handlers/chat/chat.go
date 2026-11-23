@@ -353,6 +353,7 @@ func (h *ChatHandler) HandleMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	originalBody := string(body)
 	translateResponse := true
 	var workingBody map[string]any
 	// A provider whose registry entry declares the Claude Messages format is
@@ -381,7 +382,7 @@ func (h *ChatHandler) HandleMessages(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		openaiBody, err := translator.TranslateClaudeToOpenAI(body)
+		openaiBody, err := translator.TranslateClaudeToOpenAI(moonshotClaudeConversionBody(body, modelInfo))
 		if err != nil {
 			log.Error("chat", "translate failed", "error", err)
 			handlerutil.WriteJSONError(w, http.StatusBadRequest, fmt.Sprintf("translation error: %v", err))
@@ -406,7 +407,7 @@ func (h *ChatHandler) HandleMessages(w http.ResponseWriter, r *http.Request) {
 			workingBody["stream_options"] = map[string]any{"include_usage": true}
 		}
 	}
-	ctx := handlerutil.WithSessionID(r.Context(), handlerutil.ExtractSessionID(r))
+	ctx := withMoonshotOriginal(handlerutil.WithSessionID(r.Context(), handlerutil.ExtractSessionID(r)), []byte(originalBody), true)
 	ctx = withProviderLimitState(ctx)
 	ctx = translator.WithRequestedModel(ctx, stripModelContextMarker(modelName))
 	ctx = thinking.WithSuffixIntent(ctx, suffixIntent)
