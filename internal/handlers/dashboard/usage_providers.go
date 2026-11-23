@@ -83,8 +83,8 @@ func fetchProviderUsage(ctx context.Context, provider string, data map[string]an
 		return fetchQoderUsage(ctx, firstNonEmptyStr(accessToken, apiKey)), true
 	case "qoder-cn":
 		return fetchQoderUsageAt(ctx, firstNonEmptyStr(accessToken, apiKey), "https://openapi.qoder.com.cn/api/v2/quota/usage"), true
-	case "codebuddy-intl":
-		return fetchCodeBuddyIntlUsage(ctx, accessToken, apiKey), true
+	case "codebuddy-intl", "codebuddy-cn":
+		return fetchCodeBuddyUsage(ctx, provider, accessToken, apiKey), true
 	case "kiro":
 		return fetchKiroUsage(ctx, kiroUsageToken(accessToken, apiKey, psd), psd), true
 	case "grok-cli":
@@ -1028,7 +1028,12 @@ func fetchQoderUsageAt(ctx context.Context, accessToken, usageURL string) usageR
 	return usageResult{quotas: quotas, extra: extra}
 }
 
-// ---------- codebuddy-intl: POST billing meter ----------
+// ---------- codebuddy: POST billing meter (intl + cn) ----------
+
+var (
+	codebuddyIntlUsageURL = "https://www.codebuddy.ai/v2/billing/meter/get-user-resource"
+	codebuddyCNUsageURL   = "https://copilot.tencent.com/v2/billing/meter/get-user-resource"
+)
 
 var codebuddyIntlHeaders = map[string]string{
 	"User-Agent":          "IDE/2.108.1 CodeBuddy/2.108.1",
@@ -1039,6 +1044,39 @@ var codebuddyIntlHeaders = map[string]string{
 	"X-Codebuddy-Request": "1",
 	"Content-Type":        "application/json",
 	"Accept":              "application/json",
+}
+
+// codebuddyCNHeaders reuses the registry's codebuddy-cn identity — the same
+// CLI/2.133.1 UA and X-IDE-Type: CLI the chat lane sends. The billing read is
+// then indistinguishable from the client that made the conversation, and a
+// future identity bump has one place to change. The map is copied because the
+// registry entry is shared by every request.
+//
+// X-Domain is taken from the billing origin rather than the registry: the
+// registry declares www.codebuddy.cn, but the executor overrides it per
+// connection from the BaseURL, so the chat lane actually announces
+// copilot.tencent.com for this provider.
+func codebuddyCNHeaders(origin string) map[string]string {
+	static := providers.KnownProviders["codebuddy-cn"].StaticHeaders
+	h := make(map[string]string, len(static)+2)
+	for k, v := range static {
+		h[k] = v
+	}
+	if u, err := url.Parse(origin); err == nil && u.Host != "" {
+		h["X-Domain"] = u.Host
+	}
+	h["Content-Type"] = "application/json"
+	h["Accept"] = "application/json"
+	return h
+}
+
+// codebuddyUsageTarget resolves the billing origin and request identity for a
+// CodeBuddy provider. Anything that is not the CN lane keeps the intl pair.
+func codebuddyUsageTarget(provider string) (string, map[string]string) {
+	if provider == "codebuddy-cn" {
+		return codebuddyCNUsageURL, codebuddyCNHeaders(codebuddyCNUsageURL)
+	}
+	return codebuddyIntlUsageURL, codebuddyIntlHeaders
 }
 
 func codebuddyNum(precise, plain any) float64 {
@@ -1088,35 +1126,40 @@ func codebuddyCadence(acc map[string]any) string {
 	return "Monthly"
 }
 
-func fetchCodeBuddyIntlUsage(ctx context.Context, accessToken, apiKey string) usageResult {
+// fetchCodeBuddyUsage reads the CodeBuddy billing meter for one deployment.
+// provider selects the origin and client identity (see codebuddyUsageTarget);
+// the response envelope, refill/bonus split and row names are identical on
+// both lanes, so they are parsed once here.
+func fetchCodeBuddyUsage(ctx context.Context, provider, accessToken, apiKey string) usageResult {
 	token := firstNonEmptyStr(accessToken, apiKey)
 	if token == "" {
-		return usageResult{message: "CodeBuddy (codebuddy-intl) credential not available."}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) credential not available.", provider)}
 	}
+	usageURL, identity := codebuddyUsageTarget(provider)
 	headers := map[string]string{"Authorization": "Bearer " + token}
-	for k, v := range codebuddyIntlHeaders {
+	for k, v := range identity {
 		headers[k] = v
 	}
-	status, _, out, err := usageDo(ctx, http.MethodPost, "https://www.codebuddy.ai/v2/billing/meter/get-user-resource", headers, []byte("{}"))
+	status, _, out, err := usageDo(ctx, http.MethodPost, usageURL, headers, []byte("{}"))
 	if err != nil {
-		return usageResult{message: fmt.Sprintf("CodeBuddy (codebuddy-intl) error: %v", err)}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) error: %v", provider, err)}
 	}
 	if status == 401 || status == 403 {
-		return usageResult{message: "CodeBuddy CN credential invalid or expired."}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) credential invalid or expired.", provider)}
 	}
 	if status < 200 || status >= 300 {
-		return usageResult{message: fmt.Sprintf("CodeBuddy CN quota API error (%d).", status)}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) quota API error (%d).", provider, status)}
 	}
 	body := usageJSON(out)
 	if body == nil {
-		return usageResult{message: "CodeBuddy (codebuddy-intl) error: invalid JSON"}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) error: invalid JSON", provider)}
 	}
 	if code := usageNum(body["code"], -1); code != 0 {
 		msg, _ := body["msg"].(string)
 		if msg == "" {
 			msg = "unknown"
 		}
-		return usageResult{message: fmt.Sprintf("CodeBuddy CN quota error: %s", msg)}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) quota error: %s", provider, msg)}
 	}
 	var data map[string]any
 	if d, ok := body["data"].(map[string]any); ok {
@@ -1129,7 +1172,7 @@ func fetchCodeBuddyIntlUsage(ctx context.Context, accessToken, apiKey string) us
 		accounts = a
 	}
 	if len(accounts) == 0 {
-		return usageResult{message: "CodeBuddy CN connected. No credit package found."}
+		return usageResult{message: fmt.Sprintf("CodeBuddy (%s) connected. No credit package found.", provider)}
 	}
 	var refills, bonuses []map[string]any
 	for _, a := range accounts {
@@ -1182,6 +1225,11 @@ func fetchCodeBuddyIntlUsage(ctx context.Context, accessToken, apiKey string) us
 		plan = p
 	}
 	return usageResult{plan: plan, quotas: quotas}
+}
+
+// fetchCodeBuddyIntlUsage stays as the intl-only entry point.
+func fetchCodeBuddyIntlUsage(ctx context.Context, accessToken, apiKey string) usageResult {
+	return fetchCodeBuddyUsage(ctx, "codebuddy-intl", accessToken, apiKey)
 }
 
 // ---------- kiro: codewhisperer getUsageLimits (3 attempts) ----------
