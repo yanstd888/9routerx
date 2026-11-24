@@ -49,6 +49,66 @@ func TestRTK_DetectCategory(t *testing.T) {
 	}
 }
 
+func TestRTK_CompressContainerOutput(t *testing.T) {
+	const header = "CONTAINER ID   IMAGE"
+	rows := []string{"row 1", "row 2", "row 3", "row 4", "row 5", "row 6", "row 7", "row 8", "row 9", "row 10"}
+	table := func(rowCount int) string {
+		return strings.Join(append([]string{header}, rows[:rowCount]...), "\n")
+	}
+	tests := []struct {
+		name     string
+		input    string
+		maxLines int
+		expected string
+	}{
+		{"short table max 1", table(2), 1, header},
+		{"short table max 2", table(3), 2, header + "\n... (3 table entries truncated)"},
+		{"short table max 3", table(4), 3, header + "\nrow 1\n... (3 table entries truncated)"},
+		{"short table max 4", table(5), 4, header + "\nrow 1\nrow 2\n... (3 table entries truncated)"},
+		{"short table max 5", table(6), 5, header + "\nrow 1\nrow 2\nrow 3\n... (3 table entries truncated)"},
+		{"short table max 6", table(7), 6, header + "\nrow 1\nrow 2\nrow 3\nrow 4\n... (3 table entries truncated)"},
+		{"large table max 1", table(10), 1, header},
+		{"large table max 2", table(10), 2, header + "\n... (10 table entries truncated)"},
+		{"large table max 3", table(10), 3, header + "\nrow 1\n... (9 table entries truncated)"},
+		{"large table max 4", table(10), 4, header + "\nrow 1\nrow 2\n... (8 table entries truncated)"},
+		{"large table max 5", table(10), 5, header + "\nrow 1\nrow 2\nrow 3\n... (7 table entries truncated)"},
+		{"large table max 6", table(10), 6, header + "\nrow 1\nrow 2\nrow 3\nrow 4\n... (6 table entries truncated)"},
+		{"large table max 7 unchanged", table(10), 7, header + "\nrow 1\nrow 2\nrow 3\nrow 4\nrow 5\n... (5 table entries truncated)"},
+		{"large table max 8 unchanged", table(10), 8, header + "\nrow 1\nrow 2\nrow 3\nrow 4\nrow 5\nrow 6\n... (4 table entries truncated)"},
+		{"rows equal max 1", table(1), 1, header},
+		{"rows equal max 2", table(2), 2, header + "\n... (2 table entries truncated)"},
+		{"rows equal max 3", table(3), 3, header + "\nrow 1\n... (2 table entries truncated)"},
+		{"rows equal max 4", table(4), 4, header + "\nrow 1\nrow 2\n... (2 table entries truncated)"},
+		{"rows equal max 5", table(5), 5, header + "\nrow 1\nrow 2\nrow 3\n... (2 table entries truncated)"},
+		{"rows equal max 6", table(6), 6, header + "\nrow 1\nrow 2\nrow 3\nrow 4\n... (2 table entries truncated)"},
+		{"rows equal max 7 unchanged", table(7), 7, header + "\nrow 1\nrow 2\nrow 3\n... (1 lines truncated)\nrow 5\nrow 6\nrow 7"},
+		{"rows equal max 8 unchanged", table(8), 8, header + "\nrow 1\nrow 2\nrow 3\n... (1 lines truncated)\nrow 5\nrow 6\nrow 7\nrow 8"},
+		{"empty input fits", "", 1, ""},
+		{"header fits max 1", header, 1, header},
+		{"input fits max 2", table(1), 2, table(1)},
+		{"input fits max 3", table(2), 3, table(2)},
+		{"input fits max 4", table(3), 4, table(3)},
+		{"input fits max 5", table(4), 5, table(4)},
+		{"input fits max 6", table(5), 6, table(5)},
+		{"input fits max 7", table(6), 7, table(6)},
+		{"input fits max 8", table(7), 8, table(7)},
+		{"trailing newline fits", header + "\nrow 1\n", 3, header + "\nrow 1\n"},
+		{"zero limit unchanged", table(10), 0, header + "\nrow 1\nrow 2\nrow 3\nrow 4\nrow 5\n... (5 table entries truncated)"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := CompressContainerOutput(tt.input, tt.maxLines)
+			if got != tt.expected {
+				t.Errorf("CompressContainerOutput() = %q, want %q", got, tt.expected)
+			}
+			if tt.maxLines > 0 && tt.maxLines < 7 && len(strings.Split(got, "\n")) > tt.maxLines {
+				t.Errorf("output exceeds line budget %d: %q", tt.maxLines, got)
+			}
+		})
+	}
+}
+
 func TestRTK_CompressTextDetailed(t *testing.T) {
 	cfg := DefaultRTKConfig()
 	input := "On branch dev\n  (use \"git add <file>...\" to include in what will be committed)\n  modified: internal/db/settings.go\n" + strings.Repeat("repeated log line\n", 10)
