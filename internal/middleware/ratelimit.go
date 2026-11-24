@@ -1370,6 +1370,11 @@ func rateLimitScope(scope string) string {
 // request hold two copies of itself in memory.
 const maxTokenScanBody = 4 << 20 // 4 MiB
 
+type combinedReadCloser struct {
+	io.Reader
+	io.Closer
+}
+
 // promptTokensForRequest sizes the prompt for the TPM charge, leaving r.Body
 // readable for the next handler.
 func promptTokensForRequest(r *http.Request) int {
@@ -1383,7 +1388,8 @@ func promptTokensForRequest(r *http.Request) int {
 	if r.ContentLength > maxTokenScanBody {
 		return int(r.ContentLength/4) + 1
 	}
-	body, err := io.ReadAll(io.LimitReader(r.Body, maxTokenScanBody))
+	original := r.Body
+	body, err := io.ReadAll(io.LimitReader(original, maxTokenScanBody))
 	if err != nil {
 		// The body is consumed on error and cannot be handed on. Charging the
 		// request and letting the handler see a closed body would turn a
@@ -1391,6 +1397,9 @@ func promptTokensForRequest(r *http.Request) int {
 		// judge it.
 		return 0
 	}
-	r.Body = io.NopCloser(bytes.NewReader(body))
+	r.Body = &combinedReadCloser{
+		Reader: io.MultiReader(bytes.NewReader(body), original),
+		Closer: original,
+	}
 	return estimatePromptTokens(body)
 }
