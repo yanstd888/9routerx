@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // The single Edit Connection modal, shared by the Providers tab and the
   // Quota Tracker (issue #158). Both used to keep their own copy of the same
   // nine `edit*` variables and the same markup, so any rule added here had to
@@ -187,7 +188,7 @@
     class="relative w-full bg-surface border border-border-subtle rounded-[14px] shadow-[var(--shadow-elev)] fade-in max-w-md p-6"
   >
     <div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-4">
-      <h2 class="text-lg font-semibold text-text-main">Edit Connection</h2>
+      <h2 class="text-lg font-semibold text-text-main">{t('Edit Connection')}</h2>
       <button
         type="button"
         onclick={onClose}
@@ -199,7 +200,7 @@
 
     <div class="space-y-4">
       <div>
-        <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-name">Name</label>
+        <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-name">{t('Name')}</label>
         <input
           id="edit-conn-name"
           bind:value={name}
@@ -209,16 +210,14 @@
 
       {#if connection.email}
         <div>
-          <span class="block text-xs font-medium text-text-muted mb-1">Email</span>
+          <span class="block text-xs font-medium text-text-muted mb-1">{t('Email')}</span>
           <p class="text-xs text-text-main font-medium">{formatEmailLabel(connection.email, $emailPrivacy)}</p>
         </div>
       {/if}
 
       {#if !isOAuth}
         <div>
-          <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-key">
-            API (leave blank to keep the key on file)
-          </label>
+          <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-key">{t('API (leave blank to keep the key on file)')}</label>
           <div class="flex gap-2">
             <input
               id="edit-conn-key"
@@ -240,11 +239,9 @@
             </button>
           </div>
           {#if keyCheck === 'valid'}
-            <p class="mt-1.5 text-xs text-emerald-600 dark:text-emerald-400">The provider accepted this key.</p>
+            <p class="mt-1.5 text-xs text-emerald-600 dark:text-emerald-400">{t('The provider accepted this key.')}</p>
           {:else if keyCheck === 'unsupported'}
-            <p class="mt-1.5 text-xs text-text-subtle">
-              This provider has no key check, so the new key is saved unverified.
-            </p>
+            <p class="mt-1.5 text-xs text-text-subtle">{t('This provider has no key check, so the new key is saved unverified.')}</p>
           {:else if keyError}
             <p class="mt-1.5 text-xs text-red-500">{keyError}</p>
           {/if}
@@ -252,7 +249,7 @@
       {/if}
 
       <div>
-        <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-priority">Priority</label>
+        <label class="block text-xs font-medium text-text-muted mb-1" for="edit-conn-priority">{t('Priority')}</label>
         <input
           id="edit-conn-priority"
           type="number"
@@ -288,9 +285,7 @@
             type="button"
             onclick={onClose}
             class="px-3 py-1.5 text-xs font-semibold rounded-[8px] bg-surface-2 hover:bg-surface-3 text-text-main border border-border cursor-pointer"
-          >
-            Cancel
-          </button>
+          >{t('Cancel')}</button>
           <button
             type="button"
             onclick={save}

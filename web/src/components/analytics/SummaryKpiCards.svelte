@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Same six KPIs and the same data flow the panel always had; the visual is
   // now the tremor-style KpiCard (/* adapted from tremor (Apache-2.0) */) on
   // the shadcn foundation (TASK-9routerX-shadcn-dashboard §1). The optional
@@ -53,34 +54,34 @@
 </script>
 
 <div class="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 sm:gap-4">
-  <KpiCard label="Total Requests" value={fmtTokens(stats.totalRequests)} title={fmtTokens(stats.totalRequests)} />
+  <KpiCard label={t('Total Requests')} value={fmtTokens(stats.totalRequests)} title={fmtTokens(stats.totalRequests)} />
   <KpiCard
-    label="Success Rate"
+    label={t('Success Rate')}
     value={fmtSuccessRate(stats.successRate)}
     title={fmtSuccessRate(stats.successRate)}
     accentClass={rateColor(stats.successRate)}
     sub={fmtSuccessSubtext(stats)}
   />
   <KpiCard
-    label="Total Input Tokens"
+    label={t('Total Input Tokens')}
     value={fmtTokens(stats.totalPromptTokens)}
     title={fmtTokens(stats.totalPromptTokens)}
     accentClass="text-primary"
   />
   <KpiCard
-    label="Cached Tokens"
+    label={t('Cached Tokens')}
     value={fmtTokens(stats.totalCachedTokens)}
     title={fmtTokens(stats.totalCachedTokens)}
     accentClass="text-info"
   />
   <KpiCard
-    label="Output Tokens"
+    label={t('Output Tokens')}
     value={fmtTokens(stats.totalCompletionTokens)}
     title={fmtTokens(stats.totalCompletionTokens)}
     accentClass="text-success"
   />
   <KpiCard
-    label="Est. Cost"
+    label={t('Est. Cost')}
     value={costValue}
     title={costTitle}
     accentClass="text-warning"

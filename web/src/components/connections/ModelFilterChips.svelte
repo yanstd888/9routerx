@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import type { ModelListFilter, SortMode } from './modelListFilter'
 
   interface Props {
@@ -152,7 +153,7 @@
 -->
 <div class="flex flex-col gap-1.5">
   <div class="flex flex-wrap items-center gap-1.5">
-    <span class="w-14 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">Caps</span>
+    <span class="w-14 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">{t('Caps')}</span>
     {#each capChips as chip (chip.key)}
       <button type="button" class={chipClass(chip.on)} onclick={chip.toggle} title={chip.title}>
         {#if chip.on}<span class="material-symbols-outlined text-[12px] leading-none">check</span>{/if}
@@ -160,13 +161,13 @@
       </button>
     {/each}
     {#if capChips.length === 0}
-      <span class="text-[11px] italic text-text-muted/60">No capabilities on this list</span>
+      <span class="text-[11px] italic text-text-muted/60">{t('No capabilities on this list')}</span>
     {/if}
   </div>
 
   {#if showStatus}
     <div class="flex flex-wrap items-center gap-1.5">
-      <span class="w-14 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">Status</span>
+      <span class="w-14 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">{t('Status')}</span>
       {#each statusChips as chip (chip.key)}
         <button type="button" class={chipClass(chip.on)} onclick={chip.toggle} title={chip.title}>
           {#if chip.on}<span class="material-symbols-outlined text-[12px] leading-none">check</span>{/if}
@@ -181,7 +182,7 @@
   <div class="flex items-center gap-1">
     <span class="material-symbols-outlined text-[14px] text-text-muted">sort</span>
     <select
-      aria-label="Sort models"
+      aria-label={t('Sort models')}
       value={filter.sort}
       onchange={(e) => setSort((e.target as HTMLSelectElement).value as SortMode)}
       class="rounded-md border border-border bg-background px-1.5 py-0.5 text-[11px] text-text-main focus:border-primary focus:outline-none cursor-pointer"

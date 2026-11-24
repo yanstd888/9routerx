@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { RotateCcw, ArrowLeftRight, AlertTriangle, CircleAlert, Lock } from 'lucide-svelte'
   import type {
     FreebuffSessionStatusResponse,
@@ -211,14 +212,13 @@
           {/if}
         {/if}
         {#if session?.connectionName}
-          <span class="font-normal text-xs {tone.muted} ml-1.5">
-            · Account: <span class="font-mono font-medium px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">{session.connectionName}</span>
+          <span class="font-normal text-xs {tone.muted} ml-1.5">{t('· Account:')}<span class="font-mono font-medium px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">{session.connectionName}</span>
           </span>
         {/if}
       </p>
       <button
         type="button"
-        title="Refresh session status"
+        title={t('Refresh session status')}
         disabled={isLoading}
         onclick={onRefresh}
         class="p-1 rounded-md {tone.muted} hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
@@ -257,7 +257,7 @@
     {/if}
     {#if connections && connections.length > 1}
       <div class="mt-2.5 flex items-center gap-2 flex-wrap text-xs">
-        <span class="font-medium {tone.muted}">Manage Account:</span>
+        <span class="font-medium {tone.muted}">{t('Manage Account:')}</span>
         <div class="flex items-center gap-1.5 flex-wrap">
           {#each connections as conn (conn.id)}
             <button
@@ -271,7 +271,7 @@
                   {conn.currentModel.split('/').pop()}
                 </span>
               {:else if conn.status === 'banned'}
-                <span class="text-[10px] text-red-500 font-semibold">(banned)</span>
+                <span class="text-[10px] text-red-500 font-semibold">{t('(banned)')}</span>
               {/if}
             </button>
           {/each}

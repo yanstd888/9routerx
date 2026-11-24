@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // GitHub-style activity heatmap for the Details section (issue #280): a
   // trailing-12-month grid of daily request counts, ported from
   // techysy/10router's ActivityHeatmap. Cells are plain divs — the dashboard
@@ -79,7 +80,7 @@
 
 <div class="flex min-w-0 flex-col gap-2">
   {#if weeks.length === 0}
-    <p class="py-6 text-center text-sm text-text-muted">No activity in the selected period</p>
+    <p class="py-6 text-center text-sm text-text-muted">{t('No activity in the selected period')}</p>
   {:else}
     <div class="min-w-0 overflow-x-auto">
       <div class="flex gap-[3px] min-w-max">

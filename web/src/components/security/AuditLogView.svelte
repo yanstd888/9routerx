@@ -133,11 +133,11 @@
           aria-label={t('Limit')}
           class="bg-surface-2 border border-border-subtle rounded-lg px-2.5 py-1.5 text-xs text-text-main focus:outline-none focus:border-primary"
         >
-          <option value={50}>50 {t('entries')}</option>
-          <option value={100}>100 {t('entries')}</option>
-          <option value={200}>200 {t('entries')}</option>
-          <option value={500}>500 {t('entries')}</option>
-          <option value={1000}>1000 {t('entries')}</option>
+          <option value={50}>50 entries</option>
+          <option value={100}>100 entries</option>
+          <option value={200}>200 entries</option>
+          <option value={500}>500 entries</option>
+          <option value={1000}>1000 entries</option>
         </select>
 
         <Button
@@ -200,22 +200,22 @@
           <tbody class="divide-y divide-border-subtle/60">
             {#each entries as entry (entry.id ?? entry.timestamp)}
               <tr class="hover:bg-surface-2/60 transition-colors">
-                <td data-label="Time" class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-subtle">
+                <td data-label={t('Time')} class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-subtle">
                   {formatTime(entry.timestamp)}
                 </td>
-                <td data-label="Action" class="px-4 py-3 whitespace-nowrap">
+                <td data-label={t('Action')} class="px-4 py-3 whitespace-nowrap">
                   <Badge tone={actionTone(entry.action)} size="sm">{entry.action}</Badge>
                 </td>
-                <td data-label="Target" class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-main hidden md:table-cell">
+                <td data-label={t('Target')} class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-main hidden md:table-cell">
                   {entry.target || '-'}
                 </td>
-                <td data-label="Actor" class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                <td data-label={t('Actor')} class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                   <div class="font-code text-text-main">{entry.actor}</div>
                   {#if entry.ip}
                     <div class="text-[10px] font-code text-text-muted">{entry.ip}</div>
                   {/if}
                 </td>
-                <td data-label="Details" class="px-4 py-3 font-code text-[11px] text-text-muted break-words max-w-[320px]">
+                <td data-label={t('Details')} class="px-4 py-3 font-code text-[11px] text-text-muted break-words max-w-[320px]">
                   <span class="block truncate" title={detailsOf(entry)}>{detailsOf(entry)}</span>
                 </td>
               </tr>
@@ -224,7 +224,7 @@
         </table>
       </div>
       <div class="px-4 py-2.5 border-t border-border-subtle text-[11px] text-text-muted">
-        {t('Showing the most recent')} {entries.length} {t('entries')} — {t('raise the limit to page further')}
+        {t('Showing the most recent')} {entries.length} entries — {t('raise the limit to page further')}
       </div>
     {/if}
   </Card>

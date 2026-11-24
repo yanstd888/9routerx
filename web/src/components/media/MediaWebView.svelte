@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { ChevronRight, Globe, Layers, Plus, Search, Trash2, X } from 'lucide-svelte'
   import { notifications } from '../../lib/notifications'
   import { api, type Combo, type ProviderConnection } from '../../api/client'
@@ -121,8 +122,7 @@
         </div>
       </div>
       <Button size="sm" onclick={() => openCreateDialog(kind)}>
-        <Plus class="w-3.5 h-3.5 mr-1" /> Create Combo
-      </Button>
+        <Plus class="w-3.5 h-3.5 mr-1" />{t('Create Combo')}</Button>
     </div>
 
     {#if sectionCombos.length > 0}
@@ -161,7 +161,7 @@
         {/each}
       </div>
     {:else}
-      <p class="text-xs text-text-muted italic py-1">No combos yet.</p>
+      <p class="text-xs text-text-muted italic py-1">{t('No combos yet.')}</p>
     {/if}
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-1">
@@ -184,11 +184,11 @@
                 <h3 class="font-semibold text-sm text-text-main group-hover:text-brand-500 transition-colors truncate">{p.name}</h3>
                 <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
                   {#if p.noAuth}
-                    <Badge variant="success" size="sm">Ready</Badge>
+                    <Badge variant="success" size="sm">{t('Ready')}</Badge>
                   {:else if stats.allDisabled}
-                    <Badge variant="default" size="sm">Disabled</Badge>
+                    <Badge variant="default" size="sm">{t('Disabled')}</Badge>
                   {:else if stats.total === 0}
-                    <span class="text-xs text-text-muted">No connections</span>
+                    <span class="text-xs text-text-muted">{t('No connections')}</span>
                   {:else}
                     {#if stats.connected > 0}
                       <Badge variant="success" size="sm" dot>{stats.connected} Connected</Badge>
@@ -221,15 +221,15 @@
     <div class="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-semibold text-text-main">Create {creatingKind === 'webSearch' ? 'Web Search' : 'Web Fetch'} Combo</h3>
-        <button onclick={() => (creatingKind = null)} aria-label="Close combo creation" class="text-text-muted hover:text-text-main cursor-pointer"><X class="w-5 h-5" /></button>
+        <button onclick={() => (creatingKind = null)} aria-label={t('Close combo creation')} class="text-text-muted hover:text-text-main cursor-pointer"><X class="w-5 h-5" /></button>
       </div>
       <div>
-        <label for="new-combo-name" class="block text-xs font-medium text-text-muted mb-1">Combo Name</label>
-        <input id="new-combo-name" type="text" bind:value={newComboName} class="w-full px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text-main focus:outline-none focus:border-brand-500" placeholder="e.g. search-combo-1" />
+        <label for="new-combo-name" class="block text-xs font-medium text-text-muted mb-1">{t('Combo Name')}</label>
+        <input id="new-combo-name" type="text" bind:value={newComboName} class="w-full px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text-main focus:outline-none focus:border-brand-500" placeholder={t('e.g. search-combo-1')} />
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <Button variant="secondary" size="sm" onclick={() => (creatingKind = null)}>Cancel</Button>
-        <Button size="sm" loading={isSubmitting} onclick={handleCreateCombo}>Create</Button>
+        <Button variant="secondary" size="sm" onclick={() => (creatingKind = null)}>{t('Cancel')}</Button>
+        <Button size="sm" loading={isSubmitting} onclick={handleCreateCombo}>{t('Create')}</Button>
       </div>
     </div>
   </div>
@@ -239,23 +239,23 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
     <div class="w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-semibold text-text-main">Manage Combo</h3>
-        <button onclick={() => (managingCombo = null)} aria-label="Close combo manager" class="text-text-muted hover:text-text-main cursor-pointer"><X class="w-5 h-5" /></button>
+        <h3 class="text-base font-semibold text-text-main">{t('Manage Combo')}</h3>
+        <button onclick={() => (managingCombo = null)} aria-label={t('Close combo manager')} class="text-text-muted hover:text-text-main cursor-pointer"><X class="w-5 h-5" /></button>
       </div>
       <div>
-        <label for="edit-combo-name" class="block text-xs font-medium text-text-muted mb-1">Combo Name</label>
+        <label for="edit-combo-name" class="block text-xs font-medium text-text-muted mb-1">{t('Combo Name')}</label>
         <input id="edit-combo-name" type="text" bind:value={manageName} class="w-full px-3 py-2 text-sm rounded-lg border border-border bg-bg text-text-main focus:outline-none focus:border-brand-500" />
       </div>
       <div>
-        <span class="block text-xs font-medium text-text-muted mb-2">Provider Models in Combo</span>
+        <span class="block text-xs font-medium text-text-muted mb-2">{t('Provider Models in Combo')}</span>
         {#if manageModels.length === 0}
-          <p class="text-xs text-text-muted italic mb-2">No provider models in this combo yet.</p>
+          <p class="text-xs text-text-muted italic mb-2">{t('No provider models in this combo yet.')}</p>
         {:else}
           <div class="space-y-1.5 mb-3">
             {#each manageModels as model, idx}
               <div class="flex items-center justify-between px-3 py-1.5 rounded-lg border border-border bg-bg text-xs">
                 <span class="font-mono">{model}</span>
-                <button type="button" onclick={() => removeModelFromManage(idx)} class="text-red-500 hover:text-red-600 cursor-pointer" title="Remove"><X class="w-4 h-4" /></button>
+                <button type="button" onclick={() => removeModelFromManage(idx)} class="text-red-500 hover:text-red-600 cursor-pointer" title={t('Remove')}><X class="w-4 h-4" /></button>
               </div>
             {/each}
           </div>
@@ -269,10 +269,10 @@
         </div>
       </div>
       <div class="flex items-center justify-between pt-4 border-t border-border">
-        <Button variant="danger" size="sm" onclick={handleDeleteCombo}><Trash2 class="w-4 h-4 mr-1" /> Delete</Button>
+        <Button variant="danger" size="sm" onclick={handleDeleteCombo}><Trash2 class="w-4 h-4 mr-1" /> {t('Delete')}</Button>
         <div class="flex gap-2">
-          <Button variant="secondary" size="sm" onclick={() => (managingCombo = null)}>Cancel</Button>
-          <Button size="sm" loading={isSubmitting} onclick={handleSaveCombo}>Save Changes</Button>
+          <Button variant="secondary" size="sm" onclick={() => (managingCombo = null)}>{t('Cancel')}</Button>
+          <Button size="sm" loading={isSubmitting} onclick={handleSaveCombo}>{t('Save Changes')}</Button>
         </div>
       </div>
     </div>

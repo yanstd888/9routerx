@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import {
     ArrowDown,
     ArrowUp,
@@ -406,14 +407,12 @@
     <!-- Name -->
     <div>
       <Input
-        label="Combo Name"
+        label={t('Combo Name')}
         bind:value={modalName}
-        placeholder="my-combo"
+        placeholder={t('my-combo')}
         error={modalNameError}
       />
-      <p class="text-[10px] text-text-muted mt-0.5">
-        Only letters, numbers, -, _ and . allowed
-      </p>
+      <p class="text-[10px] text-text-muted mt-0.5">{t('Only letters, numbers, -, _ and . allowed')}</p>
     </div>
 
     <!-- Model response timeout: a failover control, so it sits right under the
@@ -421,7 +420,7 @@
     <div class="rounded-lg border border-border bg-surface-2 p-3">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px] text-brand-500">timer</span>
-        <label for="combo-response-timeout" class="text-sm font-medium">Model response timeout</label>
+        <label for="combo-response-timeout" class="text-sm font-medium">{t('Model response timeout')}</label>
         <div class="ml-auto flex items-center gap-1.5">
           <input
             id="combo-response-timeout"
@@ -429,7 +428,7 @@
             min="0"
             max={MAX_FIRST_TOKEN_TIMEOUT_SECONDS}
             step="any"
-            placeholder="Off"
+            placeholder={t('Off')}
             bind:value={timeoutInput}
             class="w-24 rounded-lg border bg-surface px-2.5 py-1.5 text-sm text-text-main focus:outline-none focus:border-brand-500 {timeoutError ? 'border-red-500' : 'border-border'}"
           />
@@ -442,7 +441,7 @@
       {/if}
       <div class="mt-3 flex items-center gap-2 border-t border-border pt-3 {timeoutMs ? '' : 'opacity-50'}">
         <span class="material-symbols-outlined text-[18px] text-text-muted">hourglass_top</span>
-        <label for="combo-response-grace" class="text-sm font-medium">Grace period after a timeout</label>
+        <label for="combo-response-grace" class="text-sm font-medium">{t('Grace period after a timeout')}</label>
         <div class="ml-auto flex items-center gap-1.5">
           <input
             id="combo-response-grace"
@@ -474,7 +473,7 @@
     <div class="rounded-lg border border-border bg-surface-2 p-3">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px] text-brand-500">payments</span>
-        <label for="combo-budget-limit" class="text-sm font-medium">Spending ceiling</label>
+        <label for="combo-budget-limit" class="text-sm font-medium">{t('Spending ceiling')}</label>
         <div class="ml-auto flex items-center gap-1.5">
           <input
             id="combo-budget-limit"
@@ -482,7 +481,7 @@
             inputmode="decimal"
             min="0"
             step="any"
-            placeholder="Off"
+            placeholder={t('Off')}
             bind:value={budgetInput}
             class="w-24 rounded-lg border bg-surface px-2.5 py-1.5 text-sm text-text-main focus:outline-none focus:border-brand-500 {budgetError ? 'border-red-500' : 'border-border'}"
           />
@@ -499,10 +498,7 @@
           </select>
         </div>
       </div>
-      <p class="mt-1.5 text-xs text-text-muted">
-        Once the period's spend attributed to this combo crosses the ceiling, new requests stop — or downgrade to
-        this combo's cheapest member, per the budget breach mode. Leave empty for unbounded.
-      </p>
+      <p class="mt-1.5 text-xs text-text-muted">{t('Once the period\'s spend attributed to this combo crosses the ceiling, new requests stop — or downgrade to this combo\'s cheapest member, per the budget breach mode. Leave empty for unbounded.')}</p>
       {#if budgetError}
         <p class="mt-1 text-xs text-red-500" role="alert">{budgetError}</p>
       {/if}
@@ -513,26 +509,21 @@
          reach the mechanism that produced it. -->
     <div>
       <div class="flex items-center justify-between mb-1.5">
-        <label class="text-sm font-medium">Smart rules</label>
+        <label class="text-sm font-medium">{t('Smart rules')}</label>
         <button
           type="button"
           onclick={addRule}
           class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium text-brand-500 hover:bg-brand-500/10 transition-colors cursor-pointer"
         >
           <Plus class="w-3 h-3" />
-          <span>Add rule</span>
+          <span>{t('Add rule')}</span>
         </button>
       </div>
-      <p class="text-[10px] text-text-muted mb-2">
-        A model that matches a rule joins this combo by itself, and leaves it when it disappears.
-        Models you pick below are yours to keep.
-      </p>
+      <p class="text-[10px] text-text-muted mb-2">{t('A model that matches a rule joins this combo by itself, and leaves it when it disappears. Models you pick below are yours to keep.')}</p>
       {#if rules.length === 0}
         <div
           class="text-center py-3 border border-dashed border-black/10 dark:border-white/10 rounded-lg bg-black/[0.01] dark:bg-white/[0.01] text-[11px] text-text-muted italic"
-        >
-          No rules — this combo holds only the models you picked.
-        </div>
+        >{t('No rules — this combo holds only the models you picked.')}</div>
       {:else}
         <div class="flex flex-col gap-2">
           {#each rules as rule, idx (rule.id)}
@@ -549,14 +540,14 @@
                   type="text"
                   value={rule.pattern}
                   oninput={(e) => (rule.pattern = e.currentTarget.value)}
-                  placeholder="kenari/deepseek*"
+                  placeholder={t('kenari/deepseek*')}
                   class="min-w-0 flex-1 rounded border border-border bg-surface px-2 py-1 font-mono text-xs text-text-main focus:outline-none focus:border-brand-500"
                 />
                 <button
                   type="button"
                   onclick={() => removeRule(idx)}
                   class="shrink-0 rounded p-1 text-text-muted hover:bg-red-500/10 hover:text-red-500 transition-colors cursor-pointer"
-                  title="Remove rule"
+                  title={t('Remove rule')}
                 >
                   <X class="w-3.5 h-3.5" />
                 </button>
@@ -566,7 +557,7 @@
                   value={rule.mode}
                   onchange={(e) => (rule.mode = e.currentTarget.value as SmartRule['mode'])}
                   class="rounded border border-border bg-surface px-1.5 py-0.5 text-[11px] text-text-main focus:outline-none focus:border-brand-500 cursor-pointer"
-                  title="How the pattern is matched"
+                  title={t('How the pattern is matched')}
                 >
                   {#each SMART_RULE_MODES as mode (mode.value)}
                     <option value={mode.value}>{mode.label}</option>
@@ -576,12 +567,12 @@
                   value={rule.effect}
                   onchange={(e) => (rule.effect = e.currentTarget.value as SmartRule['effect'])}
                   class="rounded border border-border bg-surface px-1.5 py-0.5 text-[11px] text-text-main focus:outline-none focus:border-brand-500 cursor-pointer"
-                  title="Add matching models, or keep them out"
+                  title={t('Add matching models, or keep them out')}
                 >
-                  <option value="include">Add</option>
-                  <option value="exclude">Exclude</option>
+                  <option value="include">{t('Add')}</option>
+                  <option value="exclude">{t('Exclude')}</option>
                 </select>
-                <label class="flex items-center gap-1 text-[10px] text-text-muted" title="0 means no cap">
+                <label class="flex items-center gap-1 text-[10px] text-text-muted" title={t('0 means no cap')}>
                   <span>max</span>
                   <input
                     type="number"
@@ -591,14 +582,14 @@
                     class="w-14 rounded border border-border bg-surface px-1.5 py-0.5 text-[11px] text-text-main focus:outline-none focus:border-brand-500"
                   />
                 </label>
-                <label class="flex items-center gap-1 text-[10px] text-text-muted" title="Also match embedding, image, tts and stt models">
+                <label class="flex items-center gap-1 text-[10px] text-text-muted" title={t('Also match embedding, image, tts and stt models')}>
                   <input
                     type="checkbox"
                     checked={rule.allKinds}
                     onchange={(e) => (rule.allKinds = e.currentTarget.checked)}
                     class="size-3 cursor-pointer accent-brand-500"
                   />
-                  <span>all kinds</span>
+                  <span>{t('all kinds')}</span>
                 </label>
               </div>
               <p class="text-[10px] text-text-muted">
@@ -621,10 +612,10 @@
           >
             {#if isLoadingModels}
               <span class="size-3 animate-spin rounded-full border-2 border-brand-500/30 border-t-brand-500"></span>
-              <span>Loading…</span>
+              <span>{t('Loading…')}</span>
             {:else}
               <Layers class="w-3.5 h-3.5" />
-              <span>Load matching models</span>
+              <span>{t('Load matching models')}</span>
             {/if}
           </button>
           {#if loadDelta}
@@ -657,9 +648,7 @@
               onclick={loadMatchingModels}
               disabled={isLoadingModels}
               class="text-[10px] font-medium text-brand-500 hover:underline cursor-pointer disabled:opacity-50"
-            >
-              Load all
-            </button>
+            >{t('Load all')}</button>
           </div>
           <div class="flex flex-wrap gap-1">
             {#each previewMembers as member}
@@ -674,7 +663,7 @@
                     type="button"
                     onclick={() => excludeMember(member)}
                     class="shrink-0 rounded p-0.5 text-text-muted hover:bg-red-500/10 hover:text-red-500 transition-colors cursor-pointer"
-                    title="Exclude this model from the rule that claims it"
+                    title={t('Exclude this model from the rule that claims it')}
                   >
                     <X class="w-2.5 h-2.5" />
                   </button>
@@ -688,7 +677,7 @@
     <!-- Models -->
     <div>
       <div class="flex flex-wrap items-center justify-between gap-y-1.5 mb-1.5">
-        <label class="text-sm font-medium">Models</label>
+        <label class="text-sm font-medium">{t('Models')}</label>
         <div class="flex flex-wrap items-center gap-1.5">
           <!-- Sort: a one-shot reorder of the stored list. The operator picks
                an option, the list is rewritten, and anything can be dragged
@@ -698,7 +687,7 @@
             value={sortKey}
             onchange={(e) => applySort(e.currentTarget.value as ComboSortKey)}
             class="rounded border border-border bg-surface px-1.5 py-0.5 text-[11px] text-text-main focus:outline-none focus:border-brand-500 cursor-pointer shrink-0"
-            title="Reorder the members once. You can drag anything back afterwards."
+            title={t('Reorder the members once. You can drag anything back afterwards.')}
           >
             {#each COMBO_SORT_OPTIONS as opt (opt.value)}
               <option value={opt.value} title={opt.hint}>{opt.label}</option>
@@ -713,7 +702,7 @@
             class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium text-brand-500 hover:bg-brand-500/10 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
           >
             <Plus class="w-3 h-3 shrink-0" />
-            <span>Add Models Manually</span>
+            <span>{t('Add Models Manually')}</span>
           </button>
           <!-- Test Models: dead/alive check for draft models -->
           <button
@@ -743,7 +732,7 @@
       {#if models.length === 0}
         <div class="text-center py-4 border border-dashed border-black/10 dark:border-white/10 rounded-lg bg-black/[0.01] dark:bg-white/[0.01]">
           <Layers class="w-6 h-6 text-text-muted mx-auto mb-1 opacity-50" />
-          <p class="text-xs text-text-muted">No models added yet</p>
+          <p class="text-xs text-text-muted">{t('No models added yet')}</p>
         </div>
       {:else}
         <div class="flex flex-col gap-1 max-h-[55vh] overflow-y-auto sm:max-h-[350px]">
@@ -780,7 +769,7 @@
                   onkeydown={(e) => e.key === 'Enter' && startEdit(idx, model)}
                   role="textbox"
                   tabindex="0"
-                  title="Click to edit"
+                  title={t('Click to edit')}
                 >
                   <code
                     class="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-mono text-xs transition-colors {res ? (res.ok ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium' : 'border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400 font-medium') : 'border-transparent bg-transparent text-text-main'}"
@@ -801,10 +790,10 @@
                 </div>
               {/if}
               {#if caps.vision}
-                <Eye class="w-3 h-3 text-blue-500 shrink-0" title="Vision — Supports image input" />
+                <Eye class="w-3 h-3 text-blue-500 shrink-0" title={t('Vision — Supports image input')} />
               {/if}
               {#if caps.reasoning}
-                <Brain class="w-3 h-3 text-amber-500 shrink-0" title="Reasoning — Supports reasoning / thinking" />
+                <Brain class="w-3 h-3 text-amber-500 shrink-0" title={t('Reasoning — Supports reasoning / thinking')} />
               {/if}
               <div class="flex shrink-0 items-center gap-0.5">
                 <button
@@ -812,7 +801,7 @@
                   onclick={() => moveModel(idx, -1)}
                   disabled={idx === 0}
                   class="p-0.5 rounded {idx === 0 ? 'text-text-muted/20 cursor-not-allowed' : 'text-text-muted hover:text-brand-500 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer'}"
-                  title="Move up"
+                  title={t('Move up')}
                 >
                   <ArrowUp class="w-3 h-3" />
                 </button>
@@ -821,7 +810,7 @@
                   onclick={() => moveModel(idx, 1)}
                   disabled={idx === models.length - 1}
                   class="p-0.5 rounded {idx === models.length - 1 ? 'text-text-muted/20 cursor-not-allowed' : 'text-text-muted hover:text-brand-500 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer'}"
-                  title="Move down"
+                  title={t('Move down')}
                 >
                   <ArrowDown class="w-3 h-3" />
                 </button>
@@ -830,7 +819,7 @@
                 type="button"
                 onclick={() => removeModel(idx)}
                 class="p-0.5 hover:bg-red-500/10 rounded text-text-muted hover:text-red-500 transition-all cursor-pointer"
-                title="Remove"
+                title={t('Remove')}
               >
                 <X class="w-3 h-3" />
               </button>
@@ -846,9 +835,7 @@
 
     <!-- Actions -->
     <div class="flex flex-col gap-2 pt-1 sm:flex-row">
-      <Button onclick={onClose} variant="ghost" fullWidth size="sm">
-        Cancel
-      </Button>
+      <Button onclick={onClose} variant="ghost" fullWidth size="sm">{t('Cancel')}</Button>
       <Button
         onclick={handleSave}
         fullWidth

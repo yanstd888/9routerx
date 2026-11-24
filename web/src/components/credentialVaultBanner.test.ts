@@ -22,6 +22,9 @@ const component = readFileSync(
 )
 const app = readFileSync(resolve(import.meta.dirname, '..', 'App.svelte'), 'utf8')
 const readme = readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'README.md'), 'utf8')
+const zhCatalogue = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, '..', 'locales', 'zh.json'), 'utf8'),
+) as Record<string, string>
 
 describe('credential encryption banner contract', () => {
   it('renders when the vault status read succeeds and reports disabled', () => {
@@ -41,7 +44,11 @@ describe('credential encryption banner contract', () => {
     const anchor = 'https://yanstd888.github.io/9routerx/readme.html#credential-encryption'
     expect(component).toContain(`href="${anchor}"`)
     expect(component).toContain('rel="noopener noreferrer"')
-    expect(component).toContain('>How to set it</a>')
+    // The label goes through t() now, so the English text is the dictionary key
+    // rather than literal markup. Pin the wrapper, and pin that the key exists —
+    // a typo in either half would silently fall back to English.
+    expect(component).toContain(">{t('How to set it')}</a>")
+    expect(zhCatalogue['How to set it']).toBe('如何设置')
     // The anchor only resolves once the docs section exists; pin both halves.
     expect(readme).toContain('## Credential encryption')
     expect(readme).toContain('ROUTER_MASTER_KEY')

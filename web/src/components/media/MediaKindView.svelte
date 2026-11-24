@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { notifications } from '../../lib/notifications'
   import { api, type APIKey, type Combo, type ProviderConnection, type ProviderNode, type Settings } from '../../api/client'
@@ -155,9 +156,7 @@
             onclick={handleCreateCombo}
             class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-surface border border-border hover:bg-surface-2 text-text-main text-xs font-medium transition-colors cursor-pointer shadow-sm"
           >
-            <span class="material-symbols-outlined text-sm">add</span>
-            Create Combo
-          </button>
+            <span class="material-symbols-outlined text-sm">add</span>{t('Create Combo')}</button>
         {/if}
         {#if isEmbedding}
           <button
@@ -165,16 +164,14 @@
             onclick={() => (showCustomModal = true)}
             class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors cursor-pointer shadow-sm"
           >
-            <span class="material-symbols-outlined text-sm">add</span>
-            Add Custom Embedding
-          </button>
+            <span class="material-symbols-outlined text-sm">add</span>{t('Add Custom Embedding')}</button>
         {/if}
       </div>
     {/if}
 
     {#if supportsCombo && kindCombos.length > 0}
       <div class="flex flex-col gap-2">
-        <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider">Combos</h2>
+        <h2 class="text-xs font-semibold text-text-muted uppercase tracking-wider">{t('Combos')}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {#each kindCombos as combo (combo.id)}
             <a href={`/dashboard/media-providers/combo/${combo.id}`}>
@@ -198,9 +195,7 @@
     {/if}
 
     {#if allProviders.length === 0}
-      <div class="text-center py-12 border border-dashed border-border rounded-xl text-text-muted text-sm">
-        No providers support <strong>{kindConfig?.title || kind}</strong> yet.
-      </div>
+      <div class="text-center py-12 border border-dashed border-border rounded-xl text-text-muted text-sm">{t('No providers support')}<strong>{kindConfig?.title || kind}</strong>{t('yet.')}</div>
     {:else}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {#each providers as provider (provider.id)}

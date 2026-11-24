@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Pagination for a paged list: the page label on the left, the prev/next
   // pair on the right. Both lists on the jailbreak page used to carry this
   // markup twice, so a change to the button treatment had to be made twice.
@@ -26,7 +27,7 @@
       type="button"
       onclick={() => onPage(Math.max(1, page - 1))}
       disabled={page <= 1}
-      aria-label="Previous page"
+      aria-label={t('Previous page')}
       class="px-3 py-1.5 bg-surface-3 border border-border-subtle shadow-[var(--9x-shadow-sm)] text-text-main text-sm font-medium disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
     >
       ‹
@@ -35,7 +36,7 @@
       type="button"
       onclick={() => onPage(Math.min(pageCount, page + 1))}
       disabled={page >= pageCount}
-      aria-label="Next page"
+      aria-label={t('Next page')}
       class="px-3 py-1.5 bg-surface-3 border border-border-subtle shadow-[var(--9x-shadow-sm)] text-text-main text-sm font-medium disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
     >
       ›

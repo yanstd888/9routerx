@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of the toast stack in upstream DashboardLayout.js.
   import { onMount } from 'svelte'
   import { notifications, type NotificationType } from '../notifications'
@@ -92,7 +93,7 @@
             type="button"
             onclick={() => notifications.removeNotification(n.id)}
             class="text-current/70 hover:text-current cursor-pointer"
-            aria-label="Dismiss notification"
+            aria-label={t('Dismiss notification')}
           >
             <span class="material-symbols-outlined text-[16px]">close</span>
           </button>

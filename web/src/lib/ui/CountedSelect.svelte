@@ -130,9 +130,7 @@
     {#if current}
       <span class="text-text-muted">({current.count})</span>
     {/if}
-    <span class="material-symbols-outlined text-[16px] text-text-muted" aria-hidden="true">
-      expand_more
-    </span>
+    <span class="material-symbols-outlined text-[16px] text-text-muted" aria-hidden="true">expand_more</span>
   </button>
 
   {#if open}

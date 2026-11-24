@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { matchMemberRow, parseMember, sameProvider } from './comboMatch'
   import type { ActiveRequestItem, RecentRequestItem } from './types'
 
@@ -144,11 +145,11 @@
 {#if liveCombo && steps.length > 0}
   <section
     class="cf bg-surface border border-border-subtle rounded-[14px] shadow-[var(--shadow-soft)] min-w-0 overflow-hidden"
-    aria-label="Combo flow"
+    aria-label={t('Combo flow')}
   >
     <header class="cf-header">
       <div class="cf-heading">
-        <span class="cf-kicker">Combo flow</span>
+        <span class="cf-kicker">{t('Combo flow')}</span>
         <span class="cf-name">{liveCombo}</span>
         <span class="cf-strategy">{strategy}</span>
       </div>
@@ -164,7 +165,7 @@
     <div class="cf-route">
       <div class="cf-chip" data-role="router" data-state={routeState}>
         <img src="/android-chrome-192x192.png" alt="" loading="lazy" decoding="async" />
-        <span>9RouterX</span>
+        <span>{t('9RouterX')}</span>
       </div>
       <span class="cf-route-arrow" data-state={routeState} aria-hidden="true">
         <svg viewBox="0 0 40 12" preserveAspectRatio="none">
@@ -203,7 +204,7 @@
                 <small title={step.model || step.provider}>{step.model || '—'}</small>
               </span>
               {#if step.latency > 0}
-                <span class="cf-latency" title="time this member took to answer">{fmtLatency(step.latency)}</span>
+                <span class="cf-latency" title={t('time this member took to answer')}>{fmtLatency(step.latency)}</span>
               {/if}
               <span class="cf-status">
                 {#if step.status === 'connected'}
@@ -238,8 +239,8 @@
     <footer class="cf-legend">
       <span data-kind="trying">trying</span>
       <span data-kind="connected">answered</span>
-      <span data-kind="failed">failed → moves to the next one</span>
-      <span data-kind="idle">not used yet</span>
+      <span data-kind="failed">{t('failed → moves to the next one')}</span>
+      <span data-kind="idle">{t('not used yet')}</span>
     </footer>
   </section>
 {/if}

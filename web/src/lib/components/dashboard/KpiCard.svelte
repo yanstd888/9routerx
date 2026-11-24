@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../../lib/i18n.svelte'
   // /* adapted from tremor (Apache-2.0) */ — KPI card with the delta badge
   // (▲/▼) and the mini area sparkline. Presentational only: every input is a
   // prop, so the panel that renders it keeps its own data flow untouched.
@@ -106,7 +107,7 @@
           : deltaUp
             ? 'bg-success/10 text-success'
             : 'bg-danger/10 text-danger'}"
-        title="Second half of the window vs the first"
+        title={t('Second half of the window vs the first')}
       >
         {#if !flat}
           <span aria-hidden="true">{deltaUp ? '▲' : '▼'}</span>

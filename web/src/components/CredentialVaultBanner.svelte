@@ -44,7 +44,7 @@
         target="_blank"
         rel="noopener noreferrer"
         class="mt-1 inline-flex min-h-11 items-center underline underline-offset-2 hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-      >How to set it</a>
+      >{t('How to set it')}</a>
     </div>
   </div>
 {/if}

@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { api, type NotificationItem } from '../api/client'
   import { Bell, Check, Trash2, AlertTriangle, AlertOctagon, Info } from 'lucide-svelte'
@@ -144,7 +145,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-border px-4 py-3 bg-surface-2">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold text-text-main">Notifications</span>
+          <span class="text-xs font-semibold text-text-main">{t('Notifications')}</span>
           {#if unread > 0}
             <span class="px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold">
               {unread} new
@@ -157,19 +158,15 @@
               type="button"
               onclick={markAllRead}
               class="text-[11px] text-primary hover:underline cursor-pointer"
-            >
-              Mark all read
-            </button>
+            >{t('Mark all read')}</button>
           {/if}
           {#if items.length > 0}
             <button
               type="button"
               onclick={clearAll}
               class="text-[11px] text-text-muted hover:text-danger cursor-pointer ml-1"
-              title="Clear all notifications"
-            >
-              Clear all
-            </button>
+              title={t('Clear all notifications')}
+            >{t('Clear all')}</button>
           {/if}
         </div>
       </div>
@@ -179,8 +176,8 @@
         {#if items.length === 0}
           <div class="py-10 text-center text-text-muted">
             <Bell class="w-6 h-6 mx-auto mb-2 opacity-30" />
-            <p class="text-xs font-medium">Nothing to report</p>
-            <p class="text-[11px] text-text-subtle mt-0.5">Quota warnings and system alerts will appear here</p>
+            <p class="text-xs font-medium">{t('Nothing to report')}</p>
+            <p class="text-[11px] text-text-subtle mt-0.5">{t('Quota warnings and system alerts will appear here')}</p>
           </div>
         {:else}
           {#each items as item (item.id)}
@@ -221,7 +218,7 @@
                   <button
                     type="button"
                     onclick={() => markReadOne(item)}
-                    title="Mark as read"
+                    title={t('Mark as read')}
                     class="p-1 rounded text-text-muted hover:text-text-main hover:bg-surface-3 transition cursor-pointer"
                   >
                     <Check class="w-3.5 h-3.5" />
@@ -230,7 +227,7 @@
                 <button
                   type="button"
                   onclick={() => dismissOne(item)}
-                  title="Dismiss notification"
+                  title={t('Dismiss notification')}
                   class="p-1 rounded text-text-muted hover:text-danger hover:bg-danger/10 transition cursor-pointer"
                 >
                   <Trash2 class="w-3.5 h-3.5" />

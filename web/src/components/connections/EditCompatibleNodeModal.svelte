@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of upstream EditCompatibleNodeModal.js (dashboard/providers/[id]).
   import Badge from '../../lib/ui/Badge.svelte'
   import Button from '../../lib/ui/Button.svelte'
@@ -147,21 +148,21 @@
 <Modal {isOpen} title={`Edit ${isAnthropic ? 'Anthropic' : 'OpenAI'} Compatible`} {onClose}>
   <div class="flex flex-col gap-4">
     <Input
-      label="Name"
+      label={t('Name')}
       bind:value={formName}
       placeholder={`${isAnthropic ? 'Anthropic' : 'OpenAI'} Compatible (Prod)`}
       hint="Required. A friendly label for this node."
     />
     <Input
-      label="Prefix"
+      label={t('Prefix')}
       bind:value={formPrefix}
       placeholder={isAnthropic ? 'ac-prod' : 'oc-prod'}
       hint="Required. Used as the provider prefix for model IDs."
     />
     <Input
-      label="Custom URL Suffix"
+      label={t('Custom URL Suffix')}
       bind:value={formUrlSuffix}
-      placeholder="e.g. bai"
+      placeholder={t('e.g. bai')}
       hint={node.urlSuffixGenerated
         ? 'Optional. This provider still carries a randomized suffix; fill this in to name it.'
         : 'Optional. Changing this renames the provider id and carries this node\'s credentials, models and history with it.'}
@@ -169,19 +170,19 @@
     />
     {#if !isAnthropic}
       <div>
-        <label for="edit-node-api-type" class="text-sm font-medium text-text-main mb-1.5 block">API Type</label>
+        <label for="edit-node-api-type" class="text-sm font-medium text-text-main mb-1.5 block">{t('API Type')}</label>
         <select
           id="edit-node-api-type"
           bind:value={formApiType}
           class="w-full py-2.5 px-3 pr-10 text-sm text-text-main bg-surface-2 border border-transparent rounded-[10px] appearance-none focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/40 transition-all duration-150"
         >
-          <option value="chat">Chat Completions</option>
-          <option value="responses">Responses API</option>
+          <option value="chat">{t('Chat Completions')}</option>
+          <option value="responses">{t('Responses API')}</option>
         </select>
       </div>
     {/if}
     <Input
-      label="Base URL"
+      label={t('Base URL')}
       bind:value={formBaseUrl}
       placeholder={isAnthropic ? 'https://api.anthropic.com/v1' : 'https://api.openai.com/v1'}
       hint={`Use the base URL (ending in /v1) for your ${isAnthropic ? 'Anthropic' : 'OpenAI'}-compatible API.`}
@@ -190,7 +191,7 @@
     <div class="flex gap-2">
       <div class="flex-1">
         <Input
-          label="API Key (for Check)"
+          label={t('API Key (for Check)')}
           type="password"
           bind:value={checkKey}
         />
@@ -206,9 +207,9 @@
       </div>
     </div>
     <Input
-      label="Model ID (optional)"
+      label={t('Model ID (optional)')}
       bind:value={checkModelId}
-      placeholder="e.g. my-model-id"
+      placeholder={t('e.g. my-model-id')}
       hint="If provider lacks /models endpoint, enter a model ID to validate via chat/completions instead."
     />
     {#if validation}
@@ -235,7 +236,7 @@
       <Button onclick={handleSubmit} fullWidth disabled={saveDisabled}>
         {saving ? 'Saving...' : 'Save'}
       </Button>
-      <Button onclick={onClose} variant="ghost" fullWidth>Cancel</Button>
+      <Button onclick={onClose} variant="ghost" fullWidth>{t('Cancel')}</Button>
     </div>
   </div>
 </Modal>

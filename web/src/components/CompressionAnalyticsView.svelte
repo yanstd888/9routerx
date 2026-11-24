@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onDestroy, type Snippet } from 'svelte'
   import {
     api,
@@ -217,25 +218,23 @@
         />
       </div>
 
-      <Menu label="Compression analytics actions" minWidth="14rem">
+      <Menu label={t('Compression analytics actions')} minWidth="14rem">
         <MenuItem
-          label="Auto-refresh"
+          label={t('Auto-refresh')}
           icon="sync"
           checkbox
           note="15s"
           pressed={autoRefresh}
           onSelect={() => (autoRefresh = !autoRefresh)}
         />
-        <MenuItem label="Refresh now" icon="refresh" disabled={loading} onSelect={loadData} />
+        <MenuItem label={t('Refresh now')} icon="refresh" disabled={loading} onSelect={loadData} />
         <div class="my-1 border-t border-border-subtle" role="separator"></div>
-        <MenuItem label="Export CSV" icon="download" onSelect={exportCSV} />
-        <MenuItem label="Export JSON" icon="data_object" onSelect={exportJSON} />
+        <MenuItem label={t('Export CSV')} icon="download" onSelect={exportCSV} />
+        <MenuItem label={t('Export JSON')} icon="data_object" onSelect={exportJSON} />
       </Menu>
     </div>
 
-    <p class="text-sm text-text-muted">
-      Prompt token reduction, engine execution efficiency, and savings telemetry.
-    </p>
+    <p class="text-sm text-text-muted">{t('Prompt token reduction, engine execution efficiency, and savings telemetry.')}</p>
   </div>
 
   <!-- Hero StatCards -->
@@ -246,7 +245,7 @@
     <!-- Total Requests -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Total Requests</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Total Requests')}</span>
         <span class="material-symbols-outlined text-[20px] text-brand-500">compress</span>
       </div>
       <div class="mt-3">
@@ -260,49 +259,49 @@
     <!-- Tokens Saved -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Tokens Saved</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Tokens Saved')}</span>
         <span class="material-symbols-outlined text-[20px] text-emerald-500">token</span>
       </div>
       <div class="mt-3">
         <div class="text-2xl font-bold text-emerald-500">
           {(stats?.totalTokensSaved ?? 0).toLocaleString()}
         </div>
-        <p class="text-xs text-text-subtle mt-1 truncate">Prompt reduction</p>
+        <p class="text-xs text-text-subtle mt-1 truncate">{t('Prompt reduction')}</p>
       </div>
     </div>
 
     <!-- Avg Savings -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Avg Savings</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Avg Savings')}</span>
         <span class="material-symbols-outlined text-[20px] text-blue-400">percent</span>
       </div>
       <div class="mt-3">
         <div class="text-2xl font-bold text-text-main">
           {stats?.avgSavingsPct ? `${stats.avgSavingsPct}%` : '0%'}
         </div>
-        <p class="text-xs text-text-subtle mt-1 truncate">Per request savings</p>
+        <p class="text-xs text-text-subtle mt-1 truncate">{t('Per request savings')}</p>
       </div>
     </div>
 
     <!-- Avg Duration -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Avg Duration</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Avg Duration')}</span>
         <span class="material-symbols-outlined text-[20px] text-purple-400">timer</span>
       </div>
       <div class="mt-3">
         <div class="text-2xl font-bold text-text-main">
           {stats?.avgDurationMs ?? 0}ms
         </div>
-        <p class="text-xs text-text-subtle mt-1 truncate">Compression overhead</p>
+        <p class="text-xs text-text-subtle mt-1 truncate">{t('Compression overhead')}</p>
       </div>
     </div>
 
     <!-- Usage Receipts -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Receipts</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Receipts')}</span>
         <span class="material-symbols-outlined text-[20px] text-cyan-400">receipt_long</span>
       </div>
       <div class="mt-3">
@@ -318,25 +317,25 @@
     <!-- Est. Cost Saved -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">Est. Saved</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('Est. Saved')}</span>
         <span class="material-symbols-outlined text-[20px] text-emerald-400">attach_money</span>
       </div>
       <div class="mt-3">
         <div class="text-2xl font-bold text-emerald-500">
           {costIn(stats?.realUsage?.estimatedUsdSaved ?? 0)}
         </div>
-        <p class="text-xs text-text-subtle mt-1 truncate">Estimated USD saved</p>
+        <p class="text-xs text-text-subtle mt-1 truncate">{t('Estimated USD saved')}</p>
       </div>
     </div>
     <!-- ROI Speed -->
     <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm flex flex-col justify-between col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1">
       <div class="flex items-center justify-between text-text-muted">
-        <span class="text-xs font-medium uppercase tracking-wider">ROI Speed</span>
+        <span class="text-xs font-medium uppercase tracking-wider">{t('ROI Speed')}</span>
         <span class="material-symbols-outlined text-[20px] text-emerald-400">bolt</span>
       </div>
       <div class="mt-3">
         <div class="text-2xl font-bold text-emerald-500">
-          {(stats?.roiTokensPerMs ?? 0).toLocaleString()} <span class="text-xs font-normal text-text-muted">tok/ms</span>
+          {(stats?.roiTokensPerMs ?? 0).toLocaleString()} <span class="text-xs font-normal text-text-muted">{t('tok/ms')}</span>
         </div>
         <p class="text-xs text-text-subtle mt-1 truncate">
           ~{Math.round((stats?.roiTokensPerMs ?? 0) * 1000).toLocaleString()} tokens/sec
@@ -351,10 +350,8 @@
     <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
         <h3 class="text-sm font-semibold text-text-main flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px] text-brand-500">monitoring</span>
-          Hourly Token Savings Trend
-        </h3>
-        <p class="text-xs text-text-subtle">Tokens saved over recent hours.</p>
+          <span class="material-symbols-outlined text-[18px] text-brand-500">monitoring</span>{t('Hourly Token Savings Trend')}</h3>
+        <p class="text-xs text-text-subtle">{t('Tokens saved over recent hours.')}</p>
       </div>
 
       {#if hoveredTrendHour}
@@ -364,22 +361,17 @@
             {hoveredTrendHour.hour.replace('T', ' ').replace(':00:00Z', ':00')}
           </span>
           <span class="text-border">|</span>
-          <span class="text-text-muted">Runs: <strong class="text-text-main font-mono">{hoveredTrendHour.count}</strong></span>
+          <span class="text-text-muted">{t('Runs:')} <strong class="text-text-main font-mono">{hoveredTrendHour.count}</strong></span>
           <span class="text-border">|</span>
-          <span class="text-emerald-500">Tokens Saved: <strong class="font-mono">{hoveredTrendHour.tokensSaved.toLocaleString()}</strong></span>
+          <span class="text-emerald-500">{t('Tokens Saved:')} <strong class="font-mono">{hoveredTrendHour.tokensSaved.toLocaleString()}</strong></span>
         </div>
       {:else}
-        <div class="text-[11px] text-text-subtle hidden sm:block">
-          Hover over any column to inspect hourly savings
-        </div>
+        <div class="text-[11px] text-text-subtle hidden sm:block">{t('Hover over any column to inspect hourly savings')}</div>
       {/if}
     </div>
 
     {#if trendUnavailable}
-      <div class="py-12 text-center text-xs text-text-subtle">
-        The hourly trend needs a bounded window — over "All time" it is one
-        bucket per hour since the ledger began. Pick a shorter period to see it.
-      </div>
+      <div class="py-12 text-center text-xs text-text-subtle">{t('The hourly trend needs a bounded window — over "All time" it is one bucket per hour since the ledger began. Pick a shorter period to see it.')}</div>
     {:else if !stats?.trend || stats.trend.length === 0}
       <div class="py-12 text-center text-xs text-text-subtle">
         No compression activity recorded in the {periodLabel(since).toLowerCase()}.
@@ -403,7 +395,7 @@
         {/each}
       </div>
       <div class="flex flex-wrap items-center justify-between text-[11px] text-text-subtle mt-2 pt-2 border-t border-border-subtle gap-2">
-        <span>Hourly Buckets</span>
+        <span>{t('Hourly Buckets')}</span>
         <span>Window: {since.toUpperCase()}</span>
       </div>
     {/if}
@@ -417,16 +409,12 @@
     <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-semibold text-text-main flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px] text-brand-500">tune</span>
-          Breakdown by Mode
-        </h3>
+          <span class="material-symbols-outlined text-[18px] text-brand-500">tune</span>{t('Breakdown by Mode')}</h3>
         <span class="text-xs text-text-muted">{modeList.length} mode(s)</span>
       </div>
 
       {#if modeList.length === 0}
-        <div class="py-8 text-center text-xs text-text-subtle">
-          No compression mode data recorded yet.
-        </div>
+        <div class="py-8 text-center text-xs text-text-subtle">{t('No compression mode data recorded yet.')}</div>
       {:else}
         <div class="space-y-4">
           {#each modeList as m}
@@ -434,8 +422,7 @@
               <div class="flex flex-wrap items-center justify-between text-xs gap-1">
                 <span class="font-semibold text-text-main uppercase font-mono">{m.mode}</span>
                 <span class="text-text-muted">
-                  <span class="text-text-main font-medium">{m.count}</span> runs •
-                  <span class="text-emerald-500 font-mono">{m.tokensSaved.toLocaleString()}</span> tokens
+                  <span class="text-text-main font-medium">{m.count}</span>{t('runs •')}<span class="text-emerald-500 font-mono">{m.tokensSaved.toLocaleString()}</span> tokens
                   {#if m.avgSavingsPct > 0}
                     • {m.avgSavingsPct}% avg
                   {/if}
@@ -462,9 +449,7 @@
     <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-semibold text-text-main flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px] text-brand-500">dns</span>
-          Breakdown by Provider
-        </h3>
+          <span class="material-symbols-outlined text-[18px] text-brand-500">dns</span>{t('Breakdown by Provider')}</h3>
         <span class="text-xs text-text-muted">
           {providerList.length} provider(s){(stats?.truncatedProviders ?? 0) > 0
             ? ` of ${providerList.length + (stats?.truncatedProviders ?? 0)}`
@@ -473,9 +458,7 @@
       </div>
 
       {#if providerList.length === 0}
-        <div class="py-8 text-center text-xs text-text-subtle">
-          No provider compression data recorded yet.
-        </div>
+        <div class="py-8 text-center text-xs text-text-subtle">{t('No provider compression data recorded yet.')}</div>
       {:else}
         <div class="space-y-4">
           {#each providerList as p}
@@ -486,9 +469,7 @@
                   {p.provider}
                 </span>
                 <span class="text-text-muted">
-                  <span class="text-text-main font-medium">{p.count}</span> runs •
-                  <span class="text-cyan-400 font-mono font-medium">{p.tokensSaved.toLocaleString()}</span> tokens
-                </span>
+                  <span class="text-text-main font-medium">{p.count}</span>{t('runs •')}<span class="text-cyan-400 font-mono font-medium">{p.tokensSaved.toLocaleString()}</span>{t('tokens')}</span>
               </div>
               <div class="h-2 w-full glyph-bar-track">
                 <div
@@ -508,9 +489,7 @@
     <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-semibold text-text-main flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px] text-brand-500">model_training</span>
-          Breakdown by Model
-        </h3>
+          <span class="material-symbols-outlined text-[18px] text-brand-500">model_training</span>{t('Breakdown by Model')}</h3>
         <span class="text-xs text-text-muted">
           {modelList.length} model(s){(stats?.truncatedModels ?? 0) > 0
             ? ` of ${modelList.length + (stats?.truncatedModels ?? 0)}`
@@ -519,9 +498,7 @@
       </div>
 
       {#if modelList.length === 0}
-        <div class="py-8 text-center text-xs text-text-subtle">
-          No model compression data recorded yet.
-        </div>
+        <div class="py-8 text-center text-xs text-text-subtle">{t('No model compression data recorded yet.')}</div>
       {:else}
         <div class="space-y-4">
           {#each modelList as m}
@@ -531,8 +508,7 @@
                   {m.model}
                 </span>
                 <span class="text-text-muted text-[11px]">
-                  <span class="text-text-main font-medium">{m.count}</span> runs •
-                  <span class="text-cyan-400 font-mono font-medium">{m.tokensSaved.toLocaleString()}</span> tokens
+                  <span class="text-text-main font-medium">{m.count}</span>{t('runs •')}<span class="text-cyan-400 font-mono font-medium">{m.tokensSaved.toLocaleString()}</span> tokens
                   {#if m.avgSavingsPct > 0}
                     • {m.avgSavingsPct}%
                   {/if}
@@ -558,10 +534,8 @@
     <div class="flex items-center justify-between">
       <div>
         <h3 class="text-sm font-semibold text-text-main flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px] text-brand-500">trophy</span>
-          Top 10 Biggest Token Savers
-        </h3>
-        <p class="text-xs text-text-subtle">Individual requests with the highest prompt token reduction.</p>
+          <span class="material-symbols-outlined text-[18px] text-brand-500">trophy</span>{t('Top 10 Biggest Token Savers')}</h3>
+        <p class="text-xs text-text-subtle">{t('Individual requests with the highest prompt token reduction.')}</p>
       </div>
       <span class="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-text-muted">
         {stats?.topSavers?.length ?? 0} request(s)
@@ -569,23 +543,21 @@
     </div>
 
     {#if !stats?.topSavers || stats.topSavers.length === 0}
-      <div class="py-8 text-center text-xs text-text-subtle">
-        No recorded top compression runs yet.
-      </div>
+      <div class="py-8 text-center text-xs text-text-subtle">{t('No recorded top compression runs yet.')}</div>
     {:else}
       <div class="overflow-x-auto -mx-5 px-5">
         <table class="glyph-table w-full text-left text-xs min-w-[850px]">
           <thead>
             <tr class="border-b border-border text-text-muted">
-              <th class="py-2.5 px-3 font-semibold">Request ID</th>
-              <th class="py-2.5 px-3 font-semibold hidden md:table-cell">Timestamp</th>
-              <th class="py-2.5 px-3 font-semibold">Provider / Model</th>
-              <th class="py-2.5 px-3 font-semibold hidden md:table-cell">Mode</th>
+              <th class="py-2.5 px-3 font-semibold">{t('Request ID')}</th>
+              <th class="py-2.5 px-3 font-semibold hidden md:table-cell">{t('Timestamp')}</th>
+              <th class="py-2.5 px-3 font-semibold">{t('Provider / Model')}</th>
+              <th class="py-2.5 px-3 font-semibold hidden md:table-cell">{t('Mode')}</th>
               <th class="py-2.5 px-3 font-semibold text-right">Original &rarr; Compressed</th>
-              <th class="py-2.5 px-3 font-semibold text-right">Tokens Saved</th>
-              <th class="py-2.5 px-3 font-semibold text-right">Savings %</th>
-              <th class="py-2.5 px-3 font-semibold text-right hidden md:table-cell">Overhead</th>
-              <th class="py-2.5 px-3 font-semibold text-right">Est. USD</th>
+              <th class="py-2.5 px-3 font-semibold text-right">{t('Tokens Saved')}</th>
+              <th class="py-2.5 px-3 font-semibold text-right">{t('Savings %')}</th>
+              <th class="py-2.5 px-3 font-semibold text-right hidden md:table-cell">{t('Overhead')}</th>
+              <th class="py-2.5 px-3 font-semibold text-right">{t('Est. USD')}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border-subtle">
@@ -599,37 +571,37 @@
                         type="button"
                         onclick={() => copyToClipboard(s.requestId)}
                         class="text-text-subtle hover:text-text-main shrink-0"
-                        title="Copy Request ID"
+                        title={t('Copy Request ID')}
                       >
                         <span class="material-symbols-outlined text-[13px]">content_copy</span>
                       </button>
                     {/if}
                   </div>
                 </td>
-                <td data-label="Timestamp" class="py-2.5 px-3 text-text-subtle whitespace-nowrap hidden md:table-cell">
+                <td data-label={t('Timestamp')} class="py-2.5 px-3 text-text-subtle whitespace-nowrap hidden md:table-cell">
                   {s.timestamp ? s.timestamp.slice(0, 16).replace('T', ' ') : '-'}
                 </td>
-                <td data-label="Provider / Model" class="py-2.5 px-3 text-text-muted">
+                <td data-label={t('Provider / Model')} class="py-2.5 px-3 text-text-muted">
                   <span class="font-medium text-text-main">{s.provider}</span> / <span class="font-mono text-[11px]">{s.model}</span>
                 </td>
-                <td data-label="Mode" class="py-2.5 px-3 hidden md:table-cell">
+                <td data-label={t('Mode')} class="py-2.5 px-3 hidden md:table-cell">
                   <span class="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase text-brand-500">
                     {s.mode}
                   </span>
                 </td>
-                <td data-label="Original → Compressed" class="py-2.5 px-3 text-right font-mono text-text-muted">
+                <td data-label={t('Original → Compressed')} class="py-2.5 px-3 text-right font-mono text-text-muted">
                   {s.originalTokens.toLocaleString()} &rarr; {s.compressedTokens.toLocaleString()}
                 </td>
-                <td data-label="Tokens Saved" class="py-2.5 px-3 text-right font-mono font-semibold text-cyan-400">
+                <td data-label={t('Tokens Saved')} class="py-2.5 px-3 text-right font-mono font-semibold text-cyan-400">
                   {s.tokensSaved.toLocaleString()}
                 </td>
-                <td data-label="Savings %" class="py-2.5 px-3 text-right font-medium text-emerald-500">
+                <td data-label={t('Savings %')} class="py-2.5 px-3 text-right font-medium text-emerald-500">
                   {s.savingsPct}%
                 </td>
-                <td data-label="Overhead" class="py-2.5 px-3 text-right text-purple-400 font-mono hidden md:table-cell">
+                <td data-label={t('Overhead')} class="py-2.5 px-3 text-right text-purple-400 font-mono hidden md:table-cell">
                   {s.durationMs}ms
                 </td>
-                <td data-label="Est. USD" class="py-2.5 px-3 text-right font-medium text-emerald-400">
+                <td data-label={t('Est. USD')} class="py-2.5 px-3 text-right font-medium text-emerald-400">
                   {costIn(s.estimatedUsd, 3)}
                 </td>
               </tr>
@@ -645,31 +617,29 @@
   {#if isPanelVisible('compression.receipts')}
   <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
     <h3 class="text-sm font-semibold text-text-main mb-3 flex items-center gap-1.5">
-      <span class="material-symbols-outlined text-[18px] text-brand-500">receipt_long</span>
-      Upstream Usage Receipts Telemetry
-    </h3>
+      <span class="material-symbols-outlined text-[18px] text-brand-500">receipt_long</span>{t('Upstream Usage Receipts Telemetry')}</h3>
 
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 pt-2">
       <div class="p-3 rounded-xl bg-surface-2/60 border border-border-subtle">
-        <div class="text-[11px] font-medium text-text-muted uppercase">Prompt Tokens</div>
+        <div class="text-[11px] font-medium text-text-muted uppercase">{t('Prompt Tokens')}</div>
         <div class="text-lg font-bold text-text-main mt-1 font-mono">
           {(stats?.realUsage?.promptTokens ?? 0).toLocaleString()}
         </div>
       </div>
       <div class="p-3 rounded-xl bg-surface-2/60 border border-border-subtle">
-        <div class="text-[11px] font-medium text-text-muted uppercase">Completion Tokens</div>
+        <div class="text-[11px] font-medium text-text-muted uppercase">{t('Completion Tokens')}</div>
         <div class="text-lg font-bold text-text-main mt-1 font-mono">
           {(stats?.realUsage?.completionTokens ?? 0).toLocaleString()}
         </div>
       </div>
       <div class="p-3 rounded-xl bg-surface-2/60 border border-border-subtle">
-        <div class="text-[11px] font-medium text-text-muted uppercase">Total Tokens</div>
+        <div class="text-[11px] font-medium text-text-muted uppercase">{t('Total Tokens')}</div>
         <div class="text-lg font-bold text-text-main mt-1 font-mono">
           {(stats?.realUsage?.totalTokens ?? 0).toLocaleString()}
         </div>
       </div>
       <div class="p-3 rounded-xl bg-surface-2/60 border border-border-subtle">
-        <div class="text-[11px] font-medium text-text-muted uppercase">Cache Read Tokens</div>
+        <div class="text-[11px] font-medium text-text-muted uppercase">{t('Cache Read Tokens')}</div>
         <div class="text-lg font-bold text-cyan-400 mt-1 font-mono">
           {(stats?.realUsage?.cacheReadTokens ?? 0).toLocaleString()}
         </div>

@@ -1,8 +1,9 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Console Log page. Owns the authenticated SSE transport, the server log
   // level, and the buffer window; ConsoleLogStream owns how rows are read.
-  import { Pause, Play, Trash2 } from 'lucide-svelte'
+  import { Trash2 } from 'lucide-svelte'
   import ConsoleLogStream from './ConsoleLogStream.svelte'
   import Button from '../lib/ui/Button.svelte'
   import Card from '../lib/ui/Card.svelte'
@@ -146,7 +147,7 @@
 
 <Card padding="none" class="flex flex-col">
   <div class="flex flex-wrap items-center gap-2 border-b border-border-subtle px-4 py-2.5">
-    <label class="text-xs text-text-muted" for="console-log-level">Level</label>
+    <label class="text-xs text-text-muted" for="console-log-level">{t('Level')}</label>
     <select
       id="console-log-level"
       class="rounded-[8px] border border-border bg-surface px-2 py-1 text-xs text-text-main disabled:opacity-50"
@@ -158,14 +159,10 @@
         <option value={level}>{level}</option>
       {/each}
     </select>
-    <span class="text-[11px] text-text-muted">
-      Applies immediately — lines below this level are not buffered.
-    </span>
+    <span class="text-[11px] text-text-muted">{t('Applies immediately — lines below this level are not buffered.')}</span>
 
     <Button size="sm" variant="outline" class="ml-auto" onclick={handleClear}>
-      <Trash2 class="h-3.5 w-3.5" />
-      Clear
-    </Button>
+      <Trash2 class="h-3.5 w-3.5" />{t('Clear')}</Button>
   </div>
 
   <ConsoleLogStream {entries} />

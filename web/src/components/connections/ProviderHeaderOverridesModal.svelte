@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Per-provider outbound header overrides (issue #101 part 4, upstream
   // decolua/9router v0.5.95 b3cf3fde). Upstream calls this CustomConfigCard.
   import { api } from '../../api/client'
@@ -133,16 +134,13 @@
     >
       <div class="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h3 id="provider-overrides-title" class="text-sm font-semibold text-text-main">Custom headers</h3>
-          <p class="mt-0.5 text-xs text-text-muted">
-            Added to every request this provider receives. An override replaces what the gateway
-            sends.
-          </p>
+          <h3 id="provider-overrides-title" class="text-sm font-semibold text-text-main">{t('Custom headers')}</h3>
+          <p class="mt-0.5 text-xs text-text-muted">{t('Added to every request this provider receives. An override replaces what the gateway sends.')}</p>
         </div>
         <button
           type="button"
           onclick={onClose}
-          aria-label="Close"
+          aria-label={t('Close')}
           class="shrink-0 rounded-md p-1 text-text-muted hover:bg-surface-2 hover:text-text-main"
         >
           <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
@@ -150,7 +148,7 @@
       </div>
 
       {#if loading}
-        <p class="py-6 text-center text-sm text-text-muted">Loading…</p>
+        <p class="py-6 text-center text-sm text-text-muted">{t('Loading…')}</p>
       {:else}
         {#if Object.keys(builtin).length > 0}
           <details class="mb-4 rounded-lg border border-border-subtle bg-surface-2 px-3 py-2">
@@ -174,7 +172,7 @@
               <div class="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Header name"
+                  placeholder={t('Header name')}
                   aria-label={`Header name ${index + 1}`}
                   value={row.key}
                   oninput={(e) => {
@@ -185,7 +183,7 @@
                 />
                 <input
                   type="text"
-                  placeholder="Value"
+                  placeholder={t('Value')}
                   aria-label={`Header value ${index + 1}`}
                   value={row.value}
                   oninput={(e) => {
@@ -217,9 +215,7 @@
             disabled={rows.length >= MAX_HEADERS}
             class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-text-muted hover:bg-surface-2 hover:text-text-main disabled:opacity-50"
           >
-            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">add</span>
-            Add header
-          </button>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">add</span>{t('Add header')}</button>
           <span class="text-[11px] text-text-muted">{Object.keys(payload).length} / {MAX_HEADERS}</span>
         </div>
 
@@ -230,7 +226,7 @@
           <p class="mt-2 text-[11px] text-red-600 dark:text-red-400" role="alert">{error}</p>
         {/if}
         {#if saved && !error}
-          <p class="mt-2 text-[11px] text-text-muted" role="status">Saved.</p>
+          <p class="mt-2 text-[11px] text-text-muted" role="status">{t('Saved.')}</p>
         {/if}
       {/if}
 
@@ -239,9 +235,7 @@
           type="button"
           onclick={onClose}
           class="rounded-lg px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-2"
-        >
-          Close
-        </button>
+        >{t('Close')}</button>
         <button
           type="button"
           onclick={save}

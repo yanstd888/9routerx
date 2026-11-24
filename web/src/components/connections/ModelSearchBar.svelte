@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { parseSearchQuery } from '../../lib/modelSearchFilter'
 
   interface Props {
@@ -33,13 +34,13 @@
     {#if parsed.isRegex}
       <span class="text-[10px] px-1 py-0.2 rounded bg-brand-500/10 text-brand-600 dark:text-brand-400 font-mono font-medium">regex</span>
     {:else if parsed.negativeTerms.length > 0}
-      <span class="text-[10px] px-1 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 font-mono font-medium">!exclude</span>
+      <span class="text-[10px] px-1 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 font-mono font-medium">{t('!exclude')}</span>
     {/if}
     {#if value}
       <button
         type="button"
         onclick={clear}
-        aria-label="Clear search"
+        aria-label={t('Clear search')}
         class="p-1 rounded text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
       >
         <span class="material-symbols-outlined text-[14px]">close</span>

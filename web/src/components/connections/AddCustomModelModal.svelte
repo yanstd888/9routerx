@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of upstream AddCustomModelModal.js (dashboard/providers/[id]).
   import Button from '../../lib/ui/Button.svelte'
   import Modal from '../../lib/ui/Modal.svelte'
@@ -157,10 +158,10 @@
   }
 </script>
 
-<Modal {isOpen} {onClose} title="Add Custom Model">
+<Modal {isOpen} {onClose} title={t('Add Custom Model')}>
   <div class="flex flex-col gap-4">
     <div>
-      <label class="text-sm font-medium mb-1.5 block" for="add-custom-model-id">Model ID</label>
+      <label class="text-sm font-medium mb-1.5 block" for="add-custom-model-id">{t('Model ID')}</label>
       <div class="flex gap-2">
         <input
           id="add-custom-model-id"
@@ -173,7 +174,7 @@
             testError = ''
           }}
           onkeydown={handleKeyDown}
-          placeholder="e.g. claude-opus-4-5 — paste a list to add several"
+          placeholder={t('e.g. claude-opus-4-5 — paste a list to add several')}
           class="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary"
         />
         {#if !isPaste}
@@ -196,9 +197,7 @@
           {#if plan.duplicates.length > 0}· {plan.duplicates.length} repeated in the paste{/if}
           {#if plan.invalid.length > 0}· {plan.invalid.length} rejected{/if}
           — separated by spaces, commas or newlines, a
-          <code class="font-mono bg-sidebar px-1 rounded">{providerAlias}/</code> prefix is stripped, and the
-          capabilities and token limits below apply to every id.
-        </p>
+          <code class="font-mono bg-sidebar px-1 rounded">{providerAlias}/</code>{t('prefix is stripped, and the capabilities and token limits below apply to every id.')}</p>
         {#if plan.ids.length > 0}
           <div class="mt-2 flex flex-wrap gap-1">
             {#each plan.ids as id (id)}
@@ -209,14 +208,12 @@
         {#if plan.invalid.length > 0}
           <ul class="text-xs text-red-500 mt-1 space-y-0.5">
             {#each plan.invalid as id (id)}
-              <li><code class="font-mono">{id}</code> — not a usable id (pipe, quotes or angle brackets)</li>
+              <li><code class="font-mono">{id}</code> {t('— not a usable id (pipe, quotes or angle brackets)')}</li>
             {/each}
           </ul>
         {/if}
       {:else}
-        <p class="text-xs text-text-muted mt-1">
-          Sent to provider as:
-          <code class="font-mono bg-sidebar px-1 rounded">{cleanId || 'model-id'}</code>
+        <p class="text-xs text-text-muted mt-1">{t('Sent to provider as:')}<code class="font-mono bg-sidebar px-1 rounded">{cleanId || 'model-id'}</code>
         </p>
       {/if}
     </div>
@@ -241,7 +238,7 @@
     {/if}
 
     <div>
-      <label class="text-sm font-medium mb-1.5 block">Capabilities</label>
+      <label class="text-sm font-medium mb-1.5 block">{t('Capabilities')}</label>
       <div class="flex flex-wrap gap-4">
         {#each Object.entries(CAPACITY_META) as [key, meta]}
           <div class="flex items-center gap-2">
@@ -263,10 +260,10 @@
     </div>
 
     <div>
-      <label class="text-sm font-medium mb-1.5 block">Token limits (optional)</label>
+      <label class="text-sm font-medium mb-1.5 block">{t('Token limits (optional)')}</label>
       <div class="grid gap-3 sm:grid-cols-2">
         <div>
-          <label class="text-xs text-text-muted mb-1 block" for="add-custom-model-ctx">Context window</label>
+          <label class="text-xs text-text-muted mb-1 block" for="add-custom-model-ctx">{t('Context window')}</label>
           <input
             id="add-custom-model-ctx"
             type="text"
@@ -280,7 +277,7 @@
           />
         </div>
         <div>
-          <label class="text-xs text-text-muted mb-1 block" for="add-custom-model-out">Max output</label>
+          <label class="text-xs text-text-muted mb-1 block" for="add-custom-model-out">{t('Max output')}</label>
           <input
             id="add-custom-model-out"
             type="text"
@@ -296,10 +293,7 @@
           />
         </div>
       </div>
-      <p class="text-xs text-text-muted mt-1">
-        Published to <code class="font-mono bg-sidebar px-1 rounded">/v1/models</code> instead of a guessed
-        value. Leave blank to keep the default.
-      </p>
+      <p class="text-xs text-text-muted mt-1">{t('Published to')}<code class="font-mono bg-sidebar px-1 rounded">{t('/v1/models')}</code>{t('instead of a guessed value. Leave blank to keep the default.')}</p>
       {#if limitsError}
         <p id="add-custom-model-limits-error" class="text-xs text-red-600 dark:text-red-400 mt-1" role="alert">
           {limitsError}
@@ -309,9 +303,7 @@
 
     {#if testStatus === 'ok'}
       <div class="flex items-center gap-2 text-sm text-green-600">
-        <span class="material-symbols-outlined text-base">check_circle</span>
-        Model is reachable
-      </div>
+        <span class="material-symbols-outlined text-base">check_circle</span>{t('Model is reachable')}</div>
     {/if}
     {#if testStatus === 'error'}
       <div class="flex items-start gap-2 text-sm text-red-500">
@@ -321,7 +313,7 @@
     {/if}
 
     <div class="flex gap-2 pt-1">
-      <Button onclick={onClose} variant="ghost" fullWidth size="sm">Cancel</Button>
+      <Button onclick={onClose} variant="ghost" fullWidth size="sm">{t('Cancel')}</Button>
       <Button
         onclick={handleSubmit}
         fullWidth

@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import type { ActiveRequestItem } from './types'
   import ProviderArtwork from '../providers/ProviderArtwork.svelte'
@@ -228,7 +229,7 @@
 <div
   bind:this={containerEl}
   role="region"
-  aria-label="Provider topology map"
+  aria-label={t('Provider topology map')}
   class="h-[320px] w-full min-w-0 rounded-lg border border-border bg-bg-subtle/30 sm:h-[480px] relative overflow-hidden select-none cursor-grab active:cursor-grabbing"
   onpointerdown={handlePointerDown}
   onpointermove={handlePointerMove}
@@ -395,9 +396,7 @@
         loading="lazy"
         decoding="async"
       />
-      <span class="text-sm font-bold {activeCount > 0 ? 'topology-router-label topology-router-ink' : 'text-primary'}">
-        9RouterX
-      </span>
+      <span class="text-sm font-bold {activeCount > 0 ? 'topology-router-label topology-router-ink' : 'text-primary'}">{t('9RouterX')}</span>
       {#if activeCount > 0}
         <span class="ml-2 px-1.5 py-0.5 rounded-full bg-yellow-400 text-black text-xs font-bold topology-router-badge">
           {activeCount}
@@ -433,9 +432,7 @@
         <!-- Active indicator -->
         {#if node.isActive}
           <div class="flex items-center gap-1.5 ml-auto shrink-0">
-            <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              Live
-            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">{t('Live')}</span>
             <span class="relative flex h-2 w-2">
               <span
                 class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
@@ -455,9 +452,7 @@
        nothing honest to draw. The router core and the zoom controls stay put so
        the card keeps its shape instead of collapsing. -->
   {#if displayProviders.length === 0}
-    <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4 text-center text-sm text-text-muted">
-      No providers connected
-    </div>
+    <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4 text-center text-sm text-text-muted">{t('No providers connected')}</div>
   {/if}
 
   <!-- Bottom-left React Flow style controls -->
@@ -466,8 +461,8 @@
       type="button"
       onclick={() => (zoom = Math.min(2.5, zoom * 1.2))}
       class="p-1.5 text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors border-b border-border cursor-pointer flex items-center justify-center"
-      title="Zoom In"
-      aria-label="Zoom In"
+      title={t('Zoom In')}
+      aria-label={t('Zoom In')}
     >
       <span class="material-symbols-outlined text-[16px]">add</span>
     </button>
@@ -475,8 +470,8 @@
       type="button"
       onclick={() => (zoom = Math.max(0.2, zoom / 1.2))}
       class="p-1.5 text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors border-b border-border cursor-pointer flex items-center justify-center"
-      title="Zoom Out"
-      aria-label="Zoom Out"
+      title={t('Zoom Out')}
+      aria-label={t('Zoom Out')}
     >
       <span class="material-symbols-outlined text-[16px]">remove</span>
     </button>
@@ -484,8 +479,8 @@
       type="button"
       onclick={fitView}
       class="p-1.5 text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer flex items-center justify-center"
-      title="Fit View"
-      aria-label="Fit View"
+      title={t('Fit View')}
+      aria-label={t('Fit View')}
     >
       <span class="material-symbols-outlined text-[16px]">crop_free</span>
     </button>

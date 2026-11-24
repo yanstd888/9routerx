@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onMount, tick } from 'svelte'
   import { api } from '../api/client'
   import AsciiRoutingBg from './AsciiRoutingBg.svelte'
@@ -212,14 +213,14 @@
   <header class="relative z-10 flex items-center justify-between px-4 sm:px-6 h-14 shrink-0">
     <div class="flex items-center gap-2.5 min-w-0">
       <img src="/android-chrome-192x192.png" alt="" class="size-6 object-contain" />
-      <span class="font-headline font-bold tracking-tight text-[15px]">9RouterX</span>
+      <span class="font-headline font-bold tracking-tight text-[15px]">{t('9RouterX')}</span>
       {#if version}
         <span class="hidden sm:inline font-code text-[11px] text-[var(--9x-ink)]/40">v{version}</span>
       {/if}
     </div>
     <!-- Pills live top-right on every viewport (owner request: on mobile they
          belong in the header corner, not below the panel) -->
-    <nav class="flex items-center gap-2" aria-label="Resources">
+    <nav class="flex items-center gap-2" aria-label={t('Resources')}>
       <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" class="gl-pill">docs</a>
       <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="gl-pill">github</a>
     </nav>
@@ -231,35 +232,32 @@
       <div class="w-full max-w-[400px]">
       {#if hasPassword === null}
         <div class="gl-panel flex items-center justify-center py-10">
-          <span class="gl-dots" role="status" aria-label="Loading"><i></i><i></i><i></i></span>
+          <span class="gl-dots" role="status" aria-label={t('Loading')}><i></i><i></i><i></i></span>
         </div>
       {:else}
           <div class="gl-panel" class:gl-shake={errorMessage}>
             <!-- Lockup -->
             <div class="flex items-center gap-2.5 mb-5">
               <img src="/android-chrome-192x192.png" alt="9RouterX" class="size-7 object-contain" />
-              <span class="font-code text-[10px] tracking-[0.18em] text-[var(--9x-ink)]/40">9R Next Go Generation</span>
+              <span class="font-code text-[10px] tracking-[0.18em] text-[var(--9x-ink)]/40">{t('9R Next Go Generation')}</span>
             </div>
 
             <!-- Text-scramble decode on first appearance (spec 2.5.4); the
                  action only rewrites text node values, so the accent span
                  below survives it. -->
-            <h1 class="font-headline font-light lowercase text-[clamp(24px,5vw,30px)] leading-tight mb-6 tracking-tight" use:scramble>
-              welcome back, <span class="text-[var(--9x-accent)]">&rarr;9x:</span>
+            <h1 class="font-headline font-light lowercase text-[clamp(24px,5vw,30px)] leading-tight mb-6 tracking-tight" use:scramble>{t('welcome back,')}<span class="text-[var(--9x-accent)]">&rarr;9x:</span>
             </h1>
 
             {#if mustChange}
               <form onsubmit={handleSetNewPassword} class="flex flex-col gap-4">
-                <p class="text-sm text-[var(--9x-wait)] text-center font-code text-xs leading-relaxed">
-                  Set a new password before accessing the dashboard remotely.
-                </p>
+                <p class="text-sm text-[var(--9x-wait)] text-center font-code text-xs leading-relaxed">{t('Set a new password before accessing the dashboard remotely.')}</p>
                 <div class="flex flex-col gap-2">
-                  <label for="login-new-password" class="text-sm font-medium text-[var(--9x-ink)]/80 font-headline">New password</label>
+                  <label for="login-new-password" class="text-sm font-medium text-[var(--9x-ink)]/80 font-headline">{t('New password')}</label>
                   <input
                     id="login-new-password"
                     type="password"
                     autocomplete="new-password"
-                    placeholder="Enter new password"
+                    placeholder={t('Enter new password')}
                     bind:value={newPassword}
                     required
                     data-login-focus
@@ -272,9 +270,9 @@
                 <button type="submit" disabled={isLoading || !newPassword} class="gl-btn">
                   {#if isLoading}
                     <span class="gl-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                    <span>routing...</span>
+                    <span>{t('routing...')}</span>
                   {:else}
-                    <span>set password</span>
+                    <span>{t('set password')}</span>
                   {/if}
                 </button>
                 <p class="gl-kbd-hint hidden md:block" aria-hidden="true">&#8629; set password</p>
@@ -308,13 +306,13 @@
                     {/if}
 
                     <div class="flex flex-col gap-2">
-                      <label for="login-password" class="text-sm font-medium text-[var(--9x-ink)]/80 font-headline">Password</label>
+                      <label for="login-password" class="text-sm font-medium text-[var(--9x-ink)]/80 font-headline">{t('Password')}</label>
                       <div class="relative">
                         <input
                           id="login-password"
                           type={showPassword ? 'text' : 'password'}
                           autocomplete="current-password"
-                          placeholder="Enter password"
+                          placeholder={t('Enter password')}
                           bind:value={password}
                           required
                           data-login-focus
@@ -335,8 +333,7 @@
                         <p class="gl-error" role="alert">{errorMessage}</p>
                       {/if}
                       {#if retryAfter > 0}
-                        <p class="text-xs text-[var(--9x-wait)] font-code">
-                          Locked. Retry in <span>{retryAfter}s</span>.
+                        <p class="text-xs text-[var(--9x-wait)] font-code">{t('Locked. Retry in')}<span>{retryAfter}s</span>.
                         </p>
                       {/if}
                       {#if resetHint}
@@ -351,23 +348,20 @@
                     >
                       {#if isLoading}
                         <span class="gl-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                        <span>routing...</span>
+                        <span>{t('routing...')}</span>
                       {:else if retryAfter > 0}
                         <span>wait {retryAfter}s</span>
                       {:else}
-                        <span>sign in</span>
+                        <span>{t('sign in')}</span>
                       {/if}
                     </button>
 
                     <p class="gl-kbd-hint hidden md:block" aria-hidden="true">&#8629; sign in</p>
 
-                    <p class="text-xs text-center text-[var(--9x-ink)]/50 font-code">
-                      default password is <code class="bg-[var(--9x-btn)] border border-[var(--9x-line)] px-1.5 py-0.5 rounded text-[var(--9x-ink)]">123456</code>
+                    <p class="text-xs text-center text-[var(--9x-ink)]/50 font-code">{t('default password is')}<code class="bg-[var(--9x-btn)] border border-[var(--9x-line)] px-1.5 py-0.5 rounded text-[var(--9x-ink)]">123456</code>
                     </p>
                     {#if hasPassword === false}
-                      <p class="text-xs text-center text-[var(--9x-wait)] font-code">
-                        Security risk: no password set. You will be asked to set one when logging in remotely.
-                      </p>
+                      <p class="text-xs text-center text-[var(--9x-wait)] font-code">{t('Security risk: no password set. You will be asked to set one when logging in remotely.')}</p>
                     {/if}
                   </form>
                 {:else if errorMessage}

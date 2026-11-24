@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of upstream src/app/(dashboard)/dashboard/providers/[id]/AddApiKeyModal.js
   // Single/Bulk add, credential label per provider, Check (validate) button,
   // Priority + Proxy Pool, provider-specific sub-forms (Azure, Cloudflare
@@ -570,8 +571,8 @@
             <button
               type="button"
               onclick={onClose}
-              aria-label="Close"
-              title="Close"
+              aria-label={t('Close')}
+              title={t('Close')}
               class="w-4 h-4 rounded-full bg-[#FF5F56] hover:brightness-90 transition-all cursor-pointer flex items-center justify-center group/dot"
             >
               <span class="text-[9px] font-bold text-white opacity-0 group-hover/dot:opacity-100 transition-opacity leading-none">✕</span>
@@ -586,7 +587,7 @@
         <button
           type="button"
           onclick={onClose}
-          aria-label="Close"
+          aria-label={t('Close')}
           class="md:hidden p-1.5 rounded-[10px] text-text-muted hover:bg-surface-2 hover:text-text-main transition-colors cursor-pointer"
         >
           <span class="material-symbols-outlined text-[20px]">close</span>
@@ -603,7 +604,7 @@
             onclick={() => {
               mode = 'single'
               bulkResult = null
-            }}>Single</Button
+            }}>{t('Single')}</Button
           >
           <Button
             size="sm"
@@ -611,7 +612,7 @@
             onclick={() => {
               mode = 'bulk'
               bulkResult = null
-            }}>Bulk Add</Button
+            }}>{t('Bulk Add')}</Button
           >
         </div>
 
@@ -619,11 +620,11 @@
           <div class="flex flex-col gap-3">
             <p class="text-xs text-text-muted">
               {#if isCloudflareAi}
-                One key per line. Format: <code>name|apiKey|accountId</code> or just <code>apiKey</code> (auto-named by index).
+                One key per line. Format: <code>{t('name|apiKey|accountId')}</code> {t('or just')} <code>{t('apiKey')}</code> (auto-named by index).
               {:else if providerId === 'qoder'}
-                One PAT per line. Format: <code>name|pt-...</code> or just <code>pt-...</code> (auto-named by index).
+                One PAT per line. Format: <code>{t('name|pt-...')}</code> {t('or just')} <code>{t('pt-...')}</code> (auto-named by index).
               {:else}
-                One key per line. Format: <code>name|apiKey</code> or just <code>apiKey</code> (auto-named by index).
+                One key per line. Format: <code>{t('name|apiKey')}</code> {t('or just')} <code>{t('apiKey')}</code> (auto-named by index).
               {/if}
             </p>
             <textarea
@@ -640,14 +641,13 @@
               <Button onclick={handleBulkSubmit} fullWidth disabled={saving || !bulkText.trim()}>
                 {saving ? 'Adding...' : 'Add All Keys'}
               </Button>
-              <Button onclick={onClose} variant="ghost" fullWidth>Cancel</Button>
+              <Button onclick={onClose} variant="ghost" fullWidth>{t('Cancel')}</Button>
             </div>
           </div>
         {:else}
           <form onsubmit={handleSubmit} class="flex flex-col gap-4">
             <div>
-              <label for="connName" class={labelCls}>
-                Name <span class="text-red-500">*</span>
+              <label for="connName" class={labelCls}>{t('Name')}<span class="text-red-500">*</span>
               </label>
               <input
                 id="connName"
@@ -662,12 +662,12 @@
             {#if isOllamaLocal}
               <div class="flex gap-2">
                 <div class="flex-1">
-                  <label for="ollamaHost" class={labelCls}>Ollama Host URL</label>
+                  <label for="ollamaHost" class={labelCls}>{t('Ollama Host URL')}</label>
                   <input
                     id="ollamaHost"
                     type="text"
                     bind:value={formOllamaHostUrl}
-                    placeholder="http://localhost:11434"
+                    placeholder={t('http://localhost:11434')}
                     class="{inputCls} font-mono"
                   />
                 </div>
@@ -681,7 +681,7 @@
               <div class="flex gap-2">
                 <div class="flex-1">
                   <label for="connApiKey" class={labelCls}>
-                    {credentialLabel}{#if credentialIsOptional}<span class="text-text-muted text-xs font-normal"> (optional in profile mode)</span>{/if}
+                    {credentialLabel}{#if credentialIsOptional}<span class="text-text-muted text-xs font-normal"> {t('(optional in profile mode)')}</span>{/if}
                   </label>
                   {#if isDualCookie}
                     <div class="flex flex-col gap-2">
@@ -739,54 +739,48 @@
 
             {#if usesAwsCredentialForm}
               <div class="bg-sidebar/50 p-4 rounded-lg border border-accent/20 flex flex-col gap-3">
-                <h3 class="font-semibold text-sm">AWS Bedrock Credentials</h3>
+                <h3 class="font-semibold text-sm">{t('AWS Bedrock Credentials')}</h3>
                 <div>
-                  <label for="awsAccessKeyId" class={labelCls}>Access Key ID</label>
+                  <label for="awsAccessKeyId" class={labelCls}>{t('Access Key ID')}</label>
                   <input
                     id="awsAccessKeyId"
                     type="text"
                     bind:value={awsData.accessKeyId}
-                    placeholder="AKIA… / ASIA…"
+                    placeholder={t('AKIA… / ASIA…')}
                     class="{inputCls} font-mono"
                   />
                 </div>
                 <div>
-                  <label for="awsSessionToken" class={labelCls}>Session Token</label>
+                  <label for="awsSessionToken" class={labelCls}>{t('Session Token')}</label>
                   <input
                     id="awsSessionToken"
                     type="password"
                     bind:value={awsData.sessionToken}
-                    placeholder="Only for temporary (ASIA…) keys"
+                    placeholder={t('Only for temporary (ASIA…) keys')}
                     class="{inputCls} font-mono"
                   />
                 </div>
                 <div>
-                  <label for="awsProfile" class={labelCls}>Profile</label>
+                  <label for="awsProfile" class={labelCls}>{t('Profile')}</label>
                   <input
                     id="awsProfile"
                     type="text"
                     bind:value={awsData.profile}
-                    placeholder="Name from ~/.aws/config"
+                    placeholder={t('Name from ~/.aws/config')}
                     class="{inputCls} font-mono"
                   />
                 </div>
                 <div>
-                  <label for="awsRegion" class={labelCls}>Region</label>
+                  <label for="awsRegion" class={labelCls}>{t('Region')}</label>
                   <input
                     id="awsRegion"
                     type="text"
                     bind:value={awsData.region}
-                    placeholder="us-east-1"
+                    placeholder={t('us-east-1')}
                     class="{inputCls} font-mono"
                   />
                 </div>
-                <p class="text-xs text-text-muted mt-2">
-                  SSO / profile (recommended): fill in Profile and Region, leave the API key empty,
-                  then run <code>aws sso login --profile &lt;name&gt;</code> — credentials refresh
-                  automatically. Static keys: put the AWS secret access key above and the key id
-                  here, adding a Session Token for temporary keys. A profile, if set, takes
-                  precedence over static keys.
-                </p>
+                <p class="text-xs text-text-muted mt-2">{t('SSO / profile (recommended): fill in Profile and Region, leave the API key empty, then run')}<code>aws sso login --profile &lt;name&gt;</code>{t('— credentials refresh automatically. Static keys: put the AWS secret access key above and the key id here, adding a Session Token for temporary keys. A profile, if set, takes precedence over static keys.')}</p>
               </div>
             {/if}
 
@@ -807,9 +801,7 @@
               <p class="text-xs text-text-muted break-words -mt-2">{validationNote}</p>
             {/if}
             {#if isXaiApiKey}
-              <p class="text-xs text-text-muted">
-                Use a direct xAI API key from console.x.ai. This is separate from Grok Build OAuth.
-              </p>
+              <p class="text-xs text-text-muted">{t('Use a direct xAI API key from console.x.ai. This is separate from Grok Build OAuth.')}</p>
             {/if}
             {#if isCookie && providerAuthHint}
               <p class="text-xs text-text-muted">
@@ -830,24 +822,18 @@
                   onclick={handleGenericWebLogin}
                   disabled={genericLogin === 'running'}
                   class="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-main hover:bg-surface-2 disabled:opacity-50 transition-colors"
-                >
-                  Open a throwaway browser
-                </button>
+                >{t('Open a throwaway browser')}</button>
                 <button
                   type="button"
                   onclick={handleGenericChromeImport}
                   disabled={genericLogin === 'running'}
                   class="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-main hover:bg-surface-2 disabled:opacity-50 transition-colors"
-                >
-                  Import from a signed-in browser
-                </button>
+                >{t('Import from a signed-in browser')}</button>
                 <button
                   type="button"
                   onclick={handleGenericProfileReset}
                   class="rounded-lg px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-500/10 transition-colors"
-                >
-                  Reset profile
-                </button>
+                >{t('Reset profile')}</button>
               </div>
               <p class="text-[11px] text-text-muted">
                 The throwaway browser keeps this provider's profile under the data dir
@@ -865,16 +851,8 @@
                 about is the one that signs the account out.
               -->
               <div class="rounded-[10px] border border-warning/40 bg-warning/10 p-3">
-                <p class="text-xs font-semibold text-text-main">
-                  Sign in through a throwaway browser
-                </p>
-                <p class="text-xs text-text-muted mt-1">
-                  Google rotates <span class="font-mono">__Secure-1PSIDTS</span> every few minutes, and the
-                  session is bound to it. A browser that is still open keeps rotating the same session this
-                  router is about to use, and the two cancel each other out — which signs the account out. The
-                  button below opens a browser with a profile of its own, reads the session out of it, then
-                  closes it and deletes the profile, so nothing is left running that could rotate it.
-                </p>
+                <p class="text-xs font-semibold text-text-main">{t('Sign in through a throwaway browser')}</p>
+                <p class="text-xs text-text-muted mt-1">{t('Google rotates')}<span class="font-mono">{t('__Secure-1PSIDTS')}</span>{t('every few minutes, and the session is bound to it. A browser that is still open keeps rotating the same session this router is about to use, and the two cancel each other out — which signs the account out. The button below opens a browser with a profile of its own, reads the session out of it, then closes it and deletes the profile, so nothing is left running that could rotate it.')}</p>
                 <div class="mt-2">
                   <Button
                     type="button"
@@ -892,17 +870,9 @@
                     {browserLoginNote}
                   </p>
                 {/if}
-                <p class="text-xs text-text-muted mt-2">
-                  No browser to open? Open an Incognito window instead, sign in, copy the whole cookie header
-                  (DevTools → Application → Cookies, including
-                  <span class="font-mono">__Secure-1PSIDTS</span>), then close the Incognito window
-                  <span class="font-semibold">without signing out</span>.
+                <p class="text-xs text-text-muted mt-2">{t('No browser to open? Open an Incognito window instead, sign in, copy the whole cookie header (DevTools → Application → Cookies, including')}<span class="font-mono">{t('__Secure-1PSIDTS')}</span>{t('), then close the Incognito window')}<span class="font-semibold">{t('without signing out')}</span>.
                 </p>
-                <p class="text-xs text-text-muted mt-2">
-                  Already signed in a browser? Read the session out of it instead — that browser is running,
-                  so it keeps rotating the same session and the two will cancel each other out. Close it
-                  first, or use the throwaway browser above.
-                </p>
+                <p class="text-xs text-text-muted mt-2">{t('Already signed in a browser? Read the session out of it instead — that browser is running, so it keeps rotating the same session and the two will cancel each other out. Close it first, or use the throwaway browser above.')}</p>
                 <div class="mt-2">
                   <Button
                     type="button"
@@ -920,10 +890,7 @@
                     {chromeImportNote}
                   </p>
                 {/if}
-                <p class="text-xs text-text-muted mt-2">
-                  To run the router without renewing anything at all, set
-                  <span class="font-mono">GEMINI_WEB_ROTATION=off</span> in the environment.
-                </p>
+                <p class="text-xs text-text-muted mt-2">{t('To run the router without renewing anything at all, set')}<span class="font-mono">{t('GEMINI_WEB_ROTATION=off')}</span>{t('in the environment.')}</p>
               </div>
             {/if}
 
@@ -936,16 +903,8 @@
                 credential is pasted.
               -->
               <div class="rounded-[10px] border border-warning/40 bg-warning/10 p-3">
-                <p class="text-xs font-semibold text-text-main">
-                  Sign in through a throwaway browser
-                </p>
-                <p class="text-xs text-text-muted mt-1">
-                  The API authenticates with a <span class="font-mono">userToken</span> that only a real
-                  sign-in issues — there is no refresh token to exchange — and the site's WAF reads a cookie
-                  that only a browser running its JavaScript challenge renews. The button below opens a
-                  browser with a profile of its own, reads both out of it, then closes it and deletes the
-                  profile, so nothing is left running that could rotate them.
-                </p>
+                <p class="text-xs font-semibold text-text-main">{t('Sign in through a throwaway browser')}</p>
+                <p class="text-xs text-text-muted mt-1">{t('The API authenticates with a')}<span class="font-mono">{t('userToken')}</span>{t('that only a real sign-in issues — there is no refresh token to exchange — and the site\'s WAF reads a cookie that only a browser running its JavaScript challenge renews. The button below opens a browser with a profile of its own, reads both out of it, then closes it and deletes the profile, so nothing is left running that could rotate them.')}</p>
                 <div class="mt-2">
                   <Button
                     type="button"
@@ -963,18 +922,9 @@
                     {browserLoginNote}
                   </p>
                 {/if}
-                <p class="text-xs text-text-muted mt-2">
-                  No browser to open? Open an Incognito window instead, sign in to
-                  chat.deepseek.com, copy the <span class="font-mono">userToken</span> from DevTools →
-                  Application → Local Storage, and copy the cookie header from DevTools → Application →
-                  Cookies, then close the Incognito window
-                  <span class="font-semibold">without signing out</span>.
+                <p class="text-xs text-text-muted mt-2">{t('No browser to open? Open an Incognito window instead, sign in to chat.deepseek.com, copy the')}<span class="font-mono">{t('userToken')}</span>{t('from DevTools → Application → Local Storage, and copy the cookie header from DevTools → Application → Cookies, then close the Incognito window')}<span class="font-semibold">{t('without signing out')}</span>.
                 </p>
-                <p class="text-xs text-text-muted mt-2">
-                  Already signed in a browser? Read the credential out of it instead — that browser is
-                  running, so it keeps the same session and the two will cancel each other out. Close it
-                  first, or use the throwaway browser above.
-                </p>
+                <p class="text-xs text-text-muted mt-2">{t('Already signed in a browser? Read the credential out of it instead — that browser is running, so it keeps the same session and the two will cancel each other out. Close it first, or use the throwaway browser above.')}</p>
                 <div class="mt-2">
                   <Button
                     type="button"
@@ -997,26 +947,22 @@
 
             {#if providerId === 'deepseek-web'}
               <div>
-                <label for="connDeepSeekCookie" class={labelCls}>
-                  Session cookie <span class="text-text-muted text-xs font-normal">(the site's own)</span>
+                <label for="connDeepSeekCookie" class={labelCls}>{t('Session cookie')}<span class="text-text-muted text-xs font-normal">{t('(the site\'s own)')}</span>
                 </label>
                 <input
                   id="connDeepSeekCookie"
                   type="text"
                   bind:value={formDeepSeekCookie}
-                  placeholder="ds_session_id=…; aws-waf-token=…"
+                  placeholder={t('ds_session_id=…; aws-waf-token=…')}
                   class="{inputCls} font-mono"
                 />
-                <p class="text-xs text-text-muted mt-1">
-                  The WAF reads this cookie, so a request without it is a request the site does not
-                  recognise. It is sealed with the rest of the credential.
-                </p>
+                <p class="text-xs text-text-muted mt-1">{t('The WAF reads this cookie, so a request without it is a request the site does not recognise. It is sealed with the rest of the credential.')}</p>
               </div>
             {/if}
 
             {#if providerRegions}
               <div>
-                <label for="connRegion" class={labelCls}>Region</label>
+                <label for="connRegion" class={labelCls}>{t('Region')}</label>
                 <div class={selectWrapCls}>
                   <select
                     id="connRegion"
@@ -1036,8 +982,7 @@
 
             {#if isCompatible}
               <div>
-                <label for="connDefaultModel" class={labelCls}>
-                  Default Model <span class="text-red-500">*</span>
+                <label for="connDefaultModel" class={labelCls}>{t('Default Model')}<span class="text-red-500">*</span>
                 </label>
                 <input
                   id="connDefaultModel"
@@ -1050,28 +995,25 @@
             {/if}
 
             {#if isOllamaLocal}
-              <p class="text-xs text-text-muted">
-                Leave blank to use <code>http://localhost:11434</code>. For remote Ollama, enter the full host URL (e.g. <code>http://192.168.1.10:11434</code>).
+              <p class="text-xs text-text-muted">{t('Leave blank to use')}<code>{t('http://localhost:11434')}</code>{t('. For remote Ollama, enter the full host URL (e.g.')} <code>{t('http://192.168.1.10:11434')}</code>).
               </p>
             {/if}
 
             {#if isCloudflareAi}
               <div class="bg-sidebar/50 p-4 rounded-lg border border-accent/20 flex flex-col gap-3">
-                <h3 class="font-semibold mb-3 text-sm">Cloudflare Workers AI</h3>
+                <h3 class="font-semibold mb-3 text-sm">{t('Cloudflare Workers AI')}</h3>
                 <div>
-                  <label for="cfAccountId" class={labelCls}>Account ID</label>
+                  <label for="cfAccountId" class={labelCls}>{t('Account ID')}</label>
                   <input
                     id="cfAccountId"
                     type="text"
                     bind:value={cloudflareAccountId}
-                    placeholder="abc123def456..."
+                    placeholder={t('abc123def456...')}
                     class="{inputCls} font-mono"
                   />
                 </div>
-                <p class="text-xs text-text-muted mt-2">
-                  Find your Account ID in the right sidebar of
-                  <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="text-primary underline"
-                    >dash.cloudflare.com</a
+                <p class="text-xs text-text-muted mt-2">{t('Find your Account ID in the right sidebar of')}<a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="text-primary underline"
+                    >{t('dash.cloudflare.com')}</a
                   >
                 </p>
               </div>
@@ -1079,45 +1021,45 @@
 
             {#if isAzure}
               <div class="bg-sidebar/50 p-4 rounded-lg border border-accent/20">
-                <h3 class="font-semibold mb-3 text-sm">Azure OpenAI Configuration</h3>
+                <h3 class="font-semibold mb-3 text-sm">{t('Azure OpenAI Configuration')}</h3>
                 <div class="flex flex-col gap-3">
                   <div>
-                    <label for="azureEndpoint" class={labelCls}>Azure Endpoint</label>
+                    <label for="azureEndpoint" class={labelCls}>{t('Azure Endpoint')}</label>
                     <input
                       id="azureEndpoint"
                       type="text"
                       bind:value={azureData.azureEndpoint}
-                      placeholder="https://your-resource.openai.azure.com"
+                      placeholder={t('https://your-resource.openai.azure.com')}
                       class="{inputCls} font-mono"
                     />
                   </div>
                   <div>
-                    <label for="azureDeployment" class={labelCls}>Deployment Name</label>
+                    <label for="azureDeployment" class={labelCls}>{t('Deployment Name')}</label>
                     <input
                       id="azureDeployment"
                       type="text"
                       bind:value={azureData.deployment}
-                      placeholder="gpt-4"
+                      placeholder={t('gpt-4')}
                       class="{inputCls} font-mono"
                     />
                   </div>
                   <div>
-                    <label for="azureApiVersion" class={labelCls}>API Version</label>
+                    <label for="azureApiVersion" class={labelCls}>{t('API Version')}</label>
                     <input
                       id="azureApiVersion"
                       type="text"
                       bind:value={azureData.apiVersion}
-                      placeholder="2024-10-01-preview"
+                      placeholder={t('2024-10-01-preview')}
                       class="{inputCls} font-mono"
                     />
                   </div>
                   <div>
-                    <label for="azureOrganization" class={labelCls}>Organization</label>
+                    <label for="azureOrganization" class={labelCls}>{t('Organization')}</label>
                     <input
                       id="azureOrganization"
                       type="text"
                       bind:value={azureData.organization}
-                      placeholder="Organization ID"
+                      placeholder={t('Organization ID')}
                       class="{inputCls} font-mono"
                     />
                   </div>
@@ -1130,14 +1072,11 @@
             {/if}
 
             {#if isCompatible}
-              <p class="text-xs text-text-muted">
-                Enter the model ID exactly as your compatible endpoint expects it. This model will be saved as the
-                connection default.
-              </p>
+              <p class="text-xs text-text-muted">{t('Enter the model ID exactly as your compatible endpoint expects it. This model will be saved as the connection default.')}</p>
             {/if}
 
             <div>
-              <label for="connPriority" class={labelCls}>Priority</label>
+              <label for="connPriority" class={labelCls}>{t('Priority')}</label>
               <input
                 id="connPriority"
                 type="number"
@@ -1148,14 +1087,14 @@
             </div>
 
             <div>
-              <label for="connProxyPool" class={labelCls}>Proxy Pool</label>
+              <label for="connProxyPool" class={labelCls}>{t('Proxy Pool')}</label>
               <div class={selectWrapCls}>
                 <select
                   id="connProxyPool"
                   bind:value={formProxyPoolId}
                   class={selectCls}
                 >
-                  <option value={NONE_PROXY_POOL_VALUE}>None</option>
+                  <option value={NONE_PROXY_POOL_VALUE}>{t('None')}</option>
                   {#each proxyPools as pool (pool.id)}
                     <option value={pool.id}>{pool.name}</option>
                   {/each}
@@ -1167,16 +1106,14 @@
             </div>
 
             {#if proxyPools.length === 0}
-              <p class="text-xs text-text-muted">
-                No active proxy pools available. Create one in Proxy Pools page first.
-              </p>
+              <p class="text-xs text-text-muted">{t('No active proxy pools available. Create one in Proxy Pools page first.')}</p>
             {/if}
 
             <div class="flex gap-2">
               <Button type="submit" fullWidth disabled={saveDisabled}>
                 {saving ? 'Saving...' : 'Save'}
               </Button>
-              <Button onclick={onClose} variant="ghost" fullWidth>Cancel</Button>
+              <Button onclick={onClose} variant="ghost" fullWidth>{t('Cancel')}</Button>
             </div>
           </form>
         {/if}

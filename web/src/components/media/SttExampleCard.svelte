@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { api, getStoredAPIKey, type APIKey, type ProviderConnection } from '../../api/client'
   import { copyToClipboard } from '../../lib/clipboard'
@@ -183,12 +184,12 @@
 </script>
 
 <Card>
-  <h2 class="text-lg font-semibold text-text-main mb-4">Example</h2>
+  <h2 class="text-lg font-semibold text-text-main mb-4">{t('Example')}</h2>
   <div class="flex flex-col gap-2.5">
     <!-- Model Row -->
     {#if sttModels.length > 0}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Model</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Model')}</span>
         <div class="w-full min-w-0 flex-1">
           <select
             bind:value={selectedModel}
@@ -202,11 +203,11 @@
       </div>
     {:else}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Model</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Model')}</span>
         <div class="w-full min-w-0 flex-1">
           <input
             bind:value={selectedModel}
-            placeholder="Enter model id"
+            placeholder={t('Enter model id')}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main font-mono"
           />
         </div>
@@ -215,7 +216,7 @@
 
     <!-- Endpoint Row -->
     <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Endpoint</span>
+      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Endpoint')}</span>
       <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-1 sm:flex-row sm:items-center">
         <span class="w-full min-w-0 flex-1 px-3 py-1.5 text-sm font-mono text-text-main bg-sidebar rounded-lg truncate">
           {effectiveEndpoint}/v1/audio/transcriptions
@@ -227,16 +228,14 @@
             title={useTunnel ? 'Using tunnel' : 'Using local'}
             class="flex items-center gap-1 text-xs px-2 py-1.5 rounded-lg border shrink-0 transition-colors cursor-pointer {useTunnel ? 'border-primary/40 bg-primary/10 text-primary' : 'border-border text-text-muted hover:text-primary'}"
           >
-            <span class="material-symbols-outlined text-[14px]">wifi_tethering</span>
-            Tunnel
-          </button>
+            <span class="material-symbols-outlined text-[14px]">wifi_tethering</span>{t('Tunnel')}</button>
         {/if}
       </div>
     </div>
 
     <!-- API Key Row -->
     <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">API Key</span>
+      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('API Key')}</span>
       <div class="w-full min-w-0 flex-1">
         <span class="px-3 py-1.5 text-sm font-mono text-text-main bg-sidebar rounded-lg truncate block">
           {#if activeApiKey}
@@ -244,7 +243,7 @@
           {:else if connectionCount > 0}
             <span class="text-text-muted italic">Using stored key(s) · {connectionCount} connection{connectionCount > 1 ? 's' : ''}</span>
           {:else}
-            <span class="text-text-muted italic">No key configured</span>
+            <span class="text-text-muted italic">{t('No key configured')}</span>
           {/if}
         </span>
       </div>
@@ -252,7 +251,7 @@
 
     <!-- Audio file input -->
     <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Audio File</span>
+      <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Audio File')}</span>
       <div class="flex flex-col gap-1.5 flex-1 min-w-0">
         <input
           type="file"
@@ -274,11 +273,11 @@
     <!-- Language (if model supports) -->
     {#if allowedParams.includes('language')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Language</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Language')}</span>
         <div class="w-full min-w-0 flex-1">
           <input
             bind:value={language}
-            placeholder="e.g. en, vi, id, ja (auto-detect if empty)"
+            placeholder={t('e.g. en, vi, id, ja (auto-detect if empty)')}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main font-mono"
           />
         </div>
@@ -288,11 +287,11 @@
     <!-- Prompt (if model supports) -->
     {#if allowedParams.includes('prompt')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Prompt</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Prompt')}</span>
         <div class="w-full min-w-0 flex-1">
           <input
             bind:value={prompt}
-            placeholder="optional context to improve accuracy"
+            placeholder={t('optional context to improve accuracy')}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main"
           />
         </div>
@@ -302,7 +301,7 @@
     <!-- Temperature (if model supports) -->
     {#if allowedParams.includes('temperature')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Temperature</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Temperature')}</span>
         <div class="w-full min-w-0 flex-1">
           <input
             type="number"
@@ -311,7 +310,7 @@
             min="0"
             max="1"
             bind:value={temperature}
-            placeholder="0 - 1 (default 0)"
+            placeholder={t('0 - 1 (default 0)')}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main"
           />
         </div>
@@ -321,7 +320,7 @@
     <!-- Response format (if model supports) -->
     {#if allowedParams.includes('response_format')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Response Format</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Response Format')}</span>
         <div class="w-full min-w-0 flex-1">
           <select
             bind:value={responseFormat}
@@ -340,13 +339,13 @@
     <!-- Scribe-style extras — shown only when the model declares the param -->
     {#if allowedParams.includes('timestamps_granularity')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Timestamps</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Timestamps')}</span>
         <div class="w-full min-w-0 flex-1">
           <select
             bind:value={granularity}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main"
           >
-            <option value="">provider default</option>
+            <option value="">{t('provider default')}</option>
             <option value="word">word</option>
             <option value="character">character</option>
             <option value="none">none</option>
@@ -357,39 +356,35 @@
 
     {#if allowedParams.includes('tag_audio_events')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Tag audio events</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Tag audio events')}</span>
         <div class="w-full min-w-0 flex-1">
           <label class="flex items-center gap-2 text-sm text-text-muted">
             <input
               type="checkbox"
               bind:checked={tagAudioEvents}
               class="accent-primary"
-            />
-            Label non-speech sounds as [laughter], [applause], ...
-          </label>
+            />{t('Label non-speech sounds as [laughter], [applause], ...')}</label>
         </div>
       </div>
     {/if}
 
     {#if allowedParams.includes('diarize')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Speaker labels</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Speaker labels')}</span>
         <div class="w-full min-w-0 flex-1">
           <label class="flex items-center gap-2 text-sm text-text-muted">
             <input
               type="checkbox"
               bind:checked={diarize}
               class="accent-primary"
-            />
-            Detect speakers automatically (overrides speaker count)
-          </label>
+            />{t('Detect speakers automatically (overrides speaker count)')}</label>
         </div>
       </div>
     {/if}
 
     {#if allowedParams.includes('num_speakers')}
       <div class="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">Speaker count</span>
+        <span class="w-full text-xs font-medium text-text-muted sm:w-24 sm:shrink-0">{t('Speaker count')}</span>
         <div class="w-full min-w-0 flex-1">
           <input
             type="number"
@@ -398,7 +393,7 @@
             max="32"
             bind:value={numSpeakers}
             disabled={diarize}
-            placeholder="auto-detect"
+            placeholder={t('auto-detect')}
             class="w-full px-3 py-1.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:border-primary text-text-main disabled:opacity-50"
           />
         </div>
@@ -408,7 +403,7 @@
     <!-- Curl + Run -->
     <div class="mt-1">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1.5">
-        <span class="text-xs font-semibold text-text-muted uppercase tracking-wider">Request</span>
+        <span class="text-xs font-semibold text-text-muted uppercase tracking-wider">{t('Request')}</span>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <button
             type="button"
@@ -424,9 +419,7 @@
             disabled={running || !audioFile || !modelFull}
             class="flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <span class="material-symbols-outlined text-[14px] {running ? 'animate-spin' : ''}">
-              play_arrow
-            </span>
+            <span class="material-symbols-outlined text-[14px] {running ? 'animate-spin' : ''}">{t('play_arrow')}</span>
             {running ? 'Transcribing...' : 'Run'}
           </button>
         </div>

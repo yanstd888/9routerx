@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { api, type UpdateCheckResponse } from '../api/client'
   import { copyToClipboard } from '../lib/clipboard'
@@ -89,7 +90,7 @@
       <p class="font-semibold">
         New version available: v{check.latestVersion}
         {#if check.channel === 'dev'}
-          <span class="ml-1 font-code text-[10px] uppercase text-text-muted border border-border-subtle rounded px-1.5 py-0.5">dev build</span>
+          <span class="ml-1 font-code text-[10px] uppercase text-text-muted border border-border-subtle rounded px-1.5 py-0.5">{t('dev build')}</span>
         {/if}
       </p>
 
@@ -101,11 +102,10 @@
 
       {#if check.channel === 'binary'}
         <p class="mt-1 font-code text-[11px] break-all">
-          <span class="text-amber-800/70 dark:text-amber-300/70">asset:</span>
+          <span class="text-amber-800/70 dark:text-amber-300/70">{t('asset:')}</span>
           {assetName}
           {#if check.sha256}
-            <span class="block break-all text-amber-800/70 dark:text-amber-300/70">
-              sha256: <span class="break-all">{check.sha256}</span>
+            <span class="block break-all text-amber-800/70 dark:text-amber-300/70">{t('sha256:')}<span class="break-all">{check.sha256}</span>
             </span>
           {/if}
         </p>
@@ -134,7 +134,7 @@
           class="flex-1 sm:flex-none justify-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer flex items-center gap-1.5"
         >
           <span class="material-symbols-outlined text-[15px]" aria-hidden="true">download</span>
-          <span>Update now</span>
+          <span>{t('Update now')}</span>
         </button>
       {:else if check.channel !== 'npm' && trustedRelease}
         <a
@@ -144,7 +144,7 @@
           class="flex-1 sm:flex-none justify-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-surface hover:bg-surface-2 border border-border-subtle text-text-main transition-colors cursor-pointer flex items-center gap-1.5"
         >
           <span class="material-symbols-outlined text-[15px]" aria-hidden="true">open_in_new</span>
-          <span>View release</span>
+          <span>{t('View release')}</span>
         </a>
       {/if}
 
@@ -153,16 +153,14 @@
           type="button"
           onclick={skipThisVersion}
           class="flex-1 sm:flex-none justify-center px-3 py-2 text-xs rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
-        >
-          Skip this version
-        </button>
+        >{t('Skip this version')}</button>
       {/if}
 
       <button
         type="button"
         onclick={dismiss}
         class="p-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
-        aria-label="Dismiss update banner"
+        aria-label={t('Dismiss update banner')}
       >
         <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
       </button>

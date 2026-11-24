@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { PauseCircle } from 'lucide-svelte'
   import Badge from '../../lib/ui/Badge.svelte'
   import Card from '../../lib/ui/Card.svelte'
@@ -68,9 +69,7 @@
             {#if isAllDisabled}
               <Badge variant="default" size="sm">
                 <span class="flex items-center gap-1">
-                  <PauseCircle class="w-3 h-3" />
-                  Disabled
-                </span>
+                  <PauseCircle class="w-3 h-3" />{t('Disabled')}</span>
               </Badge>
             {:else if stats.errorCount > 0}
               <Badge variant="error" size="sm" dot>
@@ -82,7 +81,7 @@
                 </Badge>
               {/if}
             {:else if noAuth}
-              <Badge variant="success" size="sm" dot>Ready</Badge>
+              <Badge variant="success" size="sm" dot>{t('Ready')}</Badge>
             {:else if stats.connected > 0}
               <Badge variant="success" size="sm" dot>
                 {stats.connected} Connected
@@ -93,7 +92,7 @@
                 </Badge>
               {/if}
             {:else}
-              <span class="text-text-muted">No connections</span>
+              <span class="text-text-muted">{t('No connections')}</span>
             {/if}
           </div>
         </div>

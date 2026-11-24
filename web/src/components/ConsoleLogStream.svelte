@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Renders the console buffer: filter by level, search, and read the rows.
   // The server stamps each row's level (internal/log.ConsoleEntry), so colour
   // follows the emitted severity — never a guess made from the message text.
@@ -146,14 +147,14 @@
       <input
         type="search"
         bind:value={query}
-        placeholder="Search lines…"
-        aria-label="Search console log lines"
+        placeholder={t('Search lines…')}
+        aria-label={t('Search console log lines')}
         class="w-full rounded-[8px] border border-border bg-surface py-1.5 pl-8 pr-7 text-xs text-text-main placeholder:text-text-muted focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
       />
       {#if query}
         <button
           type="button"
-          aria-label="Clear search"
+          aria-label={t('Clear search')}
           onclick={() => (query = '')}
           class="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-text-muted hover:text-text-main"
         >
@@ -170,18 +171,12 @@
       class="h-7 cursor-pointer rounded-[8px] border border-border px-2.5 text-xs text-text-main transition-colors duration-150 hover:bg-surface-2 {wrap
         ? 'border-brand-500/40 bg-brand-500/10 text-brand-600 dark:text-brand-400'
         : ''}"
-    >
-      Wrap
-    </button>
+    >{t('Wrap')}</button>
 
-    <Button size="sm" variant="outline" title="Copy visible lines" disabled={visible.length === 0} onclick={copyVisible}>
-      <Copy class="h-3.5 w-3.5" />
-      Copy
-    </Button>
-    <Button size="sm" variant="outline" title="Download visible lines" disabled={visible.length === 0} onclick={downloadVisible}>
-      <Download class="h-3.5 w-3.5" />
-      Export
-    </Button>
+    <Button size="sm" variant="outline" title={t('Copy visible lines')} disabled={visible.length === 0} onclick={copyVisible}>
+      <Copy class="h-3.5 w-3.5" />{t('Copy')}</Button>
+    <Button size="sm" variant="outline" title={t('Download visible lines')} disabled={visible.length === 0} onclick={downloadVisible}>
+      <Download class="h-3.5 w-3.5" />{t('Export')}</Button>
   </div>
 
   <div
@@ -191,15 +186,12 @@
   >
     {#if entries.length === 0}
       <div class="flex h-full flex-col items-center justify-center gap-1.5 px-6 text-center">
-        <p class="text-sm text-text-main">No console output yet</p>
-        <p class="max-w-md text-xs text-text-muted">
-          Nothing has been logged since the server started or the last clear. Send a request, or set the level to
-          <span class="font-mono">debug</span>, and rows appear here live.
-        </p>
+        <p class="text-sm text-text-main">{t('No console output yet')}</p>
+        <p class="max-w-md text-xs text-text-muted">{t('Nothing has been logged since the server started or the last clear. Send a request, or set the level to')}<span class="font-mono">debug</span>{t(', and rows appear here live.')}</p>
       </div>
     {:else if visible.length === 0}
       <div class="flex h-full flex-col items-center justify-center gap-1.5 px-6 text-center">
-        <p class="text-sm text-text-main">Nothing matches the current filter</p>
+        <p class="text-sm text-text-main">{t('Nothing matches the current filter')}</p>
         <p class="max-w-md text-xs text-text-muted">
           {#if mutedLevels.size > 0}
             {[...mutedLevels].map((level) => LEVEL_META[level].label).join(', ')} rows are hidden by the level
@@ -244,9 +236,7 @@
         }}
         class="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-[var(--shadow-elev)] transition-colors duration-150 hover:bg-surface-2"
       >
-        <ArrowDown class="h-3.5 w-3.5" />
-        Jump to latest
-      </button>
+        <ArrowDown class="h-3.5 w-3.5" />{t('Jump to latest')}</button>
     {/if}
   </div>
 

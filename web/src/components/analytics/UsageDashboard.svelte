@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Details-section dashboard (issue #280): activity heatmap and node health
   // above the request-details table.
   import { api, type UsageDashboardResponse, type UsageLifetime } from '../../api/client'
@@ -152,13 +153,11 @@
   {:else if loading}
     <Card padding="md">
       <div class="flex items-center justify-center gap-2 py-8 text-text-muted text-sm">
-        <span class="material-symbols-outlined animate-spin text-[20px]" aria-hidden="true">progress_activity</span>
-        Loading dashboard...
-      </div>
+        <span class="material-symbols-outlined animate-spin text-[20px]" aria-hidden="true">progress_activity</span>{t('Loading dashboard...')}</div>
     </Card>
   {:else if failed || !data}
     <Card padding="md">
-      <p class="py-6 text-center text-sm text-text-muted">Failed to load usage dashboard</p>
+      <p class="py-6 text-center text-sm text-text-muted">{t('Failed to load usage dashboard')}</p>
     </Card>
   {:else}
     {#each detailBlocks as block (block.key)}
@@ -192,8 +191,8 @@
           : ''}"
       >
         <div class="min-w-0">
-          <h2 class="font-headline text-sm font-bold text-text-main">Activity Heatmap</h2>
-          <p class="font-body text-xs text-text-muted">Requests per day</p>
+          <h2 class="font-headline text-sm font-bold text-text-main">{t('Activity Heatmap')}</h2>
+          <p class="font-body text-xs text-text-muted">{t('Requests per day')}</p>
         </div>
         {@render panelToggle(heatmapOpen, 'Activity Heatmap', () => (heatmapOpen = !heatmapOpen))}
       </div>
@@ -211,8 +210,8 @@
           : ''}"
       >
         <div class="min-w-0">
-          <h2 class="font-headline text-sm font-bold text-text-main">Node Health</h2>
-          <p class="font-body text-xs text-text-muted">Last 7 days (≥50 real requests)</p>
+          <h2 class="font-headline text-sm font-bold text-text-main">{t('Node Health')}</h2>
+          <p class="font-body text-xs text-text-muted">{t('Last 7 days (≥50 real requests)')}</p>
         </div>
         {@render panelToggle(healthOpen, 'Node Health', () => (healthOpen = !healthOpen))}
       </div>
@@ -238,8 +237,6 @@
     <span
       class="material-symbols-outlined text-[18px] transition-transform duration-200"
       style:transform={open ? 'rotate(180deg)' : 'rotate(0deg)'}
-    >
-      expand_more
-    </span>
+    >expand_more</span>
   </button>
 {/snippet}

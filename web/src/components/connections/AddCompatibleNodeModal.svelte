@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { api } from '../../api/client'
   import Badge from '../../lib/ui/Badge.svelte'
   import Button from '../../lib/ui/Button.svelte'
@@ -202,8 +203,8 @@
 <Modal {isOpen} title={config.title} {onClose}>
   <div class="flex flex-col gap-4">
     <fieldset class="flex flex-col gap-2">
-      <legend class="text-sm font-medium text-text-main">Provider Type</legend>
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Provider Type">
+      <legend class="text-sm font-medium text-text-main">{t('Provider Type')}</legend>
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label={t('Provider Type')}>
         {#each typeOptions as option (option.value)}
           <button
             type="button"
@@ -224,13 +225,11 @@
           </button>
         {/each}
       </div>
-      <p class="text-xs text-text-muted">
-        Already entered your endpoint? Switch type here — your name, prefix and base URL stay put.
-      </p>
+      <p class="text-xs text-text-muted">{t('Already entered your endpoint? Switch type here — your name, prefix and base URL stay put.')}</p>
     </fieldset>
 
     <Input
-      label="Name"
+      label={t('Name')}
       bind:value={formName}
       placeholder={config.namePlaceholder}
       hint={config.nameHint}
@@ -238,7 +237,7 @@
     />
 
     <Input
-      label="Prefix"
+      label={t('Prefix')}
       bind:value={formPrefix}
       placeholder={config.prefixPlaceholder}
       hint={config.prefixHint}
@@ -246,9 +245,9 @@
     />
 
     <Input
-      label="Custom URL Suffix"
+      label={t('Custom URL Suffix')}
       bind:value={formUrlSuffix}
-      placeholder="e.g. bai"
+      placeholder={t('e.g. bai')}
       hint={composedID
         ? `Optional. Replaces the random suffix of this provider id: ${composedID}`
         : `Optional. Leave blank to keep a randomized suffix for '${idLiteral}-<this_is_user_custom_suffix>'.`}
@@ -257,20 +256,20 @@
 
     {#if config.hasApiType}
       <div>
-        <label for="api-type" class="text-sm font-medium text-text-main mb-1.5 block">API Type</label>
+        <label for="api-type" class="text-sm font-medium text-text-main mb-1.5 block">{t('API Type')}</label>
         <select
           id="api-type"
           bind:value={formApiType}
           class="w-full py-2.5 px-3 text-sm text-text-main bg-surface-2 rounded-[10px] border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/40 transition-all duration-150 ease-out text-[16px] sm:text-sm"
         >
-          <option value="chat">Chat Completions</option>
-          <option value="responses">Responses API</option>
+          <option value="chat">{t('Chat Completions')}</option>
+          <option value="responses">{t('Responses API')}</option>
         </select>
       </div>
     {/if}
 
     <Input
-      label="Base URL"
+      label={t('Base URL')}
       bind:value={formBaseUrl}
       placeholder={config.defaultBaseUrl}
       hint={config.baseUrlHint}
@@ -279,13 +278,13 @@
     />
 
     <Input
-      label="API Key (for Check)"
+      label={t('API Key (for Check)')}
       type="password"
       bind:value={checkKey}
     />
 
     <Input
-      label="Model ID (for Check)"
+      label={t('Model ID (for Check)')}
       bind:value={checkModelId}
       placeholder={config.modelIdPlaceholder}
       hint={config.modelIdHint}
@@ -303,16 +302,16 @@
       {#if validationResult}
         {#if validationResult.valid}
           <span class="inline-flex items-center gap-1.5">
-            <Badge tone="success">Valid</Badge>
+            <Badge tone="success">{t('Valid')}</Badge>
             {#if validationResult.method === 'chat'}
-              <span class="text-sm text-text-muted">(via inference test)</span>
+              <span class="text-sm text-text-muted">{t('(via inference test)')}</span>
             {:else if validationResult.dimensions}
               <span class="text-sm text-text-muted">{validationResult.dimensions} dims</span>
             {/if}
           </span>
         {:else}
           <div class="flex flex-col gap-1">
-            <Badge tone="error">Invalid</Badge>
+            <Badge tone="error">{t('Invalid')}</Badge>
             {#if validationResult.error}
               <span class="text-sm text-red-500">{validationResult.error}</span>
             {/if}
@@ -335,9 +334,7 @@
       >
         {submitting ? 'Creating...' : 'Create'}
       </Button>
-      <Button onclick={onClose} variant="ghost" fullWidth>
-        Cancel
-      </Button>
+      <Button onclick={onClose} variant="ghost" fullWidth>{t('Cancel')}</Button>
     </div>
   </div>
 </Modal>
