@@ -328,10 +328,17 @@ func CompressContainerOutput(s string, maxLines int) string {
 	}
 	header := lines[0]
 	rows := lines[1:]
-	if len(rows) > maxLines {
+	if len(rows) > maxLines || (maxLines > 0 && maxLines < 7) {
 		keep := maxLines - 2
-		if keep < 5 {
+		if maxLines > 0 && maxLines < 7 {
+			if maxLines == 1 {
+				return header
+			}
+		} else if keep < 5 {
 			keep = 5
+		}
+		if keep > len(rows) {
+			keep = len(rows)
 		}
 		result := []string{header}
 		result = append(result, rows[:keep]...)
