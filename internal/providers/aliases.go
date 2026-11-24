@@ -47,6 +47,7 @@ var ProviderAliasMap = map[string]string{
 	"ds":             "deepseek",
 	"ds-web":         "deepseek-web",
 	"sp":             "sumopod",
+	"aiml":           "aimlapi",
 	"el":             "elevenlabs",
 	"fal":            "fal-ai",
 	"fb":             "freebuff",

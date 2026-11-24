@@ -196,6 +196,15 @@ describe('providers & media separation', () => {
     assert.strictEqual(Boolean(p.modelsFetcher), true)
   })
 
+  it('wires the aimlapi provider end-to-end', () => {
+    const p = PROVIDER_CATALOG.find((e) => e.id === 'aimlapi')
+    assert.ok(p, 'aimlapi missing from the dashboard catalog')
+    assert.strictEqual(p.name, 'AI/ML API')
+    assert.strictEqual(p.category, 'apikey')
+    assert.ok(isChatProvider(p))
+    assert.ok(getModelsByProviderId('aimlapi').some((m) => m.id === 'openai/gpt-5.4-mini'))
+  })
+
   it('resolves every provider alias to a catalog with an entry', () => {
     // A dashboard id resolves two ways: directly (the catalog carries the id or
     // an alias equal to it), or through the wire alias in PROVIDER_ID_TO_ALIAS —

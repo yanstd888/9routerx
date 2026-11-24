@@ -192,6 +192,10 @@ var modelsListURL = map[string]string{
 	// SumoPod exposes the standard OpenAI /v1/models catalogue (auth required,
 	// same contract as tokenharbor/dahl).
 	"sumopod": "https://ai.sumopod.com/v1/models",
+	// AI/ML API lists every model it serves (chat, image, video, speech) in one
+	// catalogue; the dashboard keeps only the chat-completions rows
+	// (FilterAimlapiChatModels), since those are what the chat lane can route.
+	"aimlapi": "https://api.aimlapi.com/v1/models",
 	"nous":    "https://inference-api.nousresearch.com/v1/models",
 	// Command Code publishes its whole Provider API catalogue on the standard
 	// OpenAI /v1/models shape, keyless: every id it sells, the free tiers
@@ -474,6 +478,19 @@ var KnownProviders = map[string]ProviderConfig{
 		BaseURL:    "https://ai.sumopod.com/v1/chat/completions",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
+	},
+	// AI/ML API — OpenAI-compatible aggregator (api.aimlapi.com). The same key
+	// also runs its Toolbox (tools.aimlapi.com), which serves the web search
+	// and page fetch lanes through POST /v1/tools/run; the request and the
+	// answer are adapted in internal/handlers/media/aimlapi_tools.go.
+	"aimlapi": {
+		BaseURL:      "https://api.aimlapi.com/v1/chat/completions",
+		AuthHeader:   "Authorization",
+		AuthScheme:   "bearer",
+		SearchURL:    "https://tools.aimlapi.com/v1/tools/run",
+		SearchMethod: "POST",
+		FetchURL:     "https://tools.aimlapi.com/v1/tools/run",
+		FetchMethod:  "POST",
 	},
 	"groq": {
 		BaseURL:    "https://api.groq.com/openai/v1/chat/completions",

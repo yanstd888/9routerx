@@ -143,6 +143,18 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Notice:        &Notice{Text: "OpenAI-compatible aggregator. One API key reaches every model, billed per-token. Model ids are bare (e.g. claude-opus-5-5, gemini/gemini-3.8-flash, qwen3.8-max) and are fetched live from the provider.", APIKeyURL: "https://ai.sumopod.com"},
 		ModelsFetcher: &Fetcher{URL: "https://ai.sumopod.com/v1/models", Type: "openai"},
 	},
+	"aimlapi": {
+		ID:           "aimlapi",
+		Name:         "AI/ML API",
+		Alias:        "aimlapi",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#7C3AED",
+		Icon:         "hub",
+		ServiceKinds: []string{"llm", "webSearch", "webFetch"},
+		Website:      "https://aimlapi.com",
+		Notice:       &Notice{Text: "OpenAI-compatible aggregator. One API key reaches the chat models and the Toolbox web search and page fetch, billed pay-as-you-go. Model ids carry the vendor (e.g. openai/gpt-5.4-mini, anthropic/claude-sonnet-4.6).", APIKeyURL: "https://aimlapi.com/app/keys"},
+	},
 	"hcnsec": {
 		ID:            "hcnsec",
 		Name:          "HCNSec",

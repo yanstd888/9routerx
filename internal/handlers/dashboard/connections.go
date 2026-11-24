@@ -1468,6 +1468,9 @@ func (h *DashboardHandler) writeConnectionModels(w http.ResponseWriter, r *http.
 		if len(items) == 0 {
 			items = listResp.Models
 		}
+		if conn.Provider == "aimlapi" {
+			items = providers.FilterAimlapiChatModels(items)
+		}
 		if conn.Provider == "nous" {
 			handlerutil.WriteJSON(w, http.StatusOK, map[string]any{
 				"provider":     conn.Provider,
