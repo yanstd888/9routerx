@@ -32,7 +32,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"ideogram", "leonardo", "haiper", "dify", "udio", "nlpcloud", "oneminai", "gigachat", "keenable"} {
+	for _, id := range []string{"leonardo", "haiper", "dify", "udio", "nlpcloud", "oneminai", "gigachat", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}

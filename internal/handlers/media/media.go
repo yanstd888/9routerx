@@ -932,6 +932,17 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 			}
+			// Ideogram's native lane POSTs to the bare service root and expects
+			// a vendor-specific body; the generic forward cannot reach it.
+			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
+				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "ideogram" || subInfo.Provider == "ideo") {
+				if err := h.handleIdeogramImage(w, r, body, subInfo); err == nil {
+					return
+				} else {
+					lastErr = err.Error()
+					continue
+				}
+			}
 			// Codex image models are Responses-API models, not an image endpoint.
 			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "codex" || subInfo.Provider == "cx") {
@@ -1116,6 +1127,14 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 		endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (modelInfo.Provider == "gemini" || modelInfo.Provider == "gm") {
 		if err := h.handleGeminiImage(w, r, body, modelInfo); err != nil {
+			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
+		}
+		return
+	}
+	// Ideogram: native vendor POST, not an OpenAI-compatible image endpoint.
+	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
+		endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (modelInfo.Provider == "ideogram" || modelInfo.Provider == "ideo") {
+		if err := h.handleIdeogramImage(w, r, body, modelInfo); err != nil {
 			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		}
 		return

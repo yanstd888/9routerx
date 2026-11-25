@@ -1878,6 +1878,14 @@ var KnownProviders = map[string]ProviderConfig{
 			"User-Agent": "kimchi/0.1.50",
 		},
 	},
+	"ideogram": {
+		// The image lane POSTs to BaseURL verbatim (no appended path); ImageURL
+		// only advertises the endpoint in the catalog.
+		BaseURL:    "https://api.ideogram.ai",
+		AuthHeader: "Api-Key",
+		AuthScheme: "raw",
+		ImageURL:   "https://api.ideogram.ai/generate",
+	},
 	"iflow": {
 		BaseURL:        "https://apis.iflow.cn/v1/chat/completions",
 		AuthHeader:     "Authorization",

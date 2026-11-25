@@ -239,6 +239,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "groq": "groq",
   "huggingface": "hf",
   "hyperbolic": "hyp",
+  "ideogram": "ideo",
   "iflow": "if",
   "inworld": "inworld",
   "jina-ai": "jina-ai",
@@ -6916,6 +6917,18 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Whisper Large v3 Turbo (HF)",
       "kind": "stt"
     },
+  ],
+  "ideogram": [
+    {
+      "id": "V_3",
+      "name": "Ideogram V3",
+      "kind": "image"
+    },
+    {
+      "id": "V_2A",
+      "name": "Ideogram V2A",
+      "kind": "image"
+    }
   ],
   "hyperbolic": [
     {

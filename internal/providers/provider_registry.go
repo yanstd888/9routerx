@@ -365,6 +365,20 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:      "https://x.ai",
 		Notice:       &Notice{Text: "Sign in with your xAI / Grok account via device code. Uses Grok Build subscription credits (cli-chat-proxy.grok.com).", SignupURL: "https://grok.com/supergrok"},
 	},
+	"ideogram": {
+		// Pinned OmniRoute 632d84f5: apikey, image-only lane. Upstream uses the
+		// default chat executor; the native POST lives in the media handler.
+		ID:           "ideogram",
+		Name:         "Ideogram",
+		Alias:        "ideo",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#EC4899",
+		Icon:         "image",
+		ServiceKinds: []string{"image"},
+		Website:      "https://ideogram.ai",
+		AuthHint:     "Get API key at ideogram.ai/docs/api",
+	},
 	"iflow": {
 		ID:           "iflow",
 		Name:         "iFlow AI",

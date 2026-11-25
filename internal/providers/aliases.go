@@ -74,6 +74,7 @@ var ProviderAliasMap = map[string]string{
 	"veo-free":       "veoaifree-web",
 	"hf":             "huggingface",
 	"hyp":            "hyperbolic",
+	"ideo":           "ideogram",
 	"if":             "iflow",
 	"jina":           "jina-ai",
 	"kc":             "kilocode",
