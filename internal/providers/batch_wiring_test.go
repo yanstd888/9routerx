@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -41,6 +41,23 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 		if !slices.Contains(ProviderModels["opencode-server"], model) {
 			t.Errorf("opencode-server model catalog lost %q", model)
 		}
+	}
+	ccMeta := ProviderRegistry["command-code"]
+	if ccMeta.Name != "Command Code" || ccMeta.Alias != "cmd" || ccMeta.Icon != "terminal" || ccMeta.Color != "#111827" || ccMeta.Website != "https://commandcode.ai/" {
+		t.Errorf("command-code metadata = %+v", ccMeta)
+	}
+	ccCfg := KnownProviders["command-code"]
+	if ccCfg.BaseURL != "https://api.commandcode.ai" || ccCfg.AuthHeader != "Authorization" || ccCfg.AuthScheme != "bearer" || ccCfg.Format != FormatOpenAI {
+		t.Errorf("command-code config = %+v", ccCfg)
+	}
+	if len(ProviderModels["command-code"]) != 22 || len(ProviderModels["cmd"]) != 22 {
+		t.Errorf("command-code catalog = %d/%d models", len(ProviderModels["command-code"]), len(ProviderModels["cmd"]))
+	}
+	if got := ResolveAlias("cmd"); got != "command-code" {
+		t.Errorf("cmd resolved to %q", got)
+	}
+	if got := GetCapabilitiesDetailForModel("cmd", "claude-sonnet-5-5"); got.ContextWindow != 200000 || got.MaxOutput != 16384 {
+		t.Errorf("cmd alias capabilities = %+v", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

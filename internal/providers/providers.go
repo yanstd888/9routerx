@@ -202,7 +202,8 @@ var modelsListURL = map[string]string{
 	// snapshot (minimax/minimax-m3.1-flash, z-ai/glm-5.3-flash, …). The
 	// registry catalog is a fixed 22-model list, so without this entry the
 	// dashboard cannot discover anything the snapshot predates.
-	"commandcode": "https://api.commandcode.ai/provider/v1/models",
+	"command-code": "https://api.commandcode.ai/provider/v1/models",
+	"commandcode":  "https://api.commandcode.ai/provider/v1/models",
 	// Five more providers whose catalogue is reachable without a valid
 	// credential, so the discovery path that fixed commandcode covers them
 	// unchanged: "Check Latest Models", "Import from /models" and "Sync Models"
@@ -1973,6 +1974,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 		Format:     "openai-responses",
+	},
+	"command-code": {
+		BaseURL:    "https://api.commandcode.ai",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
 	},
 	"commandcode": {
 		BaseURL:    "https://api.commandcode.ai/alpha/generate",

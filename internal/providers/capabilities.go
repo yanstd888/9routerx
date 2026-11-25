@@ -469,6 +469,30 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"mimo-v2.6-flash-free":            {Vision: true, AudioInput: true, VideoInput: true, Reasoning: true, ThinkingFormat: "openai", ThinkingCanDisable: new(true), ContextWindow: 1048576, MaxOutput: 131072},
 		"deepseek-v4.1-flash-free":        {Vision: true, Reasoning: true, ThinkingFormat: "deepseek", ContextWindow: 330000, MaxOutput: 128000},
 	},
+	"command-code": {
+		"claude-opus-4-7": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32000},
+		"claude-fable-5": {Tools: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-opus-4-6": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32000},
+		"claude-sonnet-5-5": {Tools: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-sonnet-4-6": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-haiku-4-5-20251001": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 8192},
+		"gpt-5.5": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.4": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.3-codex": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.4-mini": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"deepseek/deepseek-v4-pro": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"deepseek/deepseek-v4-flash": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"deepseek/deepseek-v4-flash-vision-exp": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"moonshotai/Kimi-K3.1-Pro": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 384000},
+		"moonshotai/Kimi-K2.6": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 262144, MaxOutput: 65536},
+		"moonshotai/Kimi-K2.5": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 262144, MaxOutput: 65536},
+		"zai-org/GLM-5.1": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32768},
+		"zai-org/GLM-5": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32768},
+		"MiniMaxAI/MiniMax-M2.7": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 65536},
+		"MiniMaxAI/MiniMax-M2.5": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 65536},
+		"Qwen/Qwen3.6-Max-Preview": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
+		"Qwen/Qwen3.6-Plus": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
+	},
 	"nvidia": {
 		"minimaxai/minimax-m2.7":        {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
 		"minimaxai/minimax-m3":          {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
@@ -736,6 +760,7 @@ func init() {
 	providerCapabilities["nan"] = providerCapabilities["nanbuilders"]
 	providerCapabilities["hc"] = providerCapabilities["hcnsec"]
 	providerCapabilities["oad"] = providerCapabilities["openadapter"]
+	providerCapabilities["cmd"] = providerCapabilities["command-code"]
 
 	initPatternIndex()
 }

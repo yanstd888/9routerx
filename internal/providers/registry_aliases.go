@@ -29,6 +29,7 @@ var RegistryAliases = map[string]string{
 	"codebuddy-cn":      "cbcn",
 	"codebuddy-intl":    "cbai",
 	"codex":             "cx",
+	"command-code":      "cmd",
 	"commandcode":       "cmc",
 	"cursor":            "cu",
 	"deepgram":          "dg",

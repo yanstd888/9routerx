@@ -59,6 +59,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "codex": "cx",
   "cohere": "cohere",
   "comfyui": "comfyui",
+  "command-code": "cmd",
   "commandcode": "cmc",
   "coqui": "coqui",
   "cursor": "cu",
@@ -2603,6 +2604,140 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "Atria-Dawn-Preview",
       "name": "Atria Dawn Preview"
     }
+  ],
+  "cmd": [
+  {
+    "id": "claude-opus-4-7",
+    "name": "Claude Opus 4.7 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-fable-5",
+    "name": "Claude Fable 5 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "claude-opus-4-6",
+    "name": "Claude Opus 4.6 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-sonnet-5-5",
+    "name": "Claude Sonnet 5.5 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "claude-sonnet-4-6",
+    "name": "Claude Sonnet 4.6 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-haiku-4-5-20251001",
+    "name": "Claude Haiku 4.5 (CC)",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.5",
+    "name": "GPT-5.5 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.4",
+    "name": "GPT-5.4 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.3-codex",
+    "name": "GPT-5.3 Codex (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.4-mini",
+    "name": "GPT-5.4 Mini (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-pro",
+    "name": "DeepSeek V4 Pro (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash",
+    "name": "DeepSeek V4 Flash (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash-vision-exp",
+    "name": "DeepSeek V4 Flash Vision (exp) (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K3.1-Pro",
+    "name": "Kimi K3.1 Pro (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.6",
+    "name": "Kimi K2.6 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.5",
+    "name": "Kimi K2.5 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.1",
+    "name": "GLM-5.1 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5",
+    "name": "GLM-5 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "MiniMaxAI/MiniMax-M2.7",
+    "name": "MiniMax M2.7 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "MiniMaxAI/MiniMax-M2.5",
+    "name": "MiniMax M2.5 (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-Max-Preview",
+    "name": "Qwen 3.6 Max (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-Plus",
+    "name": "Qwen 3.6 Plus (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
   ],
   "commandcode": [
     {

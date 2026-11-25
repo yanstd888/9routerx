@@ -43,6 +43,7 @@ var ProviderAliasMap = map[string]string{
 	"cf":             "cloudflare-ai",
 	"ch":             "chutes",
 	"cl":             "cline",
+	"cmd":            "command-code",
 	"cmc":            "commandcode",
 	"cp":             "clinepass",
 	"cu":             "cursor",

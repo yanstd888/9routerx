@@ -279,6 +279,7 @@ func RegisterAll() {
 	Register("bedrock", func() Executor { return ForwardBedrock })
 	Register("bedrock-xai", func() Executor { return ForwardBedrock })
 	Register("azure", func() Executor { return ForwardAzure })
+	Register("command-code", func() Executor { return ForwardCommandCode })
 	Register("commandcode", func() Executor { return ForwardCommandcode })
 	Register("qoder", func() Executor { return ForwardQoder })
 	Register("qoder-cn", func() Executor { return ForwardQoder })
