@@ -125,7 +125,7 @@ func EnsureTrailingUserTurnBody(body []byte, intentionalPrefill bool) []byte {
 		return body
 	}
 	repaired := EnsureTrailingUserTurn(messages, false)
-	if len(repaired) == len(messages) {
+	if sameTail(repaired, messages) {
 		return body
 	}
 	req["messages"] = repaired
