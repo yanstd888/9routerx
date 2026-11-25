@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"poe": {
+		BaseURL:    "https://api.poe.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"openrouter": {
 		BaseURL:        "https://openrouter.ai/api/v1/chat/completions",
 		AuthHeader:     "Authorization",

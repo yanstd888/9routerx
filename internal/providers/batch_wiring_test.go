@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -75,6 +75,23 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := CommandcodeGoatTarget("claude-opus-5-5"); got != FormatClaude {
 		t.Errorf("claude target = %q", got)
+	}
+	poeMeta := ProviderRegistry["poe"]
+	if poeMeta.Name != "Poe" || poeMeta.Alias != "poe" || poeMeta.Icon != "hub" || poeMeta.Color != "#F97316" || poeMeta.Website != "https://creator.poe.com/api-reference" {
+		t.Errorf("poe metadata = %+v", poeMeta)
+	}
+	poeCfg := KnownProviders["poe"]
+	if poeCfg.BaseURL != "https://api.poe.com/v1/chat/completions" || poeCfg.AuthScheme != "bearer" || poeCfg.Format != FormatOpenAI {
+		t.Errorf("poe config = %+v", poeCfg)
+	}
+	if got := ResolveAlias("poe"); got != "poe" {
+		t.Errorf("poe resolved to %q", got)
+	}
+	if len(ProviderModels["poe"]) != 3 {
+		t.Errorf("poe catalog = %v", ProviderModels["poe"])
+	}
+	if got, ok := GetModelFormats("poe", "claude-opus-4.8"); !ok || got.TargetFormat != FormatClaude {
+		t.Errorf("poe Claude formats = %+v, ok=%t", got, ok)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

@@ -19,6 +19,7 @@ const (
 // with more than one transport declare it; everything else routes on the
 // transport its base URL already names.
 var ProviderModelFormats = map[string]map[string]ModelFormats{
+	"poe": poeModelFormats,
 	"commandcode-goat": commandcodeGoatModelFormats,
 	"cmc-goat":         commandcodeGoatModelFormats,
 	"command-code": commandCodeModelFormats,
@@ -41,6 +42,12 @@ var commandCodeModelFormats = map[string]ModelFormats{
 	"claude-sonnet-5-5": openCodeZenFormats(FormatClaude, FormatClaude),
 	"claude-sonnet-4-6": openCodeZenFormats(FormatClaude, FormatClaude),
 	"claude-haiku-4-5-20251001": openCodeZenFormats(FormatClaude, FormatClaude),
+}
+
+var poeModelFormats = map[string]ModelFormats{
+	"gpt-5.2":         {TargetFormat: FormatOpenAI, SupportedFormats: []string{FormatOpenAI}},
+	"claude-opus-4.8": {TargetFormat: FormatClaude, SupportedFormats: []string{FormatClaude}},
+	"gemini-3.0-pro":  {TargetFormat: FormatOpenAI, SupportedFormats: []string{FormatOpenAI}},
 }
 
 // museModelFormats mirrors open-sse/providers/registry/muse.js models[]: Meta

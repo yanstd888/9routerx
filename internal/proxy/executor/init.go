@@ -24,6 +24,7 @@ func RegisterAll() {
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })
 	Register("nvidia", func() Executor { return ForwardNvidia })
+	Register("poe", func() Executor { return ForwardPoe })
 	Register("openrouter", func() Executor { return ForwardOpenAI })
 	Register("cerebras", func() Executor { return ForwardOpenAI })
 	Register("together", func() Executor { return ForwardOpenAI })

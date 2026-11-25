@@ -493,6 +493,11 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"Qwen/Qwen3.6-Max-Preview": {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
 		"Qwen/Qwen3.6-Plus": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
 	},
+	"poe": {
+		"gpt-5.2":          {Tools: true},
+		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
+		"gemini-3.0-pro":   {Tools: true},
+	},
 	"nvidia": {
 		"minimaxai/minimax-m2.7":        {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
 		"minimaxai/minimax-m3":          {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},

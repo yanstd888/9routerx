@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "poe": "poe",
   "openrouter": "openrouter",
   "perplexity": "pplx",
   "perplexity-agent": "pa",
@@ -9455,6 +9456,26 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "poe": [
+    {
+      "id": "gpt-5.2",
+      "name": "GPT-5.2",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
+    },
+    {
+      "id": "claude-opus-4.8",
+      "name": "Claude Opus 4.8",
+      "supportedFormats": ["claude"],
+      "capabilities": ["reasoning", "tools"]
+    },
+    {
+      "id": "gemini-3.0-pro",
+      "name": "Gemini 3.0 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
     }
   ],
   "openrouter": [
