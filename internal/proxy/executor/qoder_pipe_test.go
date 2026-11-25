@@ -14,14 +14,14 @@ import (
 
 const qoderPipeExitTimeout = 2 * time.Second
 
-var qoderPipeClientFailure = errors.New("Qoder test client stopped writing")
+var errQoderPipeClientFailure = errors.New("qoder test client stopped writing")
 
 type qoderPipeFailWriter struct{ header http.Header }
 
 func (w *qoderPipeFailWriter) Header() http.Header { return w.header }
 func (w *qoderPipeFailWriter) WriteHeader(int)     {}
 func (w *qoderPipeFailWriter) Write([]byte) (int, error) {
-	return 0, qoderPipeClientFailure
+	return 0, errQoderPipeClientFailure
 }
 func (w *qoderPipeFailWriter) Flush() {}
 
@@ -108,8 +108,8 @@ func TestQoderRewindPipe_ProducerExit(t *testing.T) {
 			case "write_failure":
 				qoderPipeAwait(t, writing, "producer write start")
 				err := execSSEStream(&qoderPipeFailWriter{header: make(http.Header)}, reader, &Request{Ctx: ctx, IsStream: true})
-				if !errors.Is(err, qoderPipeClientFailure) {
-					t.Fatalf("client failure = %v, want %v", err, qoderPipeClientFailure)
+				if !errors.Is(err, errQoderPipeClientFailure) {
+					t.Fatalf("client failure = %v, want %v", err, errQoderPipeClientFailure)
 				}
 				cleanup()
 			case "cancel_write", "cancel_read":

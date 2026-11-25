@@ -176,7 +176,7 @@ func TestPromptTokensForRequestBodyRegressionCloseAndReadErrors(t *testing.T) {
 		t.Errorf("scan read %d bytes and closed %d times, want 4 MiB and 0", original.bytesRead, original.closes)
 	}
 	assertRateLimitRegressionBody(t, req.Body, payload, readErr)
-	if err := req.Body.Close(); err != closeErr {
+	if err := req.Body.Close(); !errors.Is(err, closeErr) {
 		t.Errorf("Close() = %v, want original error %v", err, closeErr)
 	}
 	if original.closes != 1 {
@@ -223,7 +223,7 @@ func assertRateLimitRegressionBody(t *testing.T, body io.Reader, want []byte, wa
 	t.Helper()
 	hash := sha256.New()
 	n, err := io.Copy(hash, body)
-	if err != wantErr {
+	if !errors.Is(err, wantErr) {
 		t.Errorf("downstream read error = %v, want %v", err, wantErr)
 	}
 	if n != int64(len(want)) {

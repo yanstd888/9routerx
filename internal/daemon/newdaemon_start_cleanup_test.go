@@ -120,7 +120,7 @@ func TestCleanupFailedStartProcessAndErrors(t *testing.T) {
 				t.Errorf("cleanup lost kill error: %v", err)
 			}
 			if tt.wantAlive && tt.killErr == nil {
-				if err == nil || err == startErr || !strings.Contains(err.Error(), "still alive") {
+				if err == nil || !errors.Is(err, startErr) || !strings.Contains(err.Error(), "still alive") {
 					t.Errorf("cleanup hid failed exit confirmation: %v", err)
 				}
 				if elapsed < 2*time.Second || elapsed > 7*time.Second {
