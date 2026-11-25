@@ -17,6 +17,7 @@ type ProviderConfig struct {
 	DefaultAPIKey string            // fallback API key when none provided
 	StaticHeaders map[string]string // extra headers to set on every request
 	Format        string            // "" (OpenAI standard), "gemini-native"
+	CatalogURL    string            // optional model catalog root for a native executor
 	ImageURL      string            // override /images/generations endpoint
 	TTSURL        string            // override /audio/speech endpoint
 	STTURL        string            // override /audio/transcriptions endpoint
@@ -551,6 +552,17 @@ var KnownProviders = map[string]ProviderConfig{
 		NoAuth:        true,
 		SystemoneURL:  "https://opencode.ai/zen/v1/systemone",
 		StaticHeaders: map[string]string{"x-opencode-client": "cli", "User-Agent": "opencode/latest/2.1.4/cli"},
+	},
+	// OpenCode CLI Server: the local `opencode serve` v1 API. Keyless by
+	// contract, so no Authorization header is ever built for this lane.
+	// AuthOptional also keeps a custom dashboard URL usable without a key.
+	"opencode-server": {
+		BaseURL:       "http://127.0.0.1:4096",
+		CatalogURL:    "http://127.0.0.1:4096/config/providers",
+		NoAuth:        true,
+		AuthOptional:  true,
+		LocalByDesign: true,
+		Format:        FormatOpenAI,
 	},
 	// Pay-as-you-go lane (upstream open-sse/providers/registry/opencode-zen.js):
 	// a key is required, and the same key answers /chat/completions, /messages

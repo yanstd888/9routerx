@@ -29,6 +29,9 @@ func RegisterAll() {
 	Register("together", func() Executor { return ForwardOpenAI })
 	Register("fireworks", func() Executor { return ForwardOpenAI })
 	Register("opencode", func() Executor { return ForwardOpencode })
+	// The CLI Server is a separate local protocol (sessions, events and a
+	// keyless /config/providers catalog), never the inference gateway.
+	Register("opencode-server", func() Executor { return ForwardOpenCodeServer })
 	Register("gemini", func() Executor { return ForwardOpenAI })
 	Register("github", func() Executor { return ForwardGithub })
 	Register("ghe-copilot", func() Executor { return ForwardGHECopilot })

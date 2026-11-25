@@ -458,6 +458,17 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		// of hard-failing mid-session.
 		"deepseek-v4.1-flash-free": {Vision: true, Reasoning: true, ThinkingFormat: "deepseek", ContextWindow: 330000, MaxOutput: 128000},
 	},
+	// The local CLI Server serves the same bare ids as the free lane, so it
+	// inherits those verified wire quirks instead of the generic *mimo*v2.6*
+	// pattern, which describes a different, always-on thinking dialect.
+	"opencode-server": {
+		"big-pickle":                      {Reasoning: true, ThinkingFormat: "openai", ContextWindow: 200000, MaxOutput: 32000},
+		"space-bunny-free":                {Vision: true, VideoInput: true, Reasoning: true, ThinkingFormat: "openai", ContextWindow: 1048576, MaxOutput: 524288},
+		"muse-spark-1.3-contributor-free": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
+		"nemotron-3-ultra-free":           {Reasoning: true, Tools: true},
+		"mimo-v2.6-flash-free":            {Vision: true, AudioInput: true, VideoInput: true, Reasoning: true, ThinkingFormat: "openai", ThinkingCanDisable: new(true), ContextWindow: 1048576, MaxOutput: 131072},
+		"deepseek-v4.1-flash-free":        {Vision: true, Reasoning: true, ThinkingFormat: "deepseek", ContextWindow: 330000, MaxOutput: 128000},
+	},
 	"nvidia": {
 		"minimaxai/minimax-m2.7":        {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
 		"minimaxai/minimax-m3":          {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},

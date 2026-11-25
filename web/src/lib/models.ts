@@ -271,6 +271,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "ollama-local": "ollama-local",
   "openai": "openai",
   "opencode": "oc",
+  "opencode-server": "ocs",
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
@@ -8254,6 +8255,44 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "beam-free",
       "name": "Beam (Free)"
+    }
+  ],
+  "ocs": [
+    {
+      "id": "big-pickle",
+      "name": "big-pickle",
+      "supportedFormats": ["openai"],
+      "capabilities": ["reasoning"]
+    },
+    {
+      "id": "space-bunny-free",
+      "name": "space-bunny-free",
+      "supportedFormats": ["openai"],
+      "capabilities": ["vision", "reasoning"]
+    },
+    {
+      "id": "muse-spark-1.3-contributor-free",
+      "name": "muse-spark-1.3-contributor-free",
+      "supportedFormats": ["openai"],
+      "capabilities": ["vision", "reasoning", "tools"]
+    },
+    {
+      "id": "nemotron-3-ultra-free",
+      "name": "nemotron-3-ultra-free",
+      "supportedFormats": ["openai"],
+      "capabilities": ["reasoning", "tools"]
+    },
+    {
+      "id": "mimo-v2.6-flash-free",
+      "name": "mimo-v2.6-flash-free",
+      "supportedFormats": ["openai"],
+      "capabilities": ["vision", "reasoning"]
+    },
+    {
+      "id": "deepseek-v4.1-flash-free",
+      "name": "deepseek-v4.1-flash-free",
+      "supportedFormats": ["openai"],
+      "capabilities": ["vision", "reasoning"]
     }
   ],
   "oc": [

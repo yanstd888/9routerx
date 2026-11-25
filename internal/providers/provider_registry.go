@@ -2443,6 +2443,23 @@ var ProviderRegistry = map[string]ProviderMeta{
 		ServiceKinds:  []string{"llm", "systemone"},
 		ModelsFetcher: &Fetcher{URL: "https://opencode.ai/zen/v1/models", Type: "opencode-free"},
 	},
+	"opencode-server": {
+		// Display from the pinned local.ts entry: terminal glyph, amber colour,
+		// textIcon "OC" and the local-server docs URL. The registry's apikey /
+		// bearer hint conflicts with the executor and PROVIDER_REFERENCE.md,
+		// which send no credential; the keyless contract wins here.
+		ID:           "opencode-server",
+		Name:         "OpenCode CLI Server",
+		Alias:        "ocs",
+		Category:     CategoryFree,
+		AuthType:     "none",
+		Color:        "#F59E0B",
+		Icon:         "terminal",
+		NoAuth:       true,
+		ServiceKinds: []string{"llm"},
+		Website:      "https://opencode.ai/docs/server/",
+		AuthHint:     "Runs against a local OpenCode CLI server at http://127.0.0.1:4096 (OPENCODE_SERVER_URL or a dashboard URL overrides it). No API key is sent; start the server with `opencode serve`.",
+	},
 	"api-airforce": {
 		ID:            "api-airforce",
 		Name:          "API.airforce",

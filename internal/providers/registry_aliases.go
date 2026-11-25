@@ -67,6 +67,7 @@ var RegistryAliases = map[string]string{
 	"nous":                "nous",
 	"openadapter":         "oad",
 	"opencode":            "oc",
+	"opencode-server":     "ocs",
 	"opencode-go":         "ocg",
 	"opencode-zen":        "ocz",
 	"perplexity":          "pplx",
