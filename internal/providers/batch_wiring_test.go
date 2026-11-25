@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -58,6 +58,23 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := GetCapabilitiesDetailForModel("cmd", "claude-sonnet-5-5"); got.ContextWindow != 200000 || got.MaxOutput != 16384 {
 		t.Errorf("cmd alias capabilities = %+v", got)
+	}
+	goatMeta := ProviderRegistry["commandcode-goat"]
+	if goatMeta.Name != "Command Code (Provider API)" || goatMeta.Alias != "cmc-goat" || goatMeta.Website != "https://commandcode.ai/docs/provider" {
+		t.Errorf("commandcode-goat metadata = %+v", goatMeta)
+	}
+	goatCfg := KnownProviders["commandcode-goat"]
+	if goatCfg.BaseURL != "https://api.commandcode.ai/provider/v1/chat/completions" || goatCfg.SystemoneURL != "https://api.commandcode.ai/provider/v1/systemone" || goatCfg.AuthScheme != "bearer" {
+		t.Errorf("commandcode-goat config = %+v", goatCfg)
+	}
+	if len(ProviderModels["commandcode-goat"]) != 97 || len(ProviderModels["cmc-goat"]) != 97 {
+		t.Errorf("commandcode-goat catalog = %d/%d models", len(ProviderModels["commandcode-goat"]), len(ProviderModels["cmc-goat"]))
+	}
+	if got := ResolveAlias("cmc-goat"); got != "commandcode-goat" {
+		t.Errorf("cmc-goat resolved to %q", got)
+	}
+	if got := CommandcodeGoatTarget("claude-opus-5-5"); got != FormatClaude {
+		t.Errorf("claude target = %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

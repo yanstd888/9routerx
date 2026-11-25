@@ -2985,6 +2985,7 @@
     // catalog is a 22-model snapshot, so this is the only path that surfaces
     // models added after it (reflection/beam:free, minimax/minimax-m3.1-flash).
     'command-code',
+    'commandcode-goat',
     'commandcode',
     // Five more keyless catalogues, each probed live at 200 with no
     // Authorization header. vercel-ai-gateway and chutes ship no static

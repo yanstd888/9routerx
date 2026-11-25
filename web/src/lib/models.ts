@@ -60,6 +60,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "cohere": "cohere",
   "comfyui": "comfyui",
   "command-code": "cmd",
+  "commandcode-goat": "cmc-goat",
   "commandcode": "cmc",
   "coqui": "coqui",
   "cursor": "cu",
@@ -2735,6 +2736,590 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
   {
     "id": "Qwen/Qwen3.6-Plus",
     "name": "Qwen 3.6 Plus (CC)",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  ],
+  "cmc-goat": [
+  {
+    "id": "MiniMaxAI/MiniMax-M2.5",
+    "name": "MiniMaxAI/MiniMax-M2.5",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "MiniMaxAI/MiniMax-M2.7",
+    "name": "MiniMaxAI/MiniMax-M2.7",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "MiniMaxAI/MiniMax-M3",
+    "name": "MiniMaxAI/MiniMax-M3",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-Max-Preview",
+    "name": "Qwen/Qwen3.6-Max-Preview",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-Plus",
+    "name": "Qwen/Qwen3.6-Plus",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.7-Flash",
+    "name": "Qwen/Qwen3.7-Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.7-Max",
+    "name": "Qwen/Qwen3.7-Max",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.7-Plus",
+    "name": "Qwen/Qwen3.7-Plus",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-27B",
+    "name": "Qwen/Qwen3.8-27B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-Flash",
+    "name": "Qwen/Qwen3.8-Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-Max",
+    "name": "Qwen/Qwen3.8-Max",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-Max-0902",
+    "name": "Qwen/Qwen3.8-Max-0902",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-Max-Prime",
+    "name": "Qwen/Qwen3.8-Max-Prime",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.8-Omni-Flash",
+    "name": "Qwen/Qwen3.8-Omni-Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-fable-5",
+    "name": "claude-fable-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-fable-5-1",
+    "name": "claude-fable-5-1",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-fable-5-2",
+    "name": "claude-fable-5-2",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-haiku-4-5-20251001",
+    "name": "claude-haiku-4-5-20251001",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-haiku-5-5",
+    "name": "claude-haiku-5-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-opus-4-7",
+    "name": "claude-opus-4-7",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-opus-4-8",
+    "name": "claude-opus-4-8",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-opus-5",
+    "name": "claude-opus-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-opus-5-5",
+    "name": "claude-opus-5-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-sonnet-4-6",
+    "name": "claude-sonnet-4-6",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-sonnet-5",
+    "name": "claude-sonnet-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "claude-sonnet-5-5",
+    "name": "claude-sonnet-5-5",
+    "supportedFormats": ["claude"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash",
+    "name": "deepseek/deepseek-v4-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash-fast",
+    "name": "deepseek/deepseek-v4-flash-fast",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash-vision-exp",
+    "name": "deepseek/deepseek-v4-flash-vision-exp",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4-pro",
+    "name": "deepseek/deepseek-v4-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4.1-flash",
+    "name": "deepseek/deepseek-v4.1-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4.1-flash-fast",
+    "name": "deepseek/deepseek-v4.1-flash-fast",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "deepseek/deepseek-v4.1-flash-ultrafast",
+    "name": "deepseek/deepseek-v4.1-flash-ultrafast",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.1-flash-lite",
+    "name": "google/gemini-3.1-flash-lite",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.5-flash",
+    "name": "google/gemini-3.5-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.5-flash-lite",
+    "name": "google/gemini-3.5-flash-lite",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.6-flash",
+    "name": "google/gemini-3.6-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.7-flash",
+    "name": "google/gemini-3.7-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-3.8-flash",
+    "name": "google/gemini-3.8-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-4-argon",
+    "name": "google/gemini-4-argon",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "google/gemini-4-carbon",
+    "name": "google/gemini-4-carbon",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.3-codex",
+    "name": "gpt-5.3-codex",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.4",
+    "name": "gpt-5.4",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.4-mini",
+    "name": "gpt-5.4-mini",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.5",
+    "name": "gpt-5.5",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.6-luna",
+    "name": "gpt-5.6-luna",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.6-sol",
+    "name": "gpt-5.6-sol",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-5.6-terra",
+    "name": "gpt-5.6-terra",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-6-astra",
+    "name": "gpt-6-astra",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-6-luna",
+    "name": "gpt-6-luna",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-6-sol",
+    "name": "gpt-6-sol",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-6.1-sol",
+    "name": "gpt-6.1-sol",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "gpt-6.1-terra",
+    "name": "gpt-6.1-terra",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "inclusionai/ling-3.1-flash",
+    "name": "inclusionai/ling-3.1-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "inclusionai/ling-3.1-flash-1019",
+    "name": "inclusionai/ling-3.1-flash-1019",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meituan/LongCat-2.0",
+    "name": "meituan/LongCat-2.0",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-ember",
+    "name": "meta/muse-ember",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-1.1",
+    "name": "meta/muse-spark-1.1",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-1.2",
+    "name": "meta/muse-spark-1.2",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-1.2-contributor",
+    "name": "meta/muse-spark-1.2-contributor",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-1.3",
+    "name": "meta/muse-spark-1.3",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-1.3-contributor",
+    "name": "meta/muse-spark-1.3-contributor",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-spark-open",
+    "name": "meta/muse-spark-open",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "meta/muse-wonder-1.0",
+    "name": "meta/muse-wonder-1.0",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "minimax/minimax-m3.1-flash",
+    "name": "minimax/minimax-m3.1-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "mistral/mistral-large-4",
+    "name": "mistral/mistral-large-4",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.5",
+    "name": "moonshotai/Kimi-K2.5",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.6",
+    "name": "moonshotai/Kimi-K2.6",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.7-Code",
+    "name": "moonshotai/Kimi-K2.7-Code",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.7-Code-Highspeed",
+    "name": "moonshotai/Kimi-K2.7-Code-Highspeed",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K3",
+    "name": "moonshotai/Kimi-K3",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K3.1-Pro",
+    "name": "moonshotai/Kimi-K3.1-Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "nvidia/nemotron-3-ultra-550b-a55b",
+    "name": "nvidia/nemotron-3-ultra-550b-a55b",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "nvidia/nemotron-3.5-super-vl",
+    "name": "nvidia/nemotron-3.5-super-vl",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "ornith/ornith-1.5-122b",
+    "name": "ornith/ornith-1.5-122b",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "sakana/fugu-ultra",
+    "name": "sakana/fugu-ultra",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "stealth/glyph-cluster:free",
+    "name": "stealth/glyph-cluster:free",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "stepfun/Step-3.5-Flash",
+    "name": "stepfun/Step-3.5-Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "stepfun/Step-3.7-Flash",
+    "name": "stepfun/Step-3.7-Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "stepfun/Step-5-Preview",
+    "name": "stepfun/Step-5-Preview",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "tencent/hy3-paid",
+    "name": "tencent/hy3-paid",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "tencent/hy4-preview",
+    "name": "tencent/hy4-preview",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "thinkingmachines/inkling",
+    "name": "thinkingmachines/inkling",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "thinkingmachines/inkling-small",
+    "name": "thinkingmachines/inkling-small",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xai/grok-4.5",
+    "name": "xai/grok-4.5",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xai/grok-4.6",
+    "name": "xai/grok-4.6",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xai/grok-4.7",
+    "name": "xai/grok-4.7",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xiaomi/mimo-v2.6-flash",
+    "name": "xiaomi/mimo-v2.6-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xiaomi/mimo-v2.6-pro",
+    "name": "xiaomi/mimo-v2.6-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "xiaomi/mimo-v2.6-pro-ultraspeed",
+    "name": "xiaomi/mimo-v2.6-pro-ultraspeed",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "z-ai/glm-5.3-flash",
+    "name": "z-ai/glm-5.3-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "z-ai/glm-5.3-flashx",
+    "name": "z-ai/glm-5.3-flashx",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5",
+    "name": "zai-org/GLM-5",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.1",
+    "name": "zai-org/GLM-5.1",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.2",
+    "name": "zai-org/GLM-5.2",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.2-Fast",
+    "name": "zai-org/GLM-5.2-Fast",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.3",
+    "name": "zai-org/GLM-5.3",
     "supportedFormats": ["openai"],
     "capabilities": ["vision", "reasoning", "tools"]
   },

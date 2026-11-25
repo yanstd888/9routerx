@@ -1120,6 +1120,13 @@ func GetCapabilitiesForModel(provider, model string) Capabilities {
 		capsCacheMu.Unlock()
 		return res
 	}
+	if isCommandCodeGoatProvider(provider) {
+		res := commandCodeGoatCapabilities(model)
+		capsCacheMu.Lock()
+		capsCache[key] = res
+		capsCacheMu.Unlock()
+		return res
+	}
 
 	// 1. Provider-specific override
 	var res Capabilities

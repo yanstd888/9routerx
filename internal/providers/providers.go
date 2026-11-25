@@ -203,7 +203,9 @@ var modelsListURL = map[string]string{
 	// registry catalog is a fixed 22-model list, so without this entry the
 	// dashboard cannot discover anything the snapshot predates.
 	"command-code": "https://api.commandcode.ai/provider/v1/models",
-	"commandcode":  "https://api.commandcode.ai/provider/v1/models",
+	"commandcode-goat": "https://api.commandcode.ai/provider/v1/models",
+	"cmc-goat":         "https://api.commandcode.ai/provider/v1/models",
+	"commandcode":      "https://api.commandcode.ai/provider/v1/models",
 	// Five more providers whose catalogue is reachable without a valid
 	// credential, so the discovery path that fixed commandcode covers them
 	// unchanged: "Check Latest Models", "Import from /models" and "Sync Models"
@@ -1980,6 +1982,13 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 		Format:     FormatOpenAI,
+	},
+	"commandcode-goat": {
+		BaseURL:       "https://api.commandcode.ai/provider/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		SystemoneURL:  "https://api.commandcode.ai/provider/v1/systemone",
+		SystemonePath: "/systemone",
 	},
 	"commandcode": {
 		BaseURL:    "https://api.commandcode.ai/alpha/generate",

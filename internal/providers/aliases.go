@@ -44,6 +44,7 @@ var ProviderAliasMap = map[string]string{
 	"ch":             "chutes",
 	"cl":             "cline",
 	"cmd":            "command-code",
+	"cmc-goat":       "commandcode-goat",
 	"cmc":            "commandcode",
 	"cp":             "clinepass",
 	"cu":             "cursor",
