@@ -4,6 +4,7 @@ package executor
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +15,9 @@ import (
 
 	json "encoding/json/v2"
 
+	"9routerx/proxy/internal/constants"
 	"9routerx/proxy/internal/providers"
+	"9routerx/proxy/internal/proxy"
 )
 
 // zedTestJWT builds an unsigned JWT whose payload carries the given exp claim.
@@ -147,6 +150,73 @@ const zedChatBody = `{"model":"claude-haiku-5-5","stream":true,"max_tokens":64,
 func zedTestCreds(tag string) (blob string, connData map[string]any) {
 	return `{"version":2,"id":"client_token_` + tag + `","token":"acct-` + tag + `"}`,
 		map[string]any{"userId": "493663", "organizationId": "org_" + tag, "systemId": "sys_" + tag}
+}
+
+func TestForwardZedBodyLimit(t *testing.T) {
+	for _, streaming := range []bool{false, true} {
+		for _, oversized := range []bool{false, true} {
+			name := []string{"buffered", "streaming"}[boolIndex(streaming)] + []string{"exact-cap", "over-cap"}[boolIndex(oversized)]
+			t.Run(name, func(t *testing.T) {
+				prefix := `{"id":"id","model":"gpt-5","output":[{"type":"message","content":[{"type":"output_text","text":"ok"}]}],"padding":"`
+				suffix := `"}`
+				body := []byte(prefix + strings.Repeat("x", int(constants.MaxUpstreamBodyBytes)-len(prefix)-len(suffix)) + suffix)
+				if oversized {
+					body = append(body, 'x')
+				}
+				closed := false
+				client := &http.Client{Transport: zedRoundTripper(func(r *http.Request) *http.Response {
+					if r.URL.Path == providers.ZedLLMTokensPath {
+						token, _ := json.Marshal(map[string]string{"token": zedTestJWT(t, time.Now().Add(time.Hour).Unix())})
+						return &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": []string{"application/json"}}, Body: io.NopCloser(strings.NewReader(string(token))), Request: r}
+					}
+					return &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": []string{"application/json"}}, Body: zedCloseTracker{Reader: strings.NewReader(string(body)), closed: &closed}, Request: r}
+				})}
+				blob, connData := zedTestCreds(name)
+				rec := httptest.NewRecorder()
+				err := ForwardZed(rec, &Request{Ctx: context.Background(), Client: client, Config: &providers.ProviderConfig{BaseURL: "https://zed.invalid/completions"}, APIKey: blob, Body: []byte(zedChatBody), IsStream: streaming, ConnData: connData, ModelName: "gpt-5"})
+				if !closed {
+					t.Fatal("upstream response body not closed")
+				}
+				if oversized {
+					var upstreamErr *proxy.UpstreamError
+					if !errors.As(err, &upstreamErr) || upstreamErr.StatusCode != http.StatusBadGateway {
+						t.Fatalf("error = %v, want sanitized 502 UpstreamError", err)
+					}
+					if rec.Body.Len() != 0 {
+						t.Fatalf("oversized response emitted partial body (%d bytes)", rec.Body.Len())
+					}
+					if rec.Code != http.StatusOK {
+						t.Fatalf("response code = %d before error handling, want untouched writer", rec.Code)
+					}
+				} else {
+					if err != nil {
+						t.Fatalf("ForwardZed exact cap: %v", err)
+					}
+					if rec.Body.Len() == 0 {
+						t.Fatal("exact-cap response produced no output")
+					}
+				}
+			})
+		}
+	}
+}
+
+type zedRoundTripper func(*http.Request) *http.Response
+
+func (rt zedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) { return rt(r), nil }
+
+type zedCloseTracker struct {
+	io.Reader
+	closed *bool
+}
+
+func (b zedCloseTracker) Close() error { *b.closed = true; return nil }
+
+func boolIndex(v bool) int {
+	if v {
+		return 1
+	}
+	return 0
 }
 
 func TestResolveZedModel(t *testing.T) {

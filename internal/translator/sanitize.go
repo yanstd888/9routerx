@@ -2,6 +2,7 @@
 package translator
 
 import (
+	stdjson "encoding/json"
 	json "encoding/json/v2"
 	"fmt"
 	"regexp"
@@ -16,15 +17,15 @@ func sanitizeToolArgs(toolName, argsJSON string) string {
 		argsJSON = "{}"
 	}
 	var args map[string]any
-	if err := json.Unmarshal([]byte(argsJSON), &args); err != nil {
+	if err := unmarshalNumbered([]byte(argsJSON), &args); err != nil {
 		if repaired := RepairTruncatedJSON(argsJSON); repaired != argsJSON {
-			if errRep := json.Unmarshal([]byte(repaired), &args); errRep == nil {
+			if errRep := unmarshalNumbered([]byte(repaired), &args); errRep == nil {
 				argsJSON = repaired
 			}
 		}
 	}
 	if args == nil {
-		if err := json.Unmarshal([]byte(argsJSON), &args); err != nil {
+		if err := unmarshalNumbered([]byte(argsJSON), &args); err != nil {
 			// If args is a JSON string (e.g. "\"query\""), try to unwrap
 			var s string
 			if err2 := json.Unmarshal([]byte(argsJSON), &s); err2 == nil && s != "" {
@@ -398,6 +399,21 @@ func sanitizeReadArgs(args map[string]any) {
 			if _, err := fmt.Sscanf(v, "%d", &n); err == nil {
 				args["limit"] = n
 			}
+		case stdjson.Number:
+			if n, err := v.Float64(); err == nil {
+				switch {
+				case n > maxReadLimit:
+					args["limit"] = maxReadLimit
+				case n < 1:
+					delete(args, "limit")
+				default:
+					args["limit"] = int(n)
+				}
+			} else if strings.HasPrefix(v.String(), "-") {
+				delete(args, "limit")
+			} else {
+				args["limit"] = maxReadLimit
+			}
 		}
 		if limitNum, ok := args["limit"].(float64); ok {
 			n := int(limitNum)
@@ -424,6 +440,18 @@ func sanitizeReadArgs(args map[string]any) {
 			if _, err := fmt.Sscanf(v, "%d", &n); err == nil {
 				args["offset"] = n
 			}
+		case stdjson.Number:
+			if n, err := v.Int64(); err == nil {
+				if n < 0 {
+					args["offset"] = 0
+				} else {
+					args["offset"] = n
+				}
+			} else if strings.HasPrefix(v.String(), "-") {
+				args["offset"] = 0
+			} else {
+				args["offset"] = int(^uint(0) >> 1)
+			}
 		}
 		if offsetNum, ok := args["offset"].(float64); ok {
 			n := int(offsetNum)
@@ -432,10 +460,8 @@ func sanitizeReadArgs(args map[string]any) {
 			} else {
 				args["offset"] = n
 			}
-		} else if offsetNum, ok := args["offset"].(int); ok {
-			if offsetNum < 0 {
-				args["offset"] = 0
-			}
+		} else if offsetNum, ok := args["offset"].(int); ok && offsetNum < 0 {
+			args["offset"] = 0
 		}
 	}
 

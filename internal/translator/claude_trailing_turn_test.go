@@ -186,6 +186,43 @@ func TestEnsureTrailingUserTurnBody(t *testing.T) {
 	}
 }
 
+func TestEnsureTrailingUserTurnBodyReplacesEmptiedTail(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		emptied string
+	}{
+		{"empty block array", `[]`},
+		{"blank string", `"   "`},
+		{"null content", `null`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			body := []byte(`{"model":"claude-sonnet","messages":[{"role":"user","content":[{"type":"text","text":"hi"}]},{"role":"assistant","content":[{"type":"text","text":"partial"}]},{"role":"user","content":` + tt.emptied + `}]}`)
+
+			got := EnsureTrailingUserTurnBody(body, false)
+			if string(got) == string(body) {
+				t.Fatal("body wrapper returned the original body; emptied tail replacement was lost")
+			}
+			if !containsPlaceholder(got) {
+				t.Fatalf("placeholder missing from repaired body: %s", got)
+			}
+			var decoded struct {
+				Messages []struct {
+					Role    string `json:"role"`
+					Content []struct {
+						Text string `json:"text"`
+					} `json:"content"`
+				} `json:"messages"`
+			}
+			if err := json.Unmarshal(got, &decoded); err != nil {
+				t.Fatalf("decode repaired body: %v", err)
+			}
+			if len(decoded.Messages) != 3 || decoded.Messages[0].Role != "user" || decoded.Messages[1].Role != "assistant" || decoded.Messages[2].Role != "user" || len(decoded.Messages[2].Content) != 1 || decoded.Messages[2].Content[0].Text != TrailingUserPlaceholder {
+				t.Fatalf("body wrapper did not replace only the emptied tail: %+v", decoded.Messages)
+			}
+		})
+	}
+}
+
 func containsPlaceholder(body []byte) bool {
 	var decoded struct {
 		Messages []struct {
