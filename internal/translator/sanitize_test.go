@@ -2,6 +2,7 @@
 package translator
 
 import (
+	stdjson "encoding/json"
 	json "encoding/json/v2"
 	"testing"
 )
@@ -218,6 +219,54 @@ func TestSanitizeToolArgs(t *testing.T) {
 			t.Errorf("expected name alias removed, got %v", m["name"])
 		}
 	})
+}
+
+func TestSanitizeToolArgsPreservesNumberLiterals(t *testing.T) {
+	tests := []struct {
+		name string
+		args string
+		want string
+	}{
+		{"positive large integer", `{"id":9007199254740993}`, `{"id":9007199254740993}`},
+		{"negative large integer", `{"id":-9007199254740993}`, `{"id":-9007199254740993}`},
+		{"numeric and string values", `{"id":9007199254740993,"text":"9007199254740993"}`, `{"id":9007199254740993,"text":"9007199254740993"}`},
+		{"non-numeric value", `{"id":"not-a-number"}`, `{"id":"not-a-number"}`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := sanitizeToolArgs("custom", tt.args); got != tt.want {
+				t.Errorf("sanitizeToolArgs() = %s, want %s", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSanitizeReadToolArgsClampsLargeNumberedLimits(t *testing.T) {
+	for _, tt := range []struct {
+		name       string
+		args       string
+		wantOffset string
+	}{
+		{"large integral limit", `{"limit":9007199254740993,"offset":9007199254740993,"id":9007199254740993}`, "9007199254740993"},
+		{"large exponent limit", `{"limit":1e100,"offset":9223372036854775808,"id":9007199254740993}`, "9223372036854775807"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			got := sanitizeToolArgs("Read", tt.args)
+			var args map[string]stdjson.Number
+			if err := unmarshalNumbered([]byte(got), &args); err != nil {
+				t.Fatalf("decode sanitized args: %v", err)
+			}
+			if args["limit"].String() != "2000" {
+				t.Errorf("limit = %s, want clamped 2000", args["limit"])
+			}
+			if args["offset"].String() != tt.wantOffset {
+				t.Errorf("offset = %s, want preserved value %s", args["offset"], tt.wantOffset)
+			}
+			if args["id"].String() != "9007199254740993" {
+				t.Errorf("unrelated tool integer changed: %s", args["id"])
+			}
+		})
+	}
 }
 
 // --- isValidPdfPagesArg ---
