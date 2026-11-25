@@ -75,6 +75,7 @@ var ProviderAliasMap = map[string]string{
 	"hf":             "huggingface",
 	"hyp":            "hyperbolic",
 	"ideo":           "ideogram",
+	"leo":            "leonardo",
 	"if":             "iflow",
 	"jina":           "jina-ai",
 	"kc":             "kilocode",

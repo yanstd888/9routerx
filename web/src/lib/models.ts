@@ -240,6 +240,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "huggingface": "hf",
   "hyperbolic": "hyp",
   "ideogram": "ideo",
+  "leonardo": "leo",
   "iflow": "if",
   "inworld": "inworld",
   "jina-ai": "jina-ai",
@@ -6927,6 +6928,18 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "V_2A",
       "name": "Ideogram V2A",
+      "kind": "image"
+    }
+  ],
+  "leonardo": [
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "kind": "image"
+    },
+    {
+      "id": "sdxl",
+      "name": "SDXL",
       "kind": "image"
     }
   ],

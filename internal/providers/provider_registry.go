@@ -379,6 +379,20 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:      "https://ideogram.ai",
 		AuthHint:     "Get API key at ideogram.ai/docs/api",
 	},
+	"leonardo": {
+		// Pinned OmniRoute 632d84f5: apikey, image-only lane. Upstream uses the
+		// default chat executor; the native POST and poll live in the media lane.
+		ID:           "leonardo",
+		Name:         "Leonardo AI",
+		Alias:        "leo",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#8B5CF6",
+		Icon:         "palette",
+		ServiceKinds: []string{"image"},
+		Website:      "https://leonardo.ai",
+		AuthHint:     "Get API key at leonardo.ai/developer",
+	},
 	"iflow": {
 		ID:           "iflow",
 		Name:         "iFlow AI",

@@ -943,6 +943,17 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 			}
+			// Leonardo's native lane POSTs a platform-model UUID and polls a
+			// generation id; the generic OpenAI forward cannot do either.
+			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
+				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "leonardo" || subInfo.Provider == "leo") {
+				if err := h.handleLeonardoImage(w, r, body, subInfo); err == nil {
+					return
+				} else {
+					lastErr = err.Error()
+					continue
+				}
+			}
 			// Codex image models are Responses-API models, not an image endpoint.
 			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "codex" || subInfo.Provider == "cx") {
@@ -1135,6 +1146,14 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 		endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (modelInfo.Provider == "ideogram" || modelInfo.Provider == "ideo") {
 		if err := h.handleIdeogramImage(w, r, body, modelInfo); err != nil {
+			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
+		}
+		return
+	}
+	// Leonardo: native UUID-model POST plus generation polling.
+	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
+		endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (modelInfo.Provider == "leonardo" || modelInfo.Provider == "leo") {
+		if err := h.handleLeonardoImage(w, r, body, modelInfo); err != nil {
 			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		}
 		return

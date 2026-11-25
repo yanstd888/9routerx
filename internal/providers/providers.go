@@ -1886,6 +1886,14 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme: "raw",
 		ImageURL:   "https://api.ideogram.ai/generate",
 	},
+	"leonardo": {
+		// Pinned OmniRoute 632d84f5: API root plus the native generations
+		// endpoint. The media handler POSTs to ImageURL and polls under it.
+		BaseURL:    "https://cloud.leonardo.ai/api/rest/v1",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		ImageURL:   "https://cloud.leonardo.ai/api/rest/v1/generations",
+	},
 	"iflow": {
 		BaseURL:        "https://apis.iflow.cn/v1/chat/completions",
 		AuthHeader:     "Authorization",

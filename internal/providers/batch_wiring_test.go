@@ -4,7 +4,7 @@ package providers
 import "testing"
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -12,6 +12,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("ali"); got != "alicode" {
 		t.Errorf("existing ali alias was changed to %q", got)
+	}
+	cfg := KnownProviders["leonardo"]
+	if cfg.BaseURL != "https://cloud.leonardo.ai/api/rest/v1" ||
+		cfg.ImageURL != "https://cloud.leonardo.ai/api/rest/v1/generations" ||
+		cfg.AuthHeader != "Authorization" || cfg.AuthScheme != "bearer" {
+		t.Errorf("leonardo config = %+v", cfg)
+	}
+	for _, model := range []string{"phoenix", "sdxl"} {
+		if got := GetProviderModelKind("leonardo", model); got != "image" {
+			t.Errorf("leonardo/%s kind = %q, want image", model, got)
+		}
 	}
 	if got := GetProviderModelKind("drex", "drex-max"); got != "systemone" {
 		t.Errorf("Drex kind = %q, want systemone", got)
@@ -32,7 +43,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"leonardo", "haiper", "dify", "udio", "nlpcloud", "oneminai", "gigachat", "keenable"} {
+	for _, id := range []string{"haiper", "dify", "udio", "nlpcloud", "oneminai", "gigachat", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}
