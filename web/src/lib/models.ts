@@ -246,6 +246,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "kilocode": "kc",
   "kimchi": "kimchi",
   "moonshot": "moonshot",
+  "replicate": "replicate",
   "kimi": "kimi",
   "kiro": "kr",
   "llm7": "llm7",
@@ -356,6 +357,10 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     { id: "kimi-k2.7-code", name: "Kimi K2.7 Code", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
     { id: "kimi-k2.7-code-highspeed", name: "Kimi K2.7 Code (High Speed)", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
     { id: "kimi-k2.6", name: "Kimi K2.6", contextLength: 262144, maxOutputTokens: 262144, capabilities: ["vision", "reasoning", "tools"] },
+  ],
+  "replicate": [
+    { id: "meta/meta-llama-3-70b-instruct", name: "Llama 3 70B Instruct" },
+    { id: "mistralai/mistral-7b-instruct-v0.2", name: "Mistral 7B Instruct v0.2" },
   ],
   "ghe-copilot": [
     "claude-fable-5", "claude-opus-5", "claude-opus-4.8-fast", "claude-opus-4.8", "claude-opus-4.7", "claude-sonnet-4.6", "claude-opus-4.5", "claude-sonnet-5", "claude-sonnet-5-5", "claude-sonnet-4.5", "claude-haiku-4.5",

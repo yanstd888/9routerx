@@ -74,6 +74,18 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website: "https://platform.kimi.ai",
 		AuthHint: "Use a Moonshot API platform key, not a Kimi Code subscription credential.",
 	},
+	"replicate": {
+		// Pinned OmniRoute 632d84f5: apikey registry entry with a native
+		// prediction executor. The upstream display lists llm+video, but its
+		// videoRegistry marks video unsupported (no dispatcher transport), so
+		// this lane implements LLM only.
+		ID: "replicate", Name: "Replicate", Alias: "replicate",
+		Category: CategoryAPIKey, AuthType: "apikey",
+		Color: "#EA2805", Icon: "content_copy",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://replicate.com",
+		AuthHint:     "Use a Replicate API token. The Chat Completions lane is supported; Replicate video is not implemented.",
+	},
 	"devin-desktop": {
 		ID: "devin-desktop",
 		Name: "Devin Desktop",

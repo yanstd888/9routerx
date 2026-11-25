@@ -1921,6 +1921,14 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme: "bearer",
 		Format:     FormatOpenAI,
 	},
+	"replicate": {
+		// The native executor rebuilds this base into /models/{owner}/{name}/
+		// predictions (or /predictions for a pinned version).
+		BaseURL:    "https://api.replicate.com/v1",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"kimi": {
 		BaseURL:    "https://api.kimi.com/coding/v1/chat/completions",
 		AuthHeader: "Authorization",
