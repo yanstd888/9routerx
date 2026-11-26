@@ -30,6 +30,7 @@ var RegistryAliases = map[string]string{
 	"codebuddy-intl":    "cbai",
 	"codex":             "cx",
 	"command-code":      "cmd",
+	"haiper":            "hp",
 	"clova-studio":      "clova",
 	"nlpcloud":          "nlpc",
 	"commandcode-goat":  "cmc-goat",

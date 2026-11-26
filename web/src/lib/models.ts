@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "haiper": "hp",
   "udio": "udio",
   "gigachat": "gigachat",
   "clova-studio": "clova",
@@ -9461,6 +9462,20 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "hp": [
+    {
+      "id": "gen2",
+      "name": "Gen 2 Video",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gen2-image",
+      "name": "Gen 2 Image",
+      "supportedFormats": ["openai"],
+      "capabilities": []
     }
   ],
   "udio": [

@@ -498,6 +498,10 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"haiper": {
+		"gen2":       {},
+		"gen2-image": {},
+	},
 	"udio": {
 		"udio-default": {},
 	},

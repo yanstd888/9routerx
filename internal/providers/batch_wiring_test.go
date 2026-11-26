@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -163,6 +163,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("udio"); got != "udio" {
 		t.Errorf("udio resolved to %q", got)
 	}
+	haiperMeta := ProviderRegistry["haiper"]
+	if haiperMeta.Name != "Haiper" || haiperMeta.Alias != "hp" || haiperMeta.Icon != "videocam" || haiperMeta.Color != "#6366F1" || haiperMeta.Website != "https://haiper.ai" {
+		t.Errorf("haiper metadata = %+v", haiperMeta)
+	}
+	haiperCfg := KnownProviders["haiper"]
+	if haiperCfg.BaseURL != "https://api.haiper.ai/v1" || haiperCfg.AuthHeader != "HAIPER_KEY" || haiperCfg.AuthScheme != "raw" {
+		t.Errorf("haiper config = %+v", haiperCfg)
+	}
+	if len(ProviderModels["haiper"]) != 2 || len(ProviderModels["hp"]) != 2 {
+		t.Errorf("haiper catalog = %d/%d models", len(ProviderModels["haiper"]), len(ProviderModels["hp"]))
+	}
+	if got := ResolveAlias("hp"); got != "haiper" {
+		t.Errorf("hp resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -185,7 +199,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"haiper", "dify", "oneminai", "keenable"} {
+	for _, id := range []string{"dify", "oneminai", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}

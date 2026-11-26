@@ -692,6 +692,21 @@ func (h *MediaHandler) HandleVideoGenerations(w http.ResponseWriter, r *http.Req
 		return
 	}
 	defer r.Body.Close()
+	var requested struct {
+		Model string `json:"model"`
+	}
+	if json.Unmarshal(body, &requested) == nil {
+		model := strings.TrimSpace(requested.Model)
+		if idx := strings.IndexByte(model, '/'); idx > 0 {
+			model = model[:idx]
+		}
+		if model == "haiper" || model == "hp" {
+			if err := h.handleHaiperMedia(w, r, body, &chat.ModelInfo{Provider: "haiper", Model: requested.Model}, "video"); err != nil {
+				handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
+			}
+			return
+		}
+	}
 	h.forwardMediaRequest(w, r, body, "sora", "/v1/videos/generations")
 }
 
@@ -952,9 +967,17 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 				} else {
 					lastErr = err.Error()
 					continue
-				}
 			}
-			// Codex image models are Responses-API models, not an image endpoint.
+		}
+		if (endpoint == "/v1/images/generations" || endpoint == "/images/generations") && (subInfo.Provider == "haiper" || subInfo.Provider == "hp") {
+			if err := h.handleHaiperMedia(w, r, body, subInfo, "image"); err == nil {
+				return
+			} else {
+				lastErr = err.Error()
+				continue
+			}
+		}
+		// Codex image models are Responses-API models, not an image endpoint.
 			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "codex" || subInfo.Provider == "cx") {
 				if err := h.handleCodexImage(w, r, body, subInfo); err == nil {
@@ -1154,6 +1177,12 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 		endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (modelInfo.Provider == "leonardo" || modelInfo.Provider == "leo") {
 		if err := h.handleLeonardoImage(w, r, body, modelInfo); err != nil {
+			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
+		}
+		return
+	}
+	if (endpoint == "/v1/images/generations" || endpoint == "/images/generations") && (modelInfo.Provider == "haiper" || modelInfo.Provider == "hp") {
+		if err := h.handleHaiperMedia(w, r, body, modelInfo, "image"); err != nil {
 			handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		}
 		return

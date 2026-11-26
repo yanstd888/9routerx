@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"haiper": {
+		BaseURL:    "https://api.haiper.ai/v1",
+		AuthHeader: "HAIPER_KEY",
+		AuthScheme: "raw",
+	},
 	"udio": {
 		BaseURL:    "https://www.udio.com/api/generate-proxy",
 		AuthHeader: "Cookie",
