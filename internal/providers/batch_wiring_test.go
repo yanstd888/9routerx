@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -149,6 +149,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("gigachat"); got != "gigachat" {
 		t.Errorf("gigachat resolved to %q", got)
 	}
+	udioMeta := ProviderRegistry["udio"]
+	if udioMeta.Name != "Udio" || udioMeta.Alias != "udio" || udioMeta.Icon != "music_note" || udioMeta.Color != "#10B981" || udioMeta.Website != "https://udio.com" {
+		t.Errorf("udio metadata = %+v", udioMeta)
+	}
+	udioCfg := KnownProviders["udio"]
+	if udioCfg.BaseURL != "https://www.udio.com/api/generate-proxy" || udioCfg.AuthHeader != "Cookie" || udioCfg.AuthScheme != "raw" {
+		t.Errorf("udio config = %+v", udioCfg)
+	}
+	if len(ProviderModels["udio"]) != 1 {
+		t.Errorf("udio catalog = %v", ProviderModels["udio"])
+	}
+	if got := ResolveAlias("udio"); got != "udio" {
+		t.Errorf("udio resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -171,7 +185,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"haiper", "dify", "udio", "oneminai", "keenable"} {
+	for _, id := range []string{"haiper", "dify", "oneminai", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}

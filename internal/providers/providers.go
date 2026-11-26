@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"udio": {
+		BaseURL:    "https://www.udio.com/api/generate-proxy",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
 	"gigachat": {
 		BaseURL:    "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
 		AuthHeader: "Authorization",

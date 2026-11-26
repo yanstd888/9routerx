@@ -498,6 +498,9 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"udio": {
+		"udio-default": {},
+	},
 	"gigachat": {
 		"GigaChat-2-Max":  {Tools: true},
 		"GigaChat-2-Pro":  {Tools: true},
