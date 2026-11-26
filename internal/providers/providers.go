@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"tencent-aistudio-web": {
+		BaseURL:    "https://aistudio.tencent.ai",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
 	"huggingchat": {
 		BaseURL:    "https://huggingface.co/chat",
 		AuthHeader: "Cookie",

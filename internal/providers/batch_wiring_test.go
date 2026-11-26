@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -190,6 +190,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("huggingchat"); got != "huggingchat" {
 		t.Errorf("huggingchat resolved to %q", got)
+	}
+	taswMeta := ProviderRegistry["tencent-aistudio-web"]
+	if taswMeta.Name != "Tencent AI Studio (Free)" || taswMeta.Alias != "tasw" || taswMeta.Icon != "auto_awesome" || taswMeta.Color != "#0052D9" || taswMeta.Website != "https://aistudio.tencent.ai" {
+		t.Errorf("tencent-aistudio-web metadata = %+v", taswMeta)
+	}
+	taswCfg := KnownProviders["tencent-aistudio-web"]
+	if taswCfg.BaseURL != "https://aistudio.tencent.ai" || taswCfg.AuthHeader != "Cookie" || taswCfg.AuthScheme != "raw" {
+		t.Errorf("tencent-aistudio-web config = %+v", taswCfg)
+	}
+	if len(ProviderModels["tencent-aistudio-web"]) != 3 || len(ProviderModels["tasw"]) != 3 {
+		t.Errorf("tencent catalog = %d/%d models", len(ProviderModels["tencent-aistudio-web"]), len(ProviderModels["tasw"]))
+	}
+	if got := ResolveAlias("tasw"); got != "tencent-aistudio-web" {
+		t.Errorf("tasw resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

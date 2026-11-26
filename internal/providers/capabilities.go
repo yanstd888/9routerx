@@ -498,6 +498,11 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"tencent-aistudio-web": {
+		"hy3-g":          {},
+		"hunyuan-default": {},
+		"hunyuan-3d":     {},
+	},
 	"huggingchat": {
 		"baidu/ERNIE-4.5-VL-424B-A47B-Base-PT": {Vision: true},
 		"CohereLabs/c4ai-command-r7b-12-2024": {Tools: true},

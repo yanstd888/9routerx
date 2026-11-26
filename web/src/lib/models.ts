@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "tencent-aistudio-web": "tasw",
   "huggingchat": "huggingchat",
   "haiper": "hp",
   "udio": "udio",
@@ -9464,6 +9465,26 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "tasw": [
+  {
+    "id": "hy3-g",
+    "name": "HY3-G (via Tencent AI Studio)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "hunyuan-default",
+    "name": "Hunyuan Default (via Tencent AI Studio)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "hunyuan-3d",
+    "name": "Hunyuan 3D (via Tencent AI Studio)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
   ],
   "huggingchat": [
   {
