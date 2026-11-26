@@ -498,6 +498,9 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"cerebrium": {
+		"meta-llama/Meta-Llama-3.1-8B-Instruct": {Tools: true},
+	},
 	"nlpcloud": {
 		"chatdolphin":          {Tools: true, ContextWindow: 8192},
 		"dolphin":              {Tools: true, ContextWindow: 16384},

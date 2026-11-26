@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -106,6 +106,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("nlpc"); got != "nlpcloud" {
 		t.Errorf("nlpc resolved to %q", got)
+	}
+	cerebriumMeta := ProviderRegistry["cerebrium"]
+	if cerebriumMeta.Name != "Cerebrium" || cerebriumMeta.Alias != "cerebrium" || cerebriumMeta.Icon != "memory" || cerebriumMeta.Color != "#EB3A6F" || cerebriumMeta.Website != "https://www.cerebrium.ai" {
+		t.Errorf("cerebrium metadata = %+v", cerebriumMeta)
+	}
+	cerebriumCfg := KnownProviders["cerebrium"]
+	if cerebriumCfg.BaseURL != "https://api.cerebrium.ai/v4" || cerebriumCfg.AuthScheme != "bearer" || cerebriumCfg.Format != FormatOpenAI {
+		t.Errorf("cerebrium config = %+v", cerebriumCfg)
+	}
+	if len(ProviderModels["cerebrium"]) != 1 {
+		t.Errorf("cerebrium catalog = %v", ProviderModels["cerebrium"])
+	}
+	if got := ResolveAlias("cerebrium"); got != "cerebrium" {
+		t.Errorf("cerebrium resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

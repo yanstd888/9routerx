@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "cerebrium": "cerebrium",
   "nlpcloud": "nlpc",
   "poe": "poe",
   "openrouter": "openrouter",
@@ -9457,6 +9458,14 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "cerebrium": [
+    {
+      "id": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
     }
   ],
   "nlpc": [

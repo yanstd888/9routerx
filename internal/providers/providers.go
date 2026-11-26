@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"cerebrium": {
+		BaseURL:    "https://api.cerebrium.ai/v4",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"nlpcloud": {
 		BaseURL:    "https://api.nlpcloud.io/v1/gpu",
 		AuthHeader: "Authorization",
