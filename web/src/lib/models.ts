@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "clova-studio": "clova",
   "cerebrium": "cerebrium",
   "nlpcloud": "nlpc",
   "poe": "poe",
@@ -9459,6 +9460,26 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "clova": [
+  {
+    "id": "HCX-007",
+    "name": "HCX-007",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "HCX-005",
+    "name": "HCX-005",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "HCX-DASH-002",
+    "name": "HCX-DASH-002",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
   ],
   "cerebrium": [
     {

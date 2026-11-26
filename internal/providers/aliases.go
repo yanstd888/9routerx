@@ -44,6 +44,7 @@ var ProviderAliasMap = map[string]string{
 	"ch":             "chutes",
 	"cl":             "cline",
 	"cmd":            "command-code",
+	"clova":          "clova-studio",
 	"nlpc":           "nlpcloud",
 	"cmc-goat":       "commandcode-goat",
 	"cmc":            "commandcode",

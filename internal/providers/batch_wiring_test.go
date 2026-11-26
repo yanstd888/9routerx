@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -120,6 +120,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("cerebrium"); got != "cerebrium" {
 		t.Errorf("cerebrium resolved to %q", got)
+	}
+	clovaMeta := ProviderRegistry["clova-studio"]
+	if clovaMeta.Name != "Naver CLOVA Studio" || clovaMeta.Alias != "clova" || clovaMeta.Icon != "auto_awesome" || clovaMeta.Color != "#03C75A" {
+		t.Errorf("clova-studio metadata = %+v", clovaMeta)
+	}
+	clovaCfg := KnownProviders["clova-studio"]
+	if clovaCfg.BaseURL != "https://clovastudio.stream.ntruss.com/v3/chat-completions" || clovaCfg.AuthScheme != "bearer" {
+		t.Errorf("clova-studio config = %+v", clovaCfg)
+	}
+	if len(ProviderModels["clova-studio"]) != 3 || len(ProviderModels["clova"]) != 3 {
+		t.Errorf("clova-studio catalog = %d/%d models", len(ProviderModels["clova-studio"]), len(ProviderModels["clova"]))
+	}
+	if got := ResolveAlias("clova"); got != "clova-studio" {
+		t.Errorf("clova resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"clova-studio": {
+		BaseURL:    "https://clovastudio.stream.ntruss.com/v3/chat-completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"cerebrium": {
 		BaseURL:    "https://api.cerebrium.ai/v4",
 		AuthHeader: "Authorization",

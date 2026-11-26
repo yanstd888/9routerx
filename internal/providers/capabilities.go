@@ -498,6 +498,11 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"clova-studio": {
+		"HCX-007":      {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 128000, MaxOutput: 32768},
+		"HCX-005":      {Vision: true, Tools: true, ContextWindow: 128000, MaxOutput: 4096},
+		"HCX-DASH-002": {Tools: true, ContextWindow: 32000, MaxOutput: 4096},
+	},
 	"cerebrium": {
 		"meta-llama/Meta-Llama-3.1-8B-Instruct": {Tools: true},
 	},
