@@ -498,6 +498,11 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"gigachat": {
+		"GigaChat-2-Max":  {Tools: true},
+		"GigaChat-2-Pro":  {Tools: true},
+		"GigaChat-2-Lite": {Tools: true},
+	},
 	"clova-studio": {
 		"HCX-007":      {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 128000, MaxOutput: 32768},
 		"HCX-005":      {Vision: true, Tools: true, ContextWindow: 128000, MaxOutput: 4096},

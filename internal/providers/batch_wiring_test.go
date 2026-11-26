@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -135,6 +135,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("clova"); got != "clova-studio" {
 		t.Errorf("clova resolved to %q", got)
 	}
+	gigaMeta := ProviderRegistry["gigachat"]
+	if gigaMeta.Name != "GigaChat (Sber)" || gigaMeta.Alias != "gigachat" || gigaMeta.Icon != "lock_person" || gigaMeta.Color != "#10B981" || gigaMeta.Website != "https://developers.sber.ru" {
+		t.Errorf("gigachat metadata = %+v", gigaMeta)
+	}
+	gigaCfg := KnownProviders["gigachat"]
+	if gigaCfg.BaseURL != "https://gigachat.devices.sberbank.ru/api/v1/chat/completions" || gigaCfg.AuthScheme != "bearer" || gigaCfg.Format != FormatOpenAI {
+		t.Errorf("gigachat config = %+v", gigaCfg)
+	}
+	if len(ProviderModels["gigachat"]) != 3 {
+		t.Errorf("gigachat catalog = %v", ProviderModels["gigachat"])
+	}
+	if got := ResolveAlias("gigachat"); got != "gigachat" {
+		t.Errorf("gigachat resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -157,7 +171,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"haiper", "dify", "udio", "oneminai", "gigachat", "keenable"} {
+	for _, id := range []string{"haiper", "dify", "udio", "oneminai", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}

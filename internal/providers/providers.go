@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"gigachat": {
+		BaseURL:    "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"clova-studio": {
 		BaseURL:    "https://clovastudio.stream.ntruss.com/v3/chat-completions",
 		AuthHeader: "Authorization",

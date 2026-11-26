@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "gigachat": "gigachat",
   "clova-studio": "clova",
   "cerebrium": "cerebrium",
   "nlpcloud": "nlpc",
@@ -9459,6 +9460,26 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "gigachat": [
+    {
+      "id": "GigaChat-2-Max",
+      "name": "GigaChat-2-Max",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
+    },
+    {
+      "id": "GigaChat-2-Pro",
+      "name": "GigaChat-2-Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
+    },
+    {
+      "id": "GigaChat-2-Lite",
+      "name": "GigaChat-2-Lite",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
     }
   ],
   "clova": [
