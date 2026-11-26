@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"nlpcloud": {
+		BaseURL:    "https://api.nlpcloud.io/v1/gpu",
+		AuthHeader: "Authorization",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
 	"poe": {
 		BaseURL:    "https://api.poe.com/v1/chat/completions",
 		AuthHeader: "Authorization",

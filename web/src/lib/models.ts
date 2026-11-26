@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "nlpcloud": "nlpc",
   "poe": "poe",
   "openrouter": "openrouter",
   "perplexity": "pplx",
@@ -9457,6 +9458,38 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "nlpc": [
+  {
+    "id": "chatdolphin",
+    "name": "ChatDolphin",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "dolphin",
+    "name": "Dolphin",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "finetuned-llama-3-70b",
+    "name": "Fine-tuned LLaMA 3.3 70B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "llama-3-1-405b",
+    "name": "LLaMA 3.1 405B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "llama-3-8b-instruct",
+    "name": "Llama 3 8B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
   ],
   "poe": [
     {

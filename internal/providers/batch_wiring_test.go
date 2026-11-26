@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -93,6 +93,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got, ok := GetModelFormats("poe", "claude-opus-4.8"); !ok || got.TargetFormat != FormatClaude {
 		t.Errorf("poe Claude formats = %+v, ok=%t", got, ok)
 	}
+	nlpMeta := ProviderRegistry["nlpcloud"]
+	if nlpMeta.Name != "NLP Cloud" || nlpMeta.Alias != "nlpc" || nlpMeta.Icon != "psychology" || nlpMeta.Color != "#2196F3" || nlpMeta.Website != "https://docs.nlpcloud.com" {
+		t.Errorf("nlpcloud metadata = %+v", nlpMeta)
+	}
+	nlpCfg := KnownProviders["nlpcloud"]
+	if nlpCfg.BaseURL != "https://api.nlpcloud.io/v1/gpu" || nlpCfg.AuthScheme != "raw" || nlpCfg.Format != FormatOpenAI {
+		t.Errorf("nlpcloud config = %+v", nlpCfg)
+	}
+	if len(ProviderModels["nlpcloud"]) != 5 || len(ProviderModels["nlpc"]) != 5 {
+		t.Errorf("nlpcloud catalog = %d/%d models", len(ProviderModels["nlpcloud"]), len(ProviderModels["nlpc"]))
+	}
+	if got := ResolveAlias("nlpc"); got != "nlpcloud" {
+		t.Errorf("nlpc resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -115,7 +129,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"haiper", "dify", "udio", "nlpcloud", "oneminai", "gigachat", "keenable"} {
+	for _, id := range []string{"haiper", "dify", "udio", "oneminai", "gigachat", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}
