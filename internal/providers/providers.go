@@ -519,6 +519,16 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"keenable": {
+		BaseURL:       "https://api.keenable.ai",
+		AuthHeader:    "X-API-Key",
+		AuthScheme:    "raw",
+		FetchURL:      "https://api.keenable.ai/v1/fetch/public",
+		FetchMethod:   "GET",
+		SearchURL:     "https://api.keenable.ai/v1/search/public",
+		SearchMethod:  "POST",
+		StaticHeaders: map[string]string{"X-Keenable-Title": "9RouterX"},
+	},
 	"oneminai": {
 		BaseURL:    "https://api.1min.ai/api/chat-with-ai",
 		AuthHeader: "API-KEY",

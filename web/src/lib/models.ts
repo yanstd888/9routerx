@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
   "huggingchat": "huggingchat",
@@ -9467,6 +9468,7 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "kind": "systemone"
     }
   ],
+  "keenable": [],
   "1min": [
     {
       "id": "gpt-4o-mini",

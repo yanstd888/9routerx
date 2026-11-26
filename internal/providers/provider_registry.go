@@ -2673,6 +2673,18 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:      "https://ollama.com",
 		Notice:       &Notice{Text: "Free tier: light usage, 1 cloud model at a time (limits reset every 5h & 7d). Pro $20/mo · Max $100/mo.", APIKeyURL: "https://ollama.com/settings/keys"},
 	},
+	"keenable": {
+		ID:           "keenable",
+		Name:         "Keenable",
+		Alias:        "keenable",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#06B6D4",
+		Icon:         "search",
+		ServiceKinds: []string{"search", "fetch"},
+		Website:      "https://docs.keenable.ai/api-reference",
+		AuthHint:     "Optional API key lifts Keenable public rate limits; the title header is always sent.",
+	},
 	"oneminai": {
 		ID:           "oneminai",
 		Name:         "1min.AI",
