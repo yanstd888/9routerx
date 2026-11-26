@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -176,6 +176,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("hp"); got != "haiper" {
 		t.Errorf("hp resolved to %q", got)
+	}
+	huggingMeta := ProviderRegistry["huggingchat"]
+	if huggingMeta.Name != "HuggingChat (Free)" || huggingMeta.Alias != "huggingchat" || huggingMeta.Icon != "auto_awesome" || huggingMeta.Color != "#FFD21E" || huggingMeta.Website != "https://huggingface.co/chat" {
+		t.Errorf("huggingchat metadata = %+v", huggingMeta)
+	}
+	huggingCfg := KnownProviders["huggingchat"]
+	if huggingCfg.BaseURL != "https://huggingface.co/chat" || huggingCfg.AuthHeader != "Cookie" || huggingCfg.AuthScheme != "raw" {
+		t.Errorf("huggingchat config = %+v", huggingCfg)
+	}
+	if len(ProviderModels["huggingchat"]) != 24 {
+		t.Errorf("huggingchat catalog = %d models", len(ProviderModels["huggingchat"]))
+	}
+	if got := ResolveAlias("huggingchat"); got != "huggingchat" {
+		t.Errorf("huggingchat resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

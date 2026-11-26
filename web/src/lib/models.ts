@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "huggingchat": "huggingchat",
   "haiper": "hp",
   "udio": "udio",
   "gigachat": "gigachat",
@@ -9463,6 +9464,152 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "huggingchat": [
+  {
+    "id": "baidu/ERNIE-4.5-VL-424B-A47B-Base-PT",
+    "name": "ERNIE 4.5 VL 424B A47B Base PT",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision"]
+  },
+  {
+    "id": "CohereLabs/c4ai-command-r7b-12-2024",
+    "name": "Command R7B 12-2024",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "CohereLabs/command-a-reasoning-08-2025",
+    "name": "Command A Reasoning 08-2025",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "CohereLabs/command-a-vision-07-2025",
+    "name": "Command A Vision 07-2025",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision"]
+  },
+  {
+    "id": "deepseek-ai/DeepSeek-V4-Pro",
+    "name": "DeepSeek V4 Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "deepseek-ai/DeepSeek-V4-Flash",
+    "name": "DeepSeek V4 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "google/gemma-4-31B-it",
+    "name": "Gemma 4 31B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "google/gemma-4-26B-A4B-it",
+    "name": "Gemma 4 26B A4B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "inclusionAI/Ling-2.6-1T",
+    "name": "Ling 2.6 1T",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "name": "Llama 4 Scout 17B 16E Instruct",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "name": "Llama 4 Maverick 17B 128E Instruct FP8",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision"]
+  },
+  {
+    "id": "MiniMaxAI/MiniMax-M3",
+    "name": "MiniMax M3",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.7-Code",
+    "name": "Kimi K2.7 Code",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "reasoning", "tools"]
+  },
+  {
+    "id": "moonshotai/Kimi-K2.6",
+    "name": "Kimi K2.6",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4",
+    "name": "NVIDIA Nemotron 3 Ultra 550B A55B NVFP4",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "openai/gpt-oss-120b",
+    "name": "GPT-OSS 120B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "openai/gpt-oss-20b",
+    "name": "GPT-OSS 20B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.5-122B-A10B",
+    "name": "Qwen3.5 122B A10B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.5-397B-A17B",
+    "name": "Qwen3.5 397B A17B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-27B",
+    "name": "Qwen3.6 27B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "Qwen/Qwen3.6-35B-A3B",
+    "name": "Qwen3.6 35B A3B",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "stepfun-ai/Step-3.7-Flash",
+    "name": "Step 3.7 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": ["vision", "tools"]
+  },
+  {
+    "id": "XiaomiMiMo/MiMo-V2.5-Pro",
+    "name": "MiMo V2.5 Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": ["tools"]
+  },
+  {
+    "id": "zai-org/GLM-5.2",
+    "name": "GLM 5.2",
+    "supportedFormats": ["openai"],
+    "capabilities": ["reasoning", "tools"]
+  },
   ],
   "hp": [
     {

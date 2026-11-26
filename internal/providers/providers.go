@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"huggingchat": {
+		BaseURL:    "https://huggingface.co/chat",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
 	"haiper": {
 		BaseURL:    "https://api.haiper.ai/v1",
 		AuthHeader: "HAIPER_KEY",
