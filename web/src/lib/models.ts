@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
   "huggingchat": "huggingchat",
   "haiper": "hp",
@@ -9464,6 +9465,14 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "1min": [
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o Mini",
+      "supportedFormats": ["openai"],
+      "capabilities": []
     }
   ],
   "tasw": [

@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -205,6 +205,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("tasw"); got != "tencent-aistudio-web" {
 		t.Errorf("tasw resolved to %q", got)
 	}
+	minMeta := ProviderRegistry["oneminai"]
+	if minMeta.Name != "1min.AI" || minMeta.Alias != "1min" || minMeta.Icon != "hub" || minMeta.Color != "#6366F1" || minMeta.Website != "https://1min.ai" {
+		t.Errorf("oneminai metadata = %+v", minMeta)
+	}
+	minCfg := KnownProviders["oneminai"]
+	if minCfg.BaseURL != "https://api.1min.ai/api/chat-with-ai" || minCfg.AuthHeader != "API-KEY" || minCfg.AuthScheme != "raw" {
+		t.Errorf("oneminai config = %+v", minCfg)
+	}
+	if len(ProviderModels["oneminai"]) != 1 || len(ProviderModels["1min"]) != 1 {
+		t.Errorf("oneminai catalog = %d/%d models", len(ProviderModels["oneminai"]), len(ProviderModels["1min"]))
+	}
+	if got := ResolveAlias("1min"); got != "oneminai" {
+		t.Errorf("1min resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -227,7 +241,7 @@ func TestProviderBatchOptionalAuthConfig(t *testing.T) {
 }
 
 func TestProviderBatchUnportedCustomLanesExcluded(t *testing.T) {
-	for _, id := range []string{"dify", "oneminai", "keenable"} {
+	for _, id := range []string{"dify", "keenable"} {
 		if _, ok := ProviderRegistry[id]; ok {
 			t.Errorf("%s is selectable before its custom protocol is ported", id)
 		}

@@ -498,6 +498,9 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"oneminai": {
+		"gpt-4o-mini": {},
+	},
 	"tencent-aistudio-web": {
 		"hy3-g":          {},
 		"hunyuan-default": {},

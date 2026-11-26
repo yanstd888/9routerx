@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"oneminai": {
+		BaseURL:    "https://api.1min.ai/api/chat-with-ai",
+		AuthHeader: "API-KEY",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
 	"tencent-aistudio-web": {
 		BaseURL:    "https://aistudio.tencent.ai",
 		AuthHeader: "Cookie",
