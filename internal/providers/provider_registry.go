@@ -2327,6 +2327,26 @@ var ProviderRegistry = map[string]ProviderMeta{
 		AuthHint:     "Paste a Snowflake programmatic access token (pat/...) or a keypair JWT, and set the connection Base URL to your account host, e.g. https://acme-org.snowflakecomputing.com.",
 		Notice:       &Notice{Text: "Snowflake Cortex routes to <account>/api/v2/cortex/inference:complete. A pat/ prefixed token is sent as a PROGRAMMATIC ACCESS TOKEN; any other credential is sent as a KEYPAIR_JWT. Model availability follows the Cortex models enabled for the account.", APIKeyURL: "https://www.snowflake.com"},
 	},
+	"charm-hyper": {
+		// Charm Hyper (OmniRoute apikey metadata, pinned 632d84f5):
+		// OpenAI-compatible chat over hyper.charm.land with a Bearer key and
+		// a passthrough model catalog (hyper/auto pinned; the live /v1/models
+		// endpoint serves the real roster and feeds refreshes). Verified live
+		// 2026-11-27: GET /v1/models answers the public catalog.
+		ID:           "charm-hyper",
+		Name:         "Charm Hyper",
+		Alias:        "charm-hyper",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#7C3AED",
+		Icon:         "router",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://hyper.charm.land",
+		AuthHint:     "Paste your Charm Hyper API key as a Bearer token. 100 free monthly Hypercredits on signup.",
+		Notice:       &Notice{Text: "Charm Hyper is a fully OpenAI-compatible gateway over hyper.charm.land; the model list comes from the live /v1/models catalog with hyper/auto as the pinned default.", APIKeyURL: "https://hyper.charm.land"},
+		PassthroughModels: true,
+		ModelsFetcher: &Fetcher{URL: "https://hyper.charm.land/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

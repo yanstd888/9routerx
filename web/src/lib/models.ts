@@ -286,6 +286,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "friendliai": "friendli",
   "databricks": "databricks",
   "snowflake": "snowflake",
+  "charm-hyper": "charm-hyper",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10163,6 +10164,14 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "claude-3-5-sonnet",
       "name": "Claude 3.5 Sonnet",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
+  "charm-hyper": [
+    {
+      "id": "hyper/auto",
+      "name": "Charm Hyper Auto",
       "supportedFormats": ["openai"],
       "capabilities": []
     }

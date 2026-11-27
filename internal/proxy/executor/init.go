@@ -24,6 +24,7 @@ func RegisterAll() {
 	Register("friendliai", func() Executor { return ForwardOpenAI })
 	Register("databricks", func() Executor { return ForwardDatabricks })
 	Register("snowflake", func() Executor { return ForwardSnowflake })
+	Register("charm-hyper", func() Executor { return ForwardOpenAI })
 	Register("deepseek", func() Executor { return ForwardOpenAI })
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })

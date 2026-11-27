@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -349,6 +349,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if len(ProviderModels["snowflake"]) != 4 {
 		t.Errorf("snowflake catalog = %d models, want 4", len(ProviderModels["snowflake"]))
+	}
+	hyperMeta := ProviderRegistry["charm-hyper"]
+	if hyperMeta.Name != "Charm Hyper" || hyperMeta.Alias != "charm-hyper" || hyperMeta.Icon != "router" || hyperMeta.Color != "#7C3AED" || hyperMeta.Website != "https://hyper.charm.land" {
+		t.Errorf("charm-hyper metadata = %+v", hyperMeta)
+	}
+	hyperCfg := KnownProviders["charm-hyper"]
+	if hyperCfg.BaseURL != "https://hyper.charm.land/v1/chat/completions" || hyperCfg.AuthHeader != "Authorization" || hyperCfg.AuthScheme != "bearer" {
+		t.Errorf("charm-hyper config = %+v", hyperCfg)
+	}
+	if len(ProviderModels["charm-hyper"]) != 1 {
+		t.Errorf("charm-hyper catalog = %d models, want 1", len(ProviderModels["charm-hyper"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
