@@ -284,6 +284,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "notrack-web": "ntw",
   "uncloseai": "unc",
   "friendliai": "friendli",
+  "databricks": "databricks",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10109,6 +10110,32 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "meta-llama-3.1-8b-instruct",
       "name": "Meta Llama 3.1 8B Instruct",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
+  "databricks": [
+    {
+      "id": "databricks-gpt-5",
+      "name": "Databricks GPT-5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "databricks-meta-llama-3-3-70b-instruct",
+      "name": "Databricks Meta Llama 3.3 70B Instruct",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "databricks-claude-sonnet-4",
+      "name": "Databricks Claude Sonnet 4",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "databricks-gemini-2-5-pro",
+      "name": "Databricks Gemini 2.5 Pro",
       "supportedFormats": ["openai"],
       "capabilities": []
     }

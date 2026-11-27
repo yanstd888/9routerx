@@ -2281,6 +2281,29 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Notice:       &Notice{Text: "FriendliAI runs through the serverless endpoint (api.friendli.ai/serverless). An flp_* serverless token is rejected with 403 on the /dedicated path — keep the pinned serverless base URL. The public serverless catalog feeds the model list.", APIKeyURL: "https://friendli.ai"},
 		ModelsFetcher: &Fetcher{URL: "https://api.friendli.ai/serverless/v1/models", Type: "openai"},
 	},
+	"databricks": {
+		// Databricks Model Serving (OmniRoute apikey metadata, pinned
+		// 632d84f5): OpenAI-compatible chat where the pinned baseUrl is a
+		// placeholder workspace (adb-0000000000000000.0) no real account
+		// answers — upstream's own dashboard example swaps in the workspace
+		// host (providerPageHelpers.ts: adb-1234567890123456.7) and the
+		// executor-default unit test pins the join to
+		// <workspace>/serving-endpoints/chat/completions. The connection
+		// therefore carries the workspace Base URL and the executor refuses
+		// the placeholder with an actionable 400 before any payload is
+		// built.
+		ID:           "databricks",
+		Name:         "Databricks",
+		Alias:        "databricks",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#F97316",
+		Icon:         "table_chart",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://www.databricks.com",
+		AuthHint:     "Paste a Databricks workspace token and set the connection Base URL to your workspace serving-endpoints host, e.g. https://adb-1234567890123456.7.azuredatabricks.net/serving-endpoints.",
+		Notice:       &Notice{Text: "Databricks Model Serving is per-workspace: requests go to <workspace>/serving-endpoints/chat/completions. The pinned default is a placeholder that no workspace answers, so the executor refuses it until the connection Base URL points at your own workspace. Model availability follows the serving endpoints created in that workspace.", APIKeyURL: "https://www.databricks.com"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

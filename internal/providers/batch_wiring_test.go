@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -327,6 +327,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("friendli"); got != "friendliai" {
 		t.Errorf("friendli resolved to %q", got)
+	}
+	dbxMeta := ProviderRegistry["databricks"]
+	if dbxMeta.Name != "Databricks" || dbxMeta.Alias != "databricks" || dbxMeta.Icon != "table_chart" || dbxMeta.Color != "#F97316" || dbxMeta.Website != "https://www.databricks.com" {
+		t.Errorf("databricks metadata = %+v", dbxMeta)
+	}
+	dbxCfg := KnownProviders["databricks"]
+	if dbxCfg.BaseURL != "https://adb-0000000000000000.0.azuredatabricks.net/serving-endpoints/chat/completions" || dbxCfg.AuthHeader != "Authorization" || dbxCfg.AuthScheme != "bearer" {
+		t.Errorf("databricks config = %+v", dbxCfg)
+	}
+	if len(ProviderModels["databricks"]) != 4 {
+		t.Errorf("databricks catalog = %d models, want 4", len(ProviderModels["databricks"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

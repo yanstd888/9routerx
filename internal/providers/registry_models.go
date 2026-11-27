@@ -351,6 +351,7 @@ var ProviderModels = map[string][]string{
 	"unc":                 {"turboderp/Qwen3.8-27B-exl3"},
 	"friendliai":          {"meta-llama-3.1-70b-instruct", "meta-llama-3.1-8b-instruct"},
 	"friendli":            {"meta-llama-3.1-70b-instruct", "meta-llama-3.1-8b-instruct"},
+	"databricks":          {"databricks-gpt-5", "databricks-meta-llama-3-3-70b-instruct", "databricks-claude-sonnet-4", "databricks-gemini-2-5-pro"},
 	"notrack-web":         {"notrack-c"},
 	"keenable":            {},
 	"1min":                {"gpt-4o-mini"},

@@ -1994,6 +1994,15 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	// Databricks: workspace-local Model Serving (OmniRoute pin 632d84f5).
+	// The default is the pinned placeholder workspace; the executor replaces
+	// it with the connection Base URL and refuses the placeholder outright,
+	// so this default never reaches the wire.
+	"databricks": {
+		BaseURL:    "https://adb-0000000000000000.0.azuredatabricks.net/serving-endpoints/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,
