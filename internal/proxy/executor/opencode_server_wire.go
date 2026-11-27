@@ -79,17 +79,6 @@ func (t opencodeServerTokenCounts) usage() *translator.OpenAIUsage {
 	}
 }
 
-type opencodeServerPart struct {
-	Type      string
-	Text      string
-	Reasoning string
-	Name      string
-	CallID    string
-	State     string
-	Tokens    opencodeServerTokenCounts
-	HasTokens bool
-}
-
 func opencodeServerInputFrom(ctx context.Context, req *Request) (opencodeServerInput, context.Context, error) {
 	body := req.Body
 	var err error

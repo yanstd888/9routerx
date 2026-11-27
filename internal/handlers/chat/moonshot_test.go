@@ -59,10 +59,11 @@ func TestMoonshotClientFormatsAndUsage(t *testing.T) {
 				h := moonshotHandlerFixture(t, stream, capture)
 				path := "/v1/chat/completions"
 				body := fmt.Sprintf(`{"model":"moonshot/kimi-k3.1-pro","stream":%t,"messages":[{"role":"user","content":"hello"}]}`, stream)
-				if format == "claude" {
+				switch format {
+				case "claude":
 					path = "/v1/messages"
 					body = fmt.Sprintf(`{"model":"moonshot/kimi-k3.1-pro","stream":%t,"max_tokens":20,"messages":[{"role":"user","content":"hello"}]}`, stream)
-				} else if format == "responses" {
+				case "responses":
 					path = "/v1/responses"
 					body = fmt.Sprintf(`{"model":"moonshot/kimi-k3.1-pro","stream":%t,"input":"hello"}`, stream)
 				}

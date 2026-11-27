@@ -15,29 +15,29 @@ import (
 	"strings"
 	"time"
 
-	json "encoding/json/v2"
 	"9routerx/proxy/internal/handlers/chat"
 	"9routerx/proxy/internal/handlerutil"
 	"9routerx/proxy/internal/proxy"
+	json "encoding/json/v2"
 )
 
 const (
-	udioDefaultBaseURL   = "https://www.udio.com/api/generate-proxy"
-	udioStatusPath       = "/api/songs"
-	udioPollInterval     = 5 * time.Second
-	udioDeadline         = 300 * time.Second
-	udioMaxAudioBytes    = 50 << 20
-	udioMaxRedirects     = 3
-	udioRequestTimeout   = 60 * time.Second
+	udioDefaultBaseURL = "https://www.udio.com/api/generate-proxy"
+	udioStatusPath     = "/api/songs"
+	udioPollInterval   = 5 * time.Second
+	udioDeadline       = 300 * time.Second
+	udioMaxAudioBytes  = 50 << 20
+	udioMaxRedirects   = 3
+	udioRequestTimeout = 60 * time.Second
 )
 
 var (
-	errUdioDownload  = errors.New("failed to download Udio audio")
-	errUdioBlocked   = errors.New("Udio endpoint blocked by SSRF guard")
-	errUdioTooLarge  = errors.New("Udio audio exceeds download limit")
-	errUdioTimeout   = errors.New("Udio download timed out")
-	errUdioNoTracks  = errors.New("no tracks returned from Udio")
-	errUdioTimedOut  = errors.New("Udio music generation timed out")
+	errUdioDownload = errors.New("failed to download Udio audio")
+	errUdioBlocked  = errors.New("udio endpoint blocked by SSRF guard")
+	errUdioTooLarge = errors.New("udio audio exceeds download limit")
+	errUdioTimeout  = errors.New("udio download timed out")
+	errUdioNoTracks = errors.New("no tracks returned from Udio")
+	errUdioTimedOut = errors.New("udio music generation timed out")
 )
 
 type udioGenerateResponse struct {
@@ -124,7 +124,7 @@ func (h *MediaHandler) handleUdioMusic(w http.ResponseWriter, r *http.Request, r
 		return
 	}
 	payload, err := json.Marshal(map[string]any{
-		"prompt": req.Prompt,
+		"prompt":         req.Prompt,
 		"samplerOptions": map[string]any{"seed": -1},
 	})
 	if err != nil {
@@ -218,9 +218,9 @@ func udioFetchSongs(ctx context.Context, client *http.Client, cookie, target str
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return nil, fmt.Errorf("Udio status %d", response.StatusCode)
+		return nil, fmt.Errorf("udio status %d", response.StatusCode)
 	}
 	var songs []udioSong
 	statusBody, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))

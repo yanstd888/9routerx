@@ -73,7 +73,7 @@ func devinDesktopGunzip(payload []byte, limit int) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("gzip header: %w", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 	decoded, err := io.ReadAll(io.LimitReader(reader, int64(limit)+1))
 	if err != nil {
 		return nil, fmt.Errorf("gzip payload: %w", err)
@@ -92,7 +92,7 @@ func devinDesktopFrames(ctx context.Context, upstream io.Reader, encoding string
 		}
 		var header [5]byte
 		if _, err := io.ReadFull(reader, header[:]); err != nil {
-			return fmt.Errorf("Connect stream ended without valid trailers: %w", err)
+			return fmt.Errorf("connect stream ended without valid trailers: %w", err)
 		}
 		flags := header[0]
 		if flags & ^byte(3) != 0 {
@@ -100,7 +100,7 @@ func devinDesktopFrames(ctx context.Context, upstream io.Reader, encoding string
 		}
 		size := binary.BigEndian.Uint32(header[1:])
 		if size > devinDesktopFrameLimit {
-			return errors.New("Connect frame exceeds safety limit")
+			return errors.New("connect frame exceeds safety limit")
 		}
 		payload := make([]byte, int(size))
 		if _, err := io.ReadFull(reader, payload); err != nil {
@@ -145,7 +145,7 @@ func devinDesktopTrailer(payload []byte) error {
 		return fmt.Errorf("invalid Connect terminal trailer: %w", err)
 	}
 	if len(trailer.Error) != 0 {
-		return errors.New("Connect terminal trailer reports upstream failure")
+		return errors.New("connect terminal trailer reports upstream failure")
 	}
 	return nil
 }

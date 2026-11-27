@@ -75,15 +75,15 @@ func devinDesktopPost(ctx context.Context, client *http.Client, endpoint string,
 		return nil, devinDesktopFailure(ctx, "connection", err)
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, proxy.UpstreamFailure(resp.StatusCode, fmt.Sprintf("Devin Desktop upstream returned HTTP %d", resp.StatusCode))
 	}
 	return resp, nil
 }
 
 func devinDesktopBounded(ctx context.Context, resp *http.Response, limit int) ([]byte, error) {
-	defer resp.Body.Close()
-	stop := context.AfterFunc(ctx, func() { resp.Body.Close() })
+	defer func() { _ = resp.Body.Close() }()
+	stop := context.AfterFunc(ctx, func() { _ = resp.Body.Close() })
 	defer stop()
 	if resp.ContentLength > int64(limit) {
 		return nil, errors.New("payload exceeds safety limit")

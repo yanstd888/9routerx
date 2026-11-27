@@ -50,7 +50,7 @@ func TestForwardNotrackWeb(t *testing.T) {
 		IsStream: true,
 		Body:     []byte(`{"model":"ntw/notrack-c","messages":[{"role":"user","content":"hi"}]}`),
 		ConnData: map[string]any{"baseUrl": server.URL},
-		Config: &providers.ProviderConfig{BaseURL: server.URL, AuthHeader: "Cookie", AuthScheme: "raw"},
+		Config:   &providers.ProviderConfig{BaseURL: server.URL, AuthHeader: "Cookie", AuthScheme: "raw"},
 	}
 	rec := httptest.NewRecorder()
 	if err := ForwardNotrackWeb(rec, req); err != nil {

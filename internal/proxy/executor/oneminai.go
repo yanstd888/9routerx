@@ -87,7 +87,7 @@ func ForwardOneminai(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "1min.ai request failed")
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		detail, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
 		return proxy.UpstreamFailure(resp.StatusCode, oneminaiError(string(detail), resp.StatusCode))

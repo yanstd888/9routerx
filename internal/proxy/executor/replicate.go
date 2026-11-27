@@ -6,6 +6,7 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -59,12 +60,12 @@ func ForwardReplicate(w http.ResponseWriter, req *Request) error {
 	forwardUpstreamResponseHeaders(w, resp.Header)
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		failure := replicateUpstreamFailure(resp)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		writeReplicateError(w, failure)
 		return nil
 	}
 	created, err := replicateReadPrediction(resp)
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	if err != nil {
 		writeReplicateError(w, &replicateHTTPError{status: http.StatusBadGateway, message: "Replicate request failed"})
 		return nil
@@ -132,7 +133,8 @@ func writeReplicateError(w http.ResponseWriter, err error) {
 	status := http.StatusBadGateway
 	message := "Replicate request failed"
 	retryAfter := ""
-	if failure, ok := err.(*replicateHTTPError); ok {
+	var failure *replicateHTTPError
+	if errors.As(err, &failure) {
 		status = failure.status
 		message = failure.message
 		retryAfter = failure.retryAfter

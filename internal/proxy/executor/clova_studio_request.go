@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	clovaMaxTokens         = 4096
+	clovaMaxTokens          = 4096
 	clovaReasoningMaxTokens = 32768
 	clovaMinToolTokens      = 1024
 )

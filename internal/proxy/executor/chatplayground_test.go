@@ -56,10 +56,10 @@ func TestForwardChatplayground(t *testing.T) {
 	defer server.Close()
 
 	req := &Request{
-		Ctx:     proxy.WithAllowLoopback(context.Background()),
-		Client:  server.Client(),
-		APIKey:  "Bearer " + cplTestJWT(t),
-		Body:    []byte(`{"model":"chatplayground/gpt-6.1-sol","messages":[{"role":"user","content":"hi"}]}`),
+		Ctx:    proxy.WithAllowLoopback(context.Background()),
+		Client: server.Client(),
+		APIKey: "Bearer " + cplTestJWT(t),
+		Body:   []byte(`{"model":"chatplayground/gpt-6.1-sol","messages":[{"role":"user","content":"hi"}]}`),
 		Config: &providers.ProviderConfig{BaseURL: server.URL + "/api/chat", AuthHeader: "Authorization", AuthScheme: "bearer"},
 	}
 	rec := httptest.NewRecorder()

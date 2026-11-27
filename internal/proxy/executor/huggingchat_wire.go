@@ -195,7 +195,7 @@ func huggingchatConvert(raw []byte, id, model string) (string, []byte) {
 		delta[field] = text
 		chunk := map[string]any{
 			"id": id, "object": "chat.completion.chunk", "created": time.Now().Unix(),
-			"model": model,
+			"model":   model,
 			"choices": []any{map[string]any{"index": 0, "delta": delta, "finish_reason": nil}},
 		}
 		if encoded, err := json.Marshal(chunk); err == nil {
@@ -246,7 +246,7 @@ func huggingchatConvert(raw []byte, id, model string) (string, []byte) {
 	}
 	finish := map[string]any{
 		"id": id, "object": "chat.completion.chunk", "created": time.Now().Unix(),
-		"model": model,
+		"model":   model,
 		"choices": []any{map[string]any{"index": 0, "delta": map[string]any{}, "finish_reason": "stop"}},
 	}
 	if encoded, err := json.Marshal(finish); err == nil {

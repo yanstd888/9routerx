@@ -3,6 +3,7 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -57,7 +58,7 @@ func relayReplicateStream(ctx context.Context, w http.ResponseWriter, client *ht
 		writeReplicateStreamFailure(w, err)
 		return nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		failure := replicateUpstreamFailure(resp)
 		writeReplicateStreamFailure(w, failure)
@@ -119,7 +120,8 @@ func relayReplicateStream(ctx context.Context, w http.ResponseWriter, client *ht
 func writeReplicateStreamFailure(w http.ResponseWriter, err error) {
 	status := http.StatusBadGateway
 	message := "Replicate stream failed"
-	if failure, ok := err.(*replicateHTTPError); ok {
+	var failure *replicateHTTPError
+	if errors.As(err, &failure) {
 		status = failure.status
 		message = failure.message
 	}

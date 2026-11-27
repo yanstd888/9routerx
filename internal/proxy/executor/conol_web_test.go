@@ -48,10 +48,10 @@ func TestForwardConolWeb(t *testing.T) {
 	defer server.Close()
 
 	req := &Request{
-		Ctx:     proxy.WithAllowLoopback(context.Background()),
-		Client:  server.Client(),
-		APIKey:  "session=abc",
-		Body:    []byte(`{"model":"conol-web/claude-sonnet-5","messages":[{"role":"user","content":"hi"}]}`),
+		Ctx:    proxy.WithAllowLoopback(context.Background()),
+		Client: server.Client(),
+		APIKey: "session=abc",
+		Body:   []byte(`{"model":"conol-web/claude-sonnet-5","messages":[{"role":"user","content":"hi"}]}`),
 		Config: &providers.ProviderConfig{BaseURL: server.URL + "/api/sessions", AuthHeader: "Cookie", AuthScheme: "raw"},
 	}
 	rec := httptest.NewRecorder()
@@ -62,7 +62,7 @@ func TestForwardConolWeb(t *testing.T) {
 		t.Fatalf("body = %s", rec.Body.String())
 	}
 	var parsed map[string]any
-	if json.Unmarshal([]byte(rec.Body.String()), &parsed) != nil {
+	if json.Unmarshal(rec.Body.Bytes(), &parsed) != nil {
 		t.Fatalf("invalid completion: %s", rec.Body.String())
 	}
 	if len(paths) < 6 {

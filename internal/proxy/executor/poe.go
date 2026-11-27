@@ -102,7 +102,7 @@ func ForwardPoe(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return fmt.Errorf("ForwardPoe upstream: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	forwardUpstreamResponseHeaders(w, resp.Header)
 	if lane == "messages" {
 		if req.IsStream {

@@ -91,7 +91,7 @@ func opencodeServerDo(ctx context.Context, client *http.Client, method, target s
 	if err != nil {
 		return nil, 0, fmt.Errorf("OpenCode request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	data, err := io.ReadAll(io.LimitReader(resp.Body, opencodeServerUpstreamBodyMax))
 	if err != nil {
 		return nil, resp.StatusCode, fmt.Errorf("read OpenCode response: %w", err)

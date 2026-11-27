@@ -102,7 +102,7 @@ func Exchange(ctx context.Context, client *http.Client, instance, access string)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, &HTTPError{resp.StatusCode}
 	}
@@ -164,7 +164,7 @@ func RefreshOAuth(ctx context.Context, client *http.Client, instance, refresh st
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, &HTTPError{resp.StatusCode}
 	}

@@ -37,7 +37,7 @@ func refreshWorkbuddy(ctx context.Context, p *Params) (*TokenResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("workbuddy refresh: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, &providers.OAuthRefreshError{Status: resp.StatusCode, Body: "WorkBuddy refresh rejected"}
 	}

@@ -106,7 +106,7 @@ func adaptaMessages(body []byte) ([]any, error) {
 			injected = true
 		}
 		out = append(out, map[string]any{
-			"role": item.role,
+			"role":  item.role,
 			"parts": []any{map[string]any{"type": "text", "text": text}},
 		})
 	}
@@ -124,7 +124,7 @@ func adaptaClientJWT(raw string) string {
 func adaptaSessionJWT(ctx context.Context, req *Request) (string, error) {
 	clientJWT := adaptaClientJWT(req.APIKey)
 	if clientJWT == "" {
-		return "", fmt.Errorf("Adapta __client cookie value is required")
+		return "", fmt.Errorf("adapta __client cookie value is required")
 	}
 	key := clientJWT
 	if len(key) > 32 {
@@ -153,7 +153,7 @@ func adaptaSessionJWT(ctx context.Context, req *Request) (string, error) {
 	}
 	guarded, err := adaptaGuard(ctx, clerkURL)
 	if err != nil {
-		return "", fmt.Errorf("Adapta auth endpoint blocked")
+		return "", fmt.Errorf("adapta auth endpoint blocked")
 	}
 	httpReq, err := http.NewRequestWithContext(guarded, http.MethodPost, clerkURL+"/v1/client/sessions/"+url.PathEscape(sessionID)+"/tokens", nil)
 	if err != nil {
@@ -165,18 +165,18 @@ func adaptaSessionJWT(ctx context.Context, req *Request) (string, error) {
 	httpReq.Header.Set("Origin", adaptaDefaultBaseURL)
 	response, err := client.Do(httpReq)
 	if err != nil {
-		return "", fmt.Errorf("Adapta token refresh failed")
+		return "", fmt.Errorf("adapta token refresh failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
-		return "", fmt.Errorf("Adapta token refresh failed")
+		return "", fmt.Errorf("adapta token refresh failed")
 	}
 	var parsed struct {
 		JWT string `json:"jwt"`
 	}
 	if json.Unmarshal(raw, &parsed) != nil || !strings.HasPrefix(parsed.JWT, "eyJ") {
-		return "", fmt.Errorf("Adapta token refresh returned no jwt")
+		return "", fmt.Errorf("adapta token refresh returned no jwt")
 	}
 	expiry := adaptaExpiry(parsed.JWT)
 	adaptaJWTMu.Lock()
@@ -188,7 +188,7 @@ func adaptaSessionJWT(ctx context.Context, req *Request) (string, error) {
 func adaptaSessionID(ctx context.Context, client *http.Client, clerkURL, clientJWT string) (string, error) {
 	guarded, err := adaptaGuard(ctx, clerkURL)
 	if err != nil {
-		return "", fmt.Errorf("Adapta auth endpoint blocked")
+		return "", fmt.Errorf("adapta auth endpoint blocked")
 	}
 	request, err := http.NewRequestWithContext(guarded, http.MethodGet, clerkURL+"/v1/client", nil)
 	if err != nil {
@@ -199,12 +199,12 @@ func adaptaSessionID(ctx context.Context, client *http.Client, clerkURL, clientJ
 	request.Header.Set("Origin", adaptaDefaultBaseURL)
 	response, err := client.Do(request)
 	if err != nil {
-		return "", fmt.Errorf("Adapta client lookup failed")
+		return "", fmt.Errorf("adapta client lookup failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
-		return "", fmt.Errorf("Adapta client lookup failed")
+		return "", fmt.Errorf("adapta client lookup failed")
 	}
 	var parsed struct {
 		Response struct {
@@ -215,7 +215,7 @@ func adaptaSessionID(ctx context.Context, client *http.Client, clerkURL, clientJ
 		} `json:"response"`
 	}
 	if json.Unmarshal(raw, &parsed) != nil {
-		return "", fmt.Errorf("Adapta client lookup invalid")
+		return "", fmt.Errorf("adapta client lookup invalid")
 	}
 	for _, session := range parsed.Response.Sessions {
 		if session.Status == "active" && session.ID != "" {

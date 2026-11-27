@@ -110,7 +110,7 @@ func Do(ctx context.Context, client *http.Client, req *http.Request) (*http.Resp
 		return nil, fmt.Errorf("GHE request: %w", err)
 	}
 	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, fmt.Errorf("GHE endpoint returned a redirect (HTTP %d)", resp.StatusCode)
 	}
 	return resp, nil

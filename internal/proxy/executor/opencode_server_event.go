@@ -122,7 +122,7 @@ func (b *opencodeServerBus) run() {
 		b.finish(err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		b.finish(fmt.Errorf("event stream status %d", resp.StatusCode))
 		return

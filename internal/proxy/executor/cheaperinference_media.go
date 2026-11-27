@@ -98,7 +98,7 @@ func cinfDetectMediaKinds(body []byte) cinfMediaKinds {
 func cinfInspectObject(obj map[string]json.RawMessage) (string, bool) {
 	var typeField string
 	if raw, ok := obj["type"]; ok {
-		json.Unmarshal(raw, &typeField)
+		_ = json.Unmarshal(raw, &typeField)
 	}
 	// input_audio: {type:"input_audio", input_audio:{data, format}}
 	if typeField == "input_audio" {
@@ -126,7 +126,7 @@ func cinfInspectObject(obj map[string]json.RawMessage) (string, bool) {
 	if json.Unmarshal(obj["source"], &source) == nil {
 		var mediaType string
 		if raw, ok := source["media_type"]; ok {
-			json.Unmarshal(raw, &mediaType)
+			_ = json.Unmarshal(raw, &mediaType)
 		}
 		mediaType = strings.ToLower(mediaType)
 		if strings.HasPrefix(mediaType, "audio/") {
@@ -149,8 +149,8 @@ func cinfInspectObject(obj map[string]json.RawMessage) (string, bool) {
 		var file map[string]json.RawMessage
 		if json.Unmarshal(obj["file"], &file) == nil {
 			var filename, fileData string
-			json.Unmarshal(file["filename"], &filename)
-			json.Unmarshal(file["file_data"], &fileData)
+			_ = json.Unmarshal(file["filename"], &filename)
+			_ = json.Unmarshal(file["file_data"], &fileData)
 			if strings.Contains(strings.ToLower(fileData), "application/pdf") || strings.HasSuffix(strings.ToLower(filename), ".pdf") {
 				return "document", true
 			}
@@ -158,7 +158,7 @@ func cinfInspectObject(obj map[string]json.RawMessage) (string, bool) {
 		var pdfSource map[string]json.RawMessage
 		if json.Unmarshal(obj["source"], &pdfSource) == nil {
 			var mediaType string
-			json.Unmarshal(pdfSource["media_type"], &mediaType)
+			_ = json.Unmarshal(pdfSource["media_type"], &mediaType)
 			if strings.EqualFold(mediaType, "application/pdf") {
 				return "document", true
 			}
@@ -291,20 +291,20 @@ func cinfRewriteCarriers(raw json.RawMessage, index *int) (json.RawMessage, bool
 		return raw, false
 	}
 	var typeField string
-	json.Unmarshal(obj["type"], &typeField)
+	_ = json.Unmarshal(obj["type"], &typeField)
 	if typeField == "input_audio" {
 		var audio map[string]json.RawMessage
 		if json.Unmarshal(obj["input_audio"], &audio) == nil {
 			var data, format string
-			json.Unmarshal(audio["data"], &data)
-			json.Unmarshal(audio["format"], &format)
+			_ = json.Unmarshal(audio["data"], &data)
+			_ = json.Unmarshal(audio["format"], &format)
 			format = strings.ToLower(format)
 			if mime := cinfAudioMIME(format); mime != "" && data != "" && !strings.HasPrefix(data, "data:") && len(audio) == 2 {
 				*index++
 				replacement := map[string]any{
 					"type": "file",
 					"file": map[string]string{
-						"filename": "audio-" + strconv.Itoa(*index) + "." + format,
+						"filename":  "audio-" + strconv.Itoa(*index) + "." + format,
 						"file_data": "data:" + mime + ";base64," + data,
 					},
 				}
@@ -332,7 +332,7 @@ func cinfRewriteCarriers(raw json.RawMessage, index *int) (json.RawMessage, bool
 			replacement := map[string]any{
 				"type": "file",
 				"file": map[string]string{
-					"filename": "video-" + strconv.Itoa(*index) + "." + ext,
+					"filename":  "video-" + strconv.Itoa(*index) + "." + ext,
 					"file_data": url,
 				},
 			}

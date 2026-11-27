@@ -19,9 +19,6 @@ func (f testTransport) RoundTrip(r *http.Request) (*http.Response, error) { retu
 func response(status int, body string) *http.Response {
 	return &http.Response{StatusCode: status, Header: http.Header{}, Body: io.NopCloser(strings.NewReader(body))}
 }
-func tokenJSON() string {
-	return `{"token":"derived","expires_at":` + time.Now().Add(time.Hour).Format("1136239445") + `}`
-}
 func validToken(t *testing.T, api, proxy string) string {
 	t.Helper()
 	raw, err := json.Marshal(map[string]any{"token": "derived", "expires_at": time.Now().Add(time.Hour).Unix(), "endpoints": map[string]any{"api": api, "proxy": proxy}})

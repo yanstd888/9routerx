@@ -51,9 +51,9 @@ func TestForwardHuggingChat(t *testing.T) {
 
 	req := &Request{
 		Ctx: proxy.WithAllowLoopback(context.Background()), Client: server.Client(),
-		APIKey: "hf-chat=session",
-		Body:   []byte(`{"model":"openai/gpt-oss-120b","messages":[{"role":"user","content":"hi"}]}`),
-		Config: &providers.ProviderConfig{BaseURL: server.URL + "/chat", AuthHeader: "Cookie", AuthScheme: "raw"},
+		APIKey:   "hf-chat=session",
+		Body:     []byte(`{"model":"openai/gpt-oss-120b","messages":[{"role":"user","content":"hi"}]}`),
+		Config:   &providers.ProviderConfig{BaseURL: server.URL + "/chat", AuthHeader: "Cookie", AuthScheme: "raw"},
 		ConnData: map[string]any{"baseUrl": server.URL + "/chat"},
 	}
 	rec := httptest.NewRecorder()

@@ -1,6 +1,9 @@
 // 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id
 package media
+
 import (
+	"9routerx/proxy/internal/db"
+	"9routerx/proxy/internal/providers"
 	"context"
 	"database/sql"
 	"encoding/base64"
@@ -12,10 +15,10 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
-	"9routerx/proxy/internal/db"
-	"9routerx/proxy/internal/providers"
 )
+
 var ideogramImageBytes = []byte("ideogram-fake-png-bytes")
+
 func seedIdeogramConn(t *testing.T, database *sql.DB) {
 	t.Helper()
 	data, _ := json.Marshal(map[string]any{"apiKey": "ideo-secret-key"})
@@ -113,7 +116,12 @@ func TestIdeogramImageSuccess(t *testing.T) {
 	if generateHits.Load() != 1 || imageHits.Load() != 1 {
 		t.Fatalf("generate hits=%d image hits=%d, want 1/1", generateHits.Load(), imageHits.Load())
 	}
-	var out struct{ Created int64 `json:"created"`; Data []struct{ B64JSON string `json:"b64_json"` } `json:"data"` }
+	var out struct {
+		Created int64 `json:"created"`
+		Data    []struct {
+			B64JSON string `json:"b64_json"`
+		} `json:"data"`
+	}
 	if err := json.Unmarshal(rec.Body.Bytes(), &out); err != nil {
 		t.Fatalf("parse response: %v", err)
 	}
@@ -183,7 +191,7 @@ func TestIdeogramImageNoImages(t *testing.T) {
 	if rec.Code != http.StatusBadGateway {
 		t.Fatalf("status = %d, want 502", rec.Code)
 	}
-	if !strings.Contains(rec.Body.String(), "No images returned from Ideogram") {
+	if !strings.Contains(rec.Body.String(), "no images returned from Ideogram") {
 		t.Errorf("body = %s", rec.Body.String())
 	}
 }
@@ -202,7 +210,7 @@ func TestIdeogramImageDownloadFailure(t *testing.T) {
 	if strings.Contains(rec.Body.String(), imageURL) || strings.Contains(rec.Body.String(), "secret-result") {
 		t.Errorf("download error leaked the upstream URL: %s", rec.Body.String())
 	}
-	if !strings.Contains(rec.Body.String(), "Failed to download image") {
+	if !strings.Contains(rec.Body.String(), "failed to download image") {
 		t.Errorf("body = %s", rec.Body.String())
 	}
 }
@@ -272,7 +280,10 @@ func TestIdeogramImageResultRedirectReGuarded(t *testing.T) {
 	}
 }
 func TestIdeogramGuardURL(t *testing.T) {
-	cases := []struct{ name, url, allowLocal string; blocked bool }{
+	cases := []struct {
+		name, url, allowLocal string
+		blocked               bool
+	}{
 		{"public https", "https://api.ideogram.ai/generate", "false", false}, {"public http", "http://example.com/generate", "false", true},
 		{"loopback", "http://127.0.0.1:8080/x", "false", true},
 		{"private", "https://10.0.0.5/x", "false", true},

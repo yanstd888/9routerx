@@ -17,11 +17,11 @@ import (
 )
 
 const (
-	adaptaDefaultBaseURL   = "https://agent.adapta.one"
-	adaptaDefaultClerkURL  = "https://clerk.agent.adapta.one"
-	adaptaUserAgent        = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
-	adaptaModelID          = 14
-	adaptaPublicStreamErr  = "\n\n[Erro: Adapta upstream error]"
+	adaptaDefaultBaseURL  = "https://agent.adapta.one"
+	adaptaDefaultClerkURL = "https://clerk.agent.adapta.one"
+	adaptaUserAgent       = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+	adaptaModelID         = 14
+	adaptaPublicStreamErr = "\n\n[Erro: Adapta upstream error]"
 )
 
 var adaptaModels = map[string]bool{
@@ -99,7 +99,7 @@ func ForwardAdaptaWeb(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "Adapta request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		return proxy.UpstreamFailure(response.StatusCode, "Adapta upstream error")
 	}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/binary"
+	"errors"
 	"io"
 	"testing"
 )
@@ -98,7 +99,7 @@ func TestDevinDesktopUnknownProtoFields(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if err := devinDesktopFrames(ctx, bytes.NewReader(nil), "", func(devinDesktopResponse) error { return io.ErrClosedPipe }); err != context.Canceled {
+	if err := devinDesktopFrames(ctx, bytes.NewReader(nil), "", func(devinDesktopResponse) error { return io.ErrClosedPipe }); !errors.Is(err, context.Canceled) {
 		t.Error(err)
 	}
 }

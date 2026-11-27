@@ -93,7 +93,7 @@ func ForwardChatplayground(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "ChatPlayground request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		detail, _ := io.ReadAll(io.LimitReader(response.Body, 1024))
 		return proxy.UpstreamFailure(response.StatusCode, chatplaygroundError(response.StatusCode, string(detail)))

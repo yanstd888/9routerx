@@ -36,10 +36,10 @@ var (
 		"phoenix": "de7d3faf-762f-48e0-b3b7-9d0ac3a3fcf3",
 		"sdxl":    "16e7060a-803e-4df3-97ee-edcfa5dc9cc8",
 	}
-	errLeonardoDownload = errors.New("Failed to download image: upstream download failed")
-	errLeonardoTimeout  = errors.New("Failed to download image: download timed out")
-	errLeonardoTooLarge = errors.New("Failed to download image: image exceeds 25MiB limit")
-	errLeonardoBlocked  = errors.New("Failed to download image: result URL blocked by SSRF guard")
+	errLeonardoDownload = errors.New("failed to download image: upstream download failed")
+	errLeonardoTimeout  = errors.New("failed to download image: download timed out")
+	errLeonardoTooLarge = errors.New("failed to download image: image exceeds 25MiB limit")
+	errLeonardoBlocked  = errors.New("failed to download image: result URL blocked by SSRF guard")
 )
 var leonardoSizePattern = regexp.MustCompile(`(?i)^(\d+)x(\d+)$`)
 
@@ -91,7 +91,7 @@ func leonardoGuardURL(ctx context.Context, raw string) (context.Context, error) 
 	u, err := url.Parse(raw)
 	allowLocal := proxy.AllowPrivateProviderURLs() || proxy.IsPrivateNetworkingAllowed() || proxy.IsLoopbackAllowed(ctx)
 	if err != nil || (!allowLocal && u.Scheme != "https") || proxy.AssertDispatchURLAllowed(raw, allowLocal) != nil {
-		return ctx, errors.New("Leonardo endpoint blocked by SSRF guard")
+		return ctx, errors.New("leonardo endpoint blocked by SSRF guard")
 	}
 	if allowLocal {
 		ctx = proxy.WithAllowLoopback(ctx)
@@ -127,7 +127,7 @@ func (h *MediaHandler) handleLeonardoImage(w http.ResponseWriter, r *http.Reques
 		target = cfg.BaseURL
 	}
 	if target == "" {
-		return errors.New("Leonardo image endpoint is not configured")
+		return errors.New("leonardo image endpoint is not configured")
 	}
 	guardedCtx, err := leonardoGuardURL(r.Context(), target)
 	if err != nil {
@@ -173,7 +173,7 @@ func (h *MediaHandler) handleLeonardoImage(w http.ResponseWriter, r *http.Reques
 		return errors.New("parse leonardo image response failed")
 	}
 	if submitted.SDGenerationJob == nil || submitted.SDGenerationJob.GenerationID == "" {
-		return errors.New("No generation ID returned")
+		return errors.New("no generation ID returned")
 	}
 	return h.leonardoPoll(w, r, client, target, submitted.SDGenerationJob.GenerationID, apiKey)
 }

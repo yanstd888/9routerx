@@ -22,12 +22,12 @@ func conolDo(ctx context.Context, client *http.Client, method, target, cookie, s
 	}
 	response, err := client.Do(httpReq)
 	if err != nil {
-		return nil, fmt.Errorf("Conol request failed")
+		return nil, fmt.Errorf("conol request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
-		return nil, fmt.Errorf("Conol upstream HTTP %d", response.StatusCode)
+		return nil, fmt.Errorf("conol upstream HTTP %d", response.StatusCode)
 	}
 	return raw, nil
 }
@@ -42,7 +42,7 @@ func conolCreateSession(ctx context.Context, client *http.Client, base, cookie s
 		SessionID string `json:"sessionId"`
 	}
 	if json.Unmarshal(raw, &parsed) != nil || parsed.SessionID == "" {
-		return "", fmt.Errorf("Conol returned no session id")
+		return "", fmt.Errorf("conol returned no session id")
 	}
 	return parsed.SessionID, nil
 }
@@ -84,11 +84,11 @@ func conolPoll(ctx context.Context, client *http.Client, base, cookie, sessionID
 	}
 	response, err := client.Do(httpReq)
 	if err != nil {
-		return "", fmt.Errorf("Conol stream request failed")
+		return "", fmt.Errorf("conol stream request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return "", fmt.Errorf("Conol stream HTTP %d", response.StatusCode)
+		return "", fmt.Errorf("conol stream HTTP %d", response.StatusCode)
 	}
 	scanner := bufio.NewScanner(io.LimitReader(response.Body, 10<<20))
 	scanner.Buffer(make([]byte, 64<<10), 1<<20)
@@ -104,12 +104,12 @@ func conolPoll(ctx context.Context, client *http.Client, base, cookie, sessionID
 			continue
 		}
 		var event struct {
-			Type     string `json:"type"`
-			Stages   []any  `json:"stages"`
-			Content  any    `json:"content"`
-			Message  any    `json:"message"`
-			Text     any    `json:"text"`
-			Delta    any    `json:"delta"`
+			Type    string `json:"type"`
+			Stages  []any  `json:"stages"`
+			Content any    `json:"content"`
+			Message any    `json:"message"`
+			Text    any    `json:"text"`
+			Delta   any    `json:"delta"`
 		}
 		if json.Unmarshal([]byte(line), &event) != nil {
 			continue

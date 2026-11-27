@@ -118,7 +118,7 @@ func gigachatExchange(ctx context.Context, client *http.Client, authURL, scope, 
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("GigaChat token request: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, gigachatTokenBodyMax))
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("read GigaChat token response: %w", err)

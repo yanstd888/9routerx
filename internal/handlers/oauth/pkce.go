@@ -122,16 +122,16 @@ var pkceProviders = map[string]*pkceConfig{
 	// flow hands the operator the callback URL to paste, matching the
 	// authorize step verified live (200).
 	"openference": {
-		providers:      []string{"openference"},
-		clientID:       "omniroute",
-		authorizeURL:   "https://openference.com/app/oauth/authorize",
-		tokenURL:       "https://openference.com/oauth/token",
-		scope:          "openid profile email model:invoke offline_access",
-		connPrefix:     "of-",
-		display:        "Openference",
-		emailFromIDTok: true,
+		providers:        []string{"openference"},
+		clientID:         "omniroute",
+		authorizeURL:     "https://openference.com/app/oauth/authorize",
+		tokenURL:         "https://openference.com/oauth/token",
+		scope:            "openid profile email model:invoke offline_access",
+		connPrefix:       "of-",
+		display:          "Openference",
+		emailFromIDTok:   true,
 		fixedRedirectURI: openferenceRedirectURI,
-		fixedPort: openferenceLoopbackPort,
+		fixedPort:        openferenceLoopbackPort,
 	},
 }
 

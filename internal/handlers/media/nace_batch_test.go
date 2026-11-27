@@ -26,10 +26,10 @@ func TestNaceSystemoneWireContract(t *testing.T) {
 			t.Fatal(err)
 		}
 		var payload struct {
-			Model     string            `json:"model"`
-			State     string            `json:"state"`
-			Images    []string          `json:"images"`
-			Questions map[string]any    `json:"questions"`
+			Model     string         `json:"model"`
+			State     string         `json:"state"`
+			Images    []string       `json:"images"`
+			Questions map[string]any `json:"questions"`
 		}
 		if err := json.Unmarshal(body, &payload); err != nil {
 			t.Fatal(err)

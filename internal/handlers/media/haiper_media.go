@@ -29,9 +29,9 @@ const (
 )
 
 var (
-	errHaiperNoJob    = errors.New("Haiper response has no job id")
-	errHaiperFailed   = errors.New("Haiper generation failed")
-	errHaiperTimedOut = errors.New("Haiper generation timed out")
+	errHaiperNoJob    = errors.New("haiper response has no job id")
+	errHaiperFailed   = errors.New("haiper generation failed")
+	errHaiperTimedOut = errors.New("haiper generation timed out")
 )
 
 type haiperJob struct {
@@ -39,9 +39,9 @@ type haiperJob struct {
 }
 
 type haiperStatus struct {
-	Status       string `json:"status"`
-	CreationURL  string `json:"creation_url"`
-	Output       struct {
+	Status      string `json:"status"`
+	CreationURL string `json:"creation_url"`
+	Output      struct {
 		ImageURL string `json:"image_url"`
 		VideoURL string `json:"video_url"`
 	} `json:"output"`
@@ -50,14 +50,14 @@ type haiperStatus struct {
 func haiperGuardURL(ctx context.Context, raw string) (context.Context, error) {
 	parsed, err := url.Parse(raw)
 	if err != nil {
-		return ctx, errors.New("Haiper endpoint blocked by SSRF guard")
+		return ctx, errors.New("haiper endpoint blocked by SSRF guard")
 	}
 	allowLocal := proxy.AllowPrivateProviderURLs() || proxy.IsPrivateNetworkingAllowed() || proxy.IsLoopbackAllowed(ctx)
 	if !allowLocal && parsed.Scheme != "https" {
-		return ctx, errors.New("Haiper endpoint must use HTTPS")
+		return ctx, errors.New("haiper endpoint must use HTTPS")
 	}
 	if err := proxy.AssertDispatchURLAllowed(raw, allowLocal); err != nil {
-		return ctx, errors.New("Haiper endpoint blocked by SSRF guard")
+		return ctx, errors.New("haiper endpoint blocked by SSRF guard")
 	}
 	if allowLocal {
 		ctx = proxy.WithAllowLoopback(ctx)
@@ -135,12 +135,12 @@ func (h *MediaHandler) handleHaiperMedia(w http.ResponseWriter, r *http.Request,
 	httpReq.Header.Set("HAIPER_KEY", key)
 	resp, err := client.Do(httpReq)
 	if err != nil {
-		return errors.New("Haiper request failed")
+		return errors.New("haiper request failed")
 	}
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 	_ = resp.Body.Close()
 	if err != nil || resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return errors.New("Haiper request failed")
+		return errors.New("haiper request failed")
 	}
 	var job haiperJob
 	if json.Unmarshal(raw, &job) != nil || job.JobID == "" {
@@ -206,9 +206,9 @@ func haiperStatusOf(ctx context.Context, client *http.Client, key, target string
 	if err != nil {
 		return status, err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return status, fmt.Errorf("Haiper status %d", response.StatusCode)
+		return status, fmt.Errorf("haiper status %d", response.StatusCode)
 	}
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil {

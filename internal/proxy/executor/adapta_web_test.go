@@ -75,12 +75,12 @@ func TestForwardAdaptaWeb(t *testing.T) {
 	defer app.Close()
 
 	req := &Request{
-		Ctx:     proxy.WithAllowLoopback(context.Background()),
-		Client:  app.Client(),
-		APIKey:  "__client=" + clientJWT,
-		Body:    []byte(`{"model":"adapta-web/adapta-one","messages":[{"role":"user","content":"hi"}]}`),
+		Ctx:      proxy.WithAllowLoopback(context.Background()),
+		Client:   app.Client(),
+		APIKey:   "__client=" + clientJWT,
+		Body:     []byte(`{"model":"adapta-web/adapta-one","messages":[{"role":"user","content":"hi"}]}`),
 		ConnData: map[string]any{"clerkUrl": clerk.URL},
-		Config: &providers.ProviderConfig{BaseURL: app.URL, AuthHeader: "Authorization", AuthScheme: "bearer"},
+		Config:   &providers.ProviderConfig{BaseURL: app.URL, AuthHeader: "Authorization", AuthScheme: "bearer"},
 	}
 	rec := httptest.NewRecorder()
 	if err := ForwardAdaptaWeb(rec, req); err != nil {

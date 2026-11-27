@@ -59,7 +59,7 @@ func ghePostForm(ctx context.Context, endpoint string, form url.Values, _ map[st
 	if err != nil {
 		return nil, 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var data map[string]any
 	if err := json.UnmarshalRead(io.LimitReader(resp.Body, 1<<20), &data); err != nil {
 		return nil, resp.StatusCode, fmt.Errorf("invalid response from GHE host")
@@ -165,7 +165,7 @@ func gheUser(ctx context.Context, base, access string) map[string]any {
 	if err != nil {
 		return nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil
 	}

@@ -17,8 +17,8 @@ import (
 
 const (
 	conolDefaultBaseURL = "https://conol.ai/api/sessions"
-	conolWebOrigin       = "https://conol.ai"
-	conolUserAgent       = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+	conolWebOrigin      = "https://conol.ai"
+	conolUserAgent      = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
 )
 
 func ForwardConolWeb(w http.ResponseWriter, req *Request) error {

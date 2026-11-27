@@ -45,6 +45,7 @@ func ForwardDevinDesktop(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return err
 	}
+	defer func() { _ = auth.Body.Close() }()
 	metadata.jwt, err = devinDesktopJWT(ctx, auth)
 	if err != nil {
 		return err
@@ -57,8 +58,8 @@ func ForwardDevinDesktop(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return err
 	}
-	defer upstream.Body.Close()
-	stop := context.AfterFunc(ctx, func() { upstream.Body.Close() })
+	defer func() { _ = upstream.Body.Close() }()
+	stop := context.AfterFunc(ctx, func() { _ = upstream.Body.Close() })
 	defer stop()
 	local := *req
 	local.Ctx = ctx

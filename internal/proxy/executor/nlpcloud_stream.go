@@ -119,8 +119,8 @@ func nlpcloudCompletion(raw []byte, id, model string, created int64) ([]byte, er
 	completion := map[string]any{
 		"id": id, "object": "chat.completion", "created": created, "model": model,
 		"choices": []any{map[string]any{
-			"index": 0,
-			"message": map[string]any{"role": "assistant", "content": text},
+			"index":         0,
+			"message":       map[string]any{"role": "assistant", "content": text},
 			"finish_reason": "stop",
 		}},
 		"usage": map[string]any{

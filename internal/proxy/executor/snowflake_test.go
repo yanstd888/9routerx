@@ -142,9 +142,9 @@ func TestForwardSnowflakeKeypairJWTClassified(t *testing.T) {
 
 func TestNormalizeSnowflakeChatURL(t *testing.T) {
 	cases := map[string]string{
-		"https://acme.snowflakecomputing.com":                                    "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
-		"https://acme.snowflakecomputing.com/api/v2":                             "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
-		"https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete":   "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
+		"https://acme.snowflakecomputing.com":                                  "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
+		"https://acme.snowflakecomputing.com/api/v2":                           "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
+		"https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete": "https://acme.snowflakecomputing.com/api/v2/cortex/inference:complete",
 		"": "",
 	}
 	for in, want := range cases {

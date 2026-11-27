@@ -81,6 +81,7 @@ func ForwardNLPCloud(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return fmt.Errorf("ForwardNLPCloud upstream: %w", err)
 	}
+	defer func() { _ = resp.Body.Close() }()
 	raw, err := proxy.ReadBody(resp)
 	if err != nil {
 		return fmt.Errorf("read NLP Cloud response: %w", err)

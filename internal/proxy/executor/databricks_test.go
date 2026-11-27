@@ -87,7 +87,7 @@ func TestForwardDatabricksUsesWorkspaceURL(t *testing.T) {
 
 func TestNormalizeDatabricksChatURL(t *testing.T) {
 	cases := map[string]string{
-		"https://adb-1.7.azuredatabricks.net/serving-endpoints":                "https://adb-1.7.azuredatabricks.net/serving-endpoints/chat/completions",
+		"https://adb-1.7.azuredatabricks.net/serving-endpoints":                  "https://adb-1.7.azuredatabricks.net/serving-endpoints/chat/completions",
 		"https://adb-1.7.azuredatabricks.net/serving-endpoints/chat/completions": "https://adb-1.7.azuredatabricks.net/serving-endpoints/chat/completions",
 		"": "",
 	}

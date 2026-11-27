@@ -32,7 +32,7 @@ func opencodeServerPump(ctx context.Context, state *opencodeServerStreamState, s
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-sub.bus.done:
-			return state.failure(fmt.Errorf("event stream closed: %v", sub.bus.err))
+			return state.failure(fmt.Errorf("event stream closed: %w", sub.bus.err))
 		case event, ok := <-sub.ch:
 			if !ok {
 				return state.failure(errors.New("event stream closed"))

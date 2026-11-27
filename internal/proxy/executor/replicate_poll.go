@@ -172,11 +172,11 @@ func pollReplicateUntilDone(ctx context.Context, client *http.Client, initial ma
 		}
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 			failure := replicateUpstreamFailure(resp)
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			return nil, failure
 		}
 		current, err = replicateReadPrediction(resp)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		if err != nil {
 			return nil, err
 		}
@@ -200,7 +200,7 @@ func cancelReplicatePrediction(ctx context.Context, client *http.Client, predict
 	}
 	resp, err := replicateDo(ctx, client, http.MethodPost, cancelURL, replicateWithoutPrefer(headers), nil)
 	if err == nil {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 }
 
@@ -217,7 +217,7 @@ func fetchFinalReplicatePrediction(ctx context.Context, client *http.Client, pre
 	if err != nil {
 		return prediction
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return prediction
 	}

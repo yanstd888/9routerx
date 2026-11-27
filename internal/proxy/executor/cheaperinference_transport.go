@@ -188,13 +188,14 @@ func cinfReserveAndPrepare(req *Request, cfg *providers.ProviderConfig, decoded,
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("CI payload reservation: %w", err)
 	}
+	defer func() { _ = created.Body.Close() }()
 	raw, _ := proxy.ReadBody(created)
 	if created.StatusCode < 200 || created.StatusCode >= 300 {
 		return nil, nil, nil, &proxy.UpstreamError{StatusCode: created.StatusCode, Body: raw}
 	}
 	var reservation cinfReservation
 	if json.Unmarshal(raw, &reservation) != nil || !cinfValidReservationID(reservation.ID) || reservation.PartSize != cinfPayloadPart {
-		return nil, nil, nil, fmt.Errorf("CI returned an invalid payload upload reservation.")
+		return nil, nil, nil, fmt.Errorf("CI returned an invalid payload upload reservation")
 	}
 	guard := &cinfUploadCleanup{resource: uploadBase + "/" + reservation.ID, ctx: ctx, client: req.Client, headers: headers}
 	partHeaders := cinfBaseHeaders(cfg, req.APIKey)

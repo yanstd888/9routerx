@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	commandCodeChatPath     = "/provider/v1/chat/completions"
-	commandCodeMessagesPath = "/provider/v1/messages"
+	commandCodeChatPath      = "/provider/v1/chat/completions"
+	commandCodeMessagesPath  = "/provider/v1/messages"
 	commandCodeResponsesPath = "/provider/v1/responses"
 )
 
@@ -83,7 +83,7 @@ func ForwardCommandCode(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return fmt.Errorf("ForwardCommandCode upstream: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	forwardUpstreamResponseHeaders(w, resp.Header)
 	if req.IsStream {
 		return handleClaudeMessagesStream(w, req, resp.Body)

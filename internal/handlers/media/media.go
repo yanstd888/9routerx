@@ -975,17 +975,17 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 				} else {
 					lastErr = err.Error()
 					continue
+				}
 			}
-		}
-		if (endpoint == "/v1/images/generations" || endpoint == "/images/generations") && (subInfo.Provider == "haiper" || subInfo.Provider == "hp") {
-			if err := h.handleHaiperMedia(w, r, body, subInfo, "image"); err == nil {
-				return
-			} else {
-				lastErr = err.Error()
-				continue
+			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations") && (subInfo.Provider == "haiper" || subInfo.Provider == "hp") {
+				if err := h.handleHaiperMedia(w, r, body, subInfo, "image"); err == nil {
+					return
+				} else {
+					lastErr = err.Error()
+					continue
+				}
 			}
-		}
-		// Codex image models are Responses-API models, not an image endpoint.
+			// Codex image models are Responses-API models, not an image endpoint.
 			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "codex" || subInfo.Provider == "cx") {
 				if err := h.handleCodexImage(w, r, body, subInfo); err == nil {

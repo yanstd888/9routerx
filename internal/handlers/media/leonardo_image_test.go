@@ -172,7 +172,7 @@ func TestLeonardoMissingGenerationID(t *testing.T) {
 	}))
 	defer generate.Close()
 	rec := leonardoPost(t, leonardoTestHandler(t, generate.URL), `{"model":"leonardo/phoenix","prompt":"fox"}`)
-	if rec.Code != http.StatusBadGateway || !strings.Contains(rec.Body.String(), "No generation ID returned") {
+	if rec.Code != http.StatusBadGateway || !strings.Contains(rec.Body.String(), "no generation ID returned") {
 		t.Fatalf("status=%d body=%s, want 502 missing id", rec.Code, rec.Body.String())
 	}
 }

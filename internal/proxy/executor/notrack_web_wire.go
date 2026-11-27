@@ -104,10 +104,10 @@ func notrackPayload(body []byte) ([]byte, error) {
 				Parameters  any    `json:"parameters"`
 			} `json:"function"`
 		} `json:"tools"`
-		ToolChoice any `json:"tool_choice"`
+		ToolChoice any      `json:"tool_choice"`
 		MaxTurns   *float64 `json:"notrack_max_turns"`
-		ChatID     string `json:"notrack_chat_id"`
-		Regenerate bool   `json:"notrack_regenerate"`
+		ChatID     string   `json:"notrack_chat_id"`
+		Regenerate bool     `json:"notrack_regenerate"`
 	}
 	if json.Unmarshal(body, &request) != nil {
 		return nil, fmt.Errorf("decode NoTrack request")

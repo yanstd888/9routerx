@@ -78,7 +78,7 @@ func (h *OAuthHandler) exchangeDevinCode(ctx context.Context, raw, state, verifi
 	if strings.HasPrefix(code, "http://") || strings.HasPrefix(code, "https://") {
 		u, err := url.Parse(code)
 		if err != nil || u.Query().Get("state") != state {
-			return pkceExchangeResult{}, fmt.Errorf("Devin callback state mismatch")
+			return pkceExchangeResult{}, fmt.Errorf("devin callback state mismatch")
 		}
 		code = u.Query().Get("code")
 	}
@@ -97,18 +97,18 @@ func (h *OAuthHandler) exchangeDevinCode(ctx context.Context, raw, state, verifi
 	req.Header.Set("Accept", "application/json")
 	resp, err := devinOAuthClient.Do(req)
 	if err != nil {
-		return pkceExchangeResult{}, fmt.Errorf("Devin token exchange unavailable")
+		return pkceExchangeResult{}, fmt.Errorf("devin token exchange unavailable")
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
-		return pkceExchangeResult{}, fmt.Errorf("Devin token exchange returned HTTP %d", resp.StatusCode)
+		return pkceExchangeResult{}, fmt.Errorf("devin token exchange returned HTTP %d", resp.StatusCode)
 	}
 	var body struct {
 		Token string `json:"token"`
 	}
 	b, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 	if err != nil || json.Unmarshal(b, &body) != nil || strings.TrimSpace(body.Token) == "" {
-		return pkceExchangeResult{}, fmt.Errorf("Devin token exchange returned no token")
+		return pkceExchangeResult{}, fmt.Errorf("devin token exchange returned no token")
 	}
 	token := strings.TrimSpace(body.Token)
 	if !strings.HasPrefix(token, devinTokenPrefix) {
@@ -119,7 +119,7 @@ func (h *OAuthHandler) exchangeDevinCode(ctx context.Context, raw, state, verifi
 
 func (h *OAuthHandler) saveDevinCredential(token, name string, browser bool) (pkceExchangeResult, error) {
 	if len(strings.TrimSpace(token)) < 16 {
-		return pkceExchangeResult{}, fmt.Errorf("Devin credential must contain at least 16 characters")
+		return pkceExchangeResult{}, fmt.Errorf("devin credential must contain at least 16 characters")
 	}
 	id := "devind-" + shortHash(token)
 	data := map[string]any{"apiKey": token, "accessToken": token}
@@ -172,7 +172,7 @@ func (h *OAuthHandler) HandleDevinExchange(w http.ResponseWriter, r *http.Reques
 }
 
 func readDevinBody(r *http.Request) []byte {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	b, _ := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	return b
 }

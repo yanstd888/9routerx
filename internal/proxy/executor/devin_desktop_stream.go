@@ -21,7 +21,7 @@ type devinDesktopStreamWriter struct {
 
 func devinDesktopStream(w http.ResponseWriter, req *Request, upstream io.Reader, encoding string, output *devinDesktopOutput) error {
 	hw := proxy.NewHeartbeatWriter(req.Ctx, w, 0)
-	defer hw.Close()
+	defer func() { _ = hw.Close() }()
 	proxy.WriteSSEHeaders(hw)
 	sink := devinDesktopStreamWriter{req: req, writer: hw}
 	if translator.IsResponsesClient(req.Ctx) {

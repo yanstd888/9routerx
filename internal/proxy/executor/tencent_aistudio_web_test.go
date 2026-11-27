@@ -21,12 +21,12 @@ func TestForwardTencentAistudioWeb(t *testing.T) {
 	defer server.Close()
 
 	req := &Request{
-		Ctx:     proxy.WithAllowLoopback(context.Background()),
-		APIKey:  "Cookie: session=abc",
-		Client:  server.Client(),
-		Body:    []byte(`{"model":"hy3-g","messages":[{"role":"user","content":"hi"}]}`),
+		Ctx:      proxy.WithAllowLoopback(context.Background()),
+		APIKey:   "Cookie: session=abc",
+		Client:   server.Client(),
+		Body:     []byte(`{"model":"hy3-g","messages":[{"role":"user","content":"hi"}]}`),
 		ConnData: map[string]any{"baseUrl": server.URL},
-		Config: &providers.ProviderConfig{BaseURL: server.URL, AuthHeader: "Cookie", AuthScheme: "raw"},
+		Config:   &providers.ProviderConfig{BaseURL: server.URL, AuthHeader: "Cookie", AuthScheme: "raw"},
 	}
 	rec := httptest.NewRecorder()
 	if err := ForwardTencentAistudioWeb(rec, req); err != nil {

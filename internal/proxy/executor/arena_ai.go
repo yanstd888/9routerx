@@ -114,13 +114,13 @@ func ForwardArenaAI(w http.ResponseWriter, req *Request) error {
 	}
 
 	payload := map[string]any{
-		"id":               sessionID,
-		"mode":             "direct",
-		"modelAId":         targetModelAID,
-		"userMessageId":    userMsgID,
-		"modelAMessageId":  modelMsgID,
-		"userMessage":      map[string]any{"content": prompt, "experimental_attachments": []any{}},
-		"modality":         "text",
+		"id":              sessionID,
+		"mode":            "direct",
+		"modelAId":        targetModelAID,
+		"userMessageId":   userMsgID,
+		"modelAMessageId": modelMsgID,
+		"userMessage":     map[string]any{"content": prompt, "experimental_attachments": []any{}},
+		"modality":        "text",
 	}
 	payloadBytes, err := json.Marshal(payload, json.Deterministic(true))
 	if err != nil {
@@ -171,7 +171,7 @@ func ForwardArenaAI(w http.ResponseWriter, req *Request) error {
 		handlerutil.WriteJSONError(w, http.StatusBadGateway, "arena-ai: upstream error: "+err.Error())
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(io.LimitReader(resp.Body, 64*1024))

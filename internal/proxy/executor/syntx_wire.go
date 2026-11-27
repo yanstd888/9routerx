@@ -49,7 +49,7 @@ func syntxAuthHeaders(token string) map[string]string {
 	return map[string]string{
 		"accept": "application/json, text/plain, */*", "accept-language": "en",
 		"authorization": "Bearer " + token,
-		"origin": "https://syntx.ai", "referer": "https://syntx.ai/", "user-agent": syntxUserAgent,
+		"origin":        "https://syntx.ai", "referer": "https://syntx.ai/", "user-agent": syntxUserAgent,
 	}
 }
 
@@ -112,7 +112,7 @@ func syntxPrompt(body []byte, modelThinking bool) (string, string, bool) {
 		}
 	}
 	text := strings.Join(lines, "\n\n")
-	thinking := modelThinking && strings.EqualFold(request.ReasoningEffort, "none") == false
+	thinking := modelThinking && !strings.EqualFold(request.ReasoningEffort, "none")
 	return text, title, thinking
 }
 
@@ -143,7 +143,7 @@ func syntxCreateChat(ctx context.Context, client *http.Client, base, token, titl
 	if err != nil {
 		return "", fmt.Errorf("SYNTX create chat failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
 		return "", fmt.Errorf("SYNTX create chat failed")
@@ -176,7 +176,7 @@ func syntxGenerate(ctx context.Context, client *http.Client, base, token, chatID
 	if err != nil {
 		return "", fmt.Errorf("SYNTX generate failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
 		return "", fmt.Errorf("SYNTX generate failed")
@@ -216,10 +216,10 @@ func syntxStream(raw []byte) (string, map[string]any) {
 				continue
 			}
 			var event struct {
-				Type          string  `json:"type"`
-				Content       string  `json:"content"`
-				TokensInput   float64 `json:"tokens_input"`
-				TokensOutput  float64 `json:"tokens_output"`
+				Type         string  `json:"type"`
+				Content      string  `json:"content"`
+				TokensInput  float64 `json:"tokens_input"`
+				TokensOutput float64 `json:"tokens_output"`
 			}
 			if json.Unmarshal([]byte(payload), &event) != nil {
 				continue

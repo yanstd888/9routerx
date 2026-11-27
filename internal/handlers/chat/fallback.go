@@ -710,7 +710,9 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	}
 
 	apiKey := resolveProviderAuthToken(provider, connData, extractAPIKey(connData))
-	if provider == "ghe-copilot" { apiKey = gheToken }
+	if provider == "ghe-copilot" {
+		apiKey = gheToken
+	}
 	if apiKey == "" {
 		if providerCfg.DefaultAPIKey != "" {
 			apiKey = providerCfg.DefaultAPIKey
@@ -1207,7 +1209,9 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 		var rErr error
 		if provider == "ghe-copilot" {
 			connData, refreshedKey, rErr = h.prepareGHE(ctx, connectionID, connData, true, apiKey)
-			if rErr == nil { providerCfg, rErr = h.getProviderConfig(provider, connData) }
+			if rErr == nil {
+				providerCfg, rErr = h.getProviderConfig(provider, connData)
+			}
 		} else {
 			refreshedKey, _, rErr = h.forceRefreshOAuthToken(connectionID)
 		}

@@ -76,6 +76,7 @@ func ForwardClovaStudio(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return fmt.Errorf("ForwardClovaStudio upstream: %w", err)
 	}
+	defer func() { _ = resp.Body.Close() }()
 	raw, err := proxy.ReadBody(resp)
 	if err != nil {
 		return fmt.Errorf("read CLOVA Studio response: %w", err)

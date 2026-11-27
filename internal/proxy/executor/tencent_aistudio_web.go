@@ -18,9 +18,9 @@ import (
 )
 
 var tencentAistudioModels = map[string]string{
-	"hy3-g":          "HunyuanDefault",
+	"hy3-g":           "HunyuanDefault",
 	"hunyuan-default": "HunyuanDefault",
-	"hunyuan-3d":     "Hunyuan3D",
+	"hunyuan-3d":      "Hunyuan3D",
 }
 
 func tencentAistudioGuard(ctx context.Context, raw string) (context.Context, error) {
@@ -119,7 +119,7 @@ func ForwardTencentAistudioWeb(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "Tencent AI Studio request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		detail, _ := io.ReadAll(io.LimitReader(response.Body, 1024))
 		return proxy.UpstreamFailure(response.StatusCode, fmt.Sprintf("Tencent AI Studio failed with status %d: %s", response.StatusCode, strings.TrimSpace(string(detail))))

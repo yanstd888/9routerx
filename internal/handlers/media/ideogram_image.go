@@ -33,10 +33,10 @@ const (
 )
 
 var (
-	errIdeogramDownload = errors.New("Failed to download image: upstream download failed")
-	errIdeogramTimeout  = errors.New("Failed to download image: download timed out")
-	errIdeogramTooLarge = errors.New("Failed to download image: image exceeds 25MiB limit")
-	errIdeogramBlocked  = errors.New("Failed to download image: result URL blocked by SSRF guard")
+	errIdeogramDownload = errors.New("failed to download image: upstream download failed")
+	errIdeogramTimeout  = errors.New("failed to download image: download timed out")
+	errIdeogramTooLarge = errors.New("failed to download image: image exceeds 25MiB limit")
+	errIdeogramBlocked  = errors.New("failed to download image: result URL blocked by SSRF guard")
 )
 
 type ideogramImageRequest struct {
@@ -51,14 +51,14 @@ type ideogramImageRequest struct {
 func ideogramGuardURL(ctx context.Context, raw string) (context.Context, error) {
 	parsed, err := url.Parse(raw)
 	if err != nil {
-		return ctx, errors.New("Ideogram endpoint has an invalid URL")
+		return ctx, errors.New("ideogram endpoint has an invalid URL")
 	}
 	allowLocal := proxy.AllowPrivateProviderURLs() || proxy.IsPrivateNetworkingAllowed() || proxy.IsLoopbackAllowed(ctx)
 	if !allowLocal && parsed.Scheme != "https" {
-		return ctx, errors.New("Ideogram endpoint must use HTTPS")
+		return ctx, errors.New("ideogram endpoint must use HTTPS")
 	}
 	if err := proxy.AssertDispatchURLAllowed(raw, allowLocal); err != nil {
-		return ctx, errors.New("Ideogram endpoint blocked by SSRF guard")
+		return ctx, errors.New("ideogram endpoint blocked by SSRF guard")
 	}
 	if allowLocal {
 		ctx = proxy.WithAllowLoopback(ctx)
@@ -107,7 +107,7 @@ func (h *MediaHandler) handleIdeogramImage(w http.ResponseWriter, r *http.Reques
 		target = cfg.BaseURL
 	}
 	if target == "" {
-		return errors.New("Ideogram image endpoint is not configured")
+		return errors.New("ideogram image endpoint is not configured")
 	}
 	// Both configured endpoints pass the dispatch guard; only one is dialed.
 	if cfg.BaseURL != "" {
@@ -168,7 +168,7 @@ func (h *MediaHandler) handleIdeogramImage(w http.ResponseWriter, r *http.Reques
 		return fmt.Errorf("parse ideogram image response: %w", err)
 	}
 	if len(result.Data) == 0 || result.Data[0].URL == "" {
-		return errors.New("No images returned from Ideogram")
+		return errors.New("no images returned from Ideogram")
 	}
 	downloadCtx, cancel := context.WithTimeout(r.Context(), ideogramDownloadMaxAge)
 	defer cancel()

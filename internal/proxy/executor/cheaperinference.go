@@ -34,11 +34,11 @@ const cinfResponsesBase = "https://api.cheaperinference.com/v1/responses"
 // cinfResponsesModels mirrors the pinned per-model targetFormat:
 // "openai-responses" tags on the GPT-5.x family (registry index.ts).
 var cinfResponsesModels = map[string]bool{
-	"gpt-5.4":      true,
-	"gpt-5.4-mini": true,
-	"gpt-5.5":      true,
-	"gpt-5.6-luna": true,
-	"gpt-5.6-sol":  true,
+	"gpt-5.4":       true,
+	"gpt-5.4-mini":  true,
+	"gpt-5.5":       true,
+	"gpt-5.6-luna":  true,
+	"gpt-5.6-sol":   true,
 	"gpt-5.6-terra": true,
 }
 

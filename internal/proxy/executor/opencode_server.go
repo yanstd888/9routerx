@@ -81,7 +81,7 @@ func opencodeServerStream(ctx context.Context, w http.ResponseWriter, req *Reque
 	state := &opencodeServerStreamState{
 		req: req, writer: proxy.NewHeartbeatWriter(ctx, w, 0), id: "ocs-" + sessionID, model: model,
 	}
-	defer state.writer.Close()
+	defer func() { _ = state.writer.Close() }()
 	proxy.WriteSSEHeaders(state.writer)
 	if translator.IsResponsesClient(ctx) {
 		state.responses = &opencodeServerResponses{state: translator.InitResponsesState(model, true)}

@@ -65,10 +65,6 @@ func restoreMoonshotOriginal(ctx context.Context, prepared []byte) []byte {
 	return preserveMoonshotIntent([]byte(original.body), prepared, original.claude)
 }
 
-func preserveMoonshotClaudeIntent(original, prepared []byte) []byte {
-	return preserveMoonshotIntent(original, prepared, true)
-}
-
 func preserveMoonshotIntent(original, prepared []byte, claude bool) []byte {
 	var source, target map[string]any
 	if json.Unmarshal(original, &source) != nil || json.Unmarshal(prepared, &target) != nil {

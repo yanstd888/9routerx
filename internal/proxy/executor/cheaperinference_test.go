@@ -243,10 +243,10 @@ func TestForwardCheaperInferenceChunkedUploadReservation(t *testing.T) {
 			dispatchUploadHeader = r.Header.Get("X-CI-Payload-Upload")
 			raw, _ := io.ReadAll(r.Body)
 			dispatchBody = raw
-		w.Header().Set("Content-Type", "text/event-stream")
-		_, _ = w.Write([]byte("data: {\"type\":\"response.output_text.delta\",\"delta\":\"chunk-ok\"}\n\n"))
-		_, _ = w.Write([]byte("data: {\"type\":\"response.completed\",\"response\":{\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}}\n\n"))
-		_, _ = w.Write([]byte("data: [DONE]\n\n"))
+			w.Header().Set("Content-Type", "text/event-stream")
+			_, _ = w.Write([]byte("data: {\"type\":\"response.output_text.delta\",\"delta\":\"chunk-ok\"}\n\n"))
+			_, _ = w.Write([]byte("data: {\"type\":\"response.completed\",\"response\":{\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}}\n\n"))
+			_, _ = w.Write([]byte("data: [DONE]\n\n"))
 		default:
 			t.Errorf("unexpected request %s %s", r.Method, r.URL.Path)
 		}

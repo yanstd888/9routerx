@@ -28,7 +28,7 @@ func FetchDevinDesktopModels(ctx context.Context, client *http.Client, apiKey, b
 		ctx = context.Background()
 	}
 	if apiKey == "" {
-		return nil, errors.New("Devin Desktop API key is required")
+		return nil, errors.New("devin Desktop API key is required")
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -41,6 +41,7 @@ func FetchDevinDesktopModels(ctx context.Context, client *http.Client, apiKey, b
 	if err != nil {
 		return nil, err
 	}
+	defer func() { _ = resp.Body.Close() }()
 	payload, err := devinDesktopBounded(ctx, resp, devinDesktopFrameLimit)
 	if err != nil {
 		return nil, devinDesktopFailure(ctx, "model discovery", err)

@@ -71,7 +71,7 @@ func TestForwardClovaStudioNonStream(t *testing.T) {
 
 	req := &Request{
 		Ctx: context.Background(), APIKey: "clova-test-key", Client: server.Client(),
-		Body: []byte(`{"model":"HCX-DASH-002","messages":[{"role":"user","content":"hi"}]}`),
+		Body:   []byte(`{"model":"HCX-DASH-002","messages":[{"role":"user","content":"hi"}]}`),
 		Config: &providers.ProviderConfig{BaseURL: server.URL + "/v3/chat-completions", AuthHeader: "Authorization", AuthScheme: "bearer"},
 	}
 	rec := httptest.NewRecorder()

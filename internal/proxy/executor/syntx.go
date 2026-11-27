@@ -78,7 +78,7 @@ func ForwardSyntx(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "SYNTX stream request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		return proxy.UpstreamFailure(response.StatusCode, "SYNTX stream failed")
 	}

@@ -19,28 +19,28 @@ const (
 // with more than one transport declare it; everything else routes on the
 // transport its base URL already names.
 var ProviderModelFormats = map[string]map[string]ModelFormats{
-	"poe": poeModelFormats,
+	"poe":              poeModelFormats,
 	"commandcode-goat": commandcodeGoatModelFormats,
 	"cmc-goat":         commandcodeGoatModelFormats,
-	"command-code": commandCodeModelFormats,
-	"cmd":          commandCodeModelFormats,
-	"moonshot": moonshotModelFormats,
-	"ghe-copilot": gheCopilotFormats,
-	"muse":         museModelFormats,
-	"kimi":         kimiModelFormats,
-	"kimi-coding":  kimiModelFormats,
-	"ocz":          openCodeZenModelFormats,
-	"opencode-zen": openCodeZenModelFormats,
-	"ocg":          openCodeGoModelFormats,
-	"opencode-go":  openCodeGoModelFormats,
+	"command-code":     commandCodeModelFormats,
+	"cmd":              commandCodeModelFormats,
+	"moonshot":         moonshotModelFormats,
+	"ghe-copilot":      gheCopilotFormats,
+	"muse":             museModelFormats,
+	"kimi":             kimiModelFormats,
+	"kimi-coding":      kimiModelFormats,
+	"ocz":              openCodeZenModelFormats,
+	"opencode-zen":     openCodeZenModelFormats,
+	"ocg":              openCodeGoModelFormats,
+	"opencode-go":      openCodeGoModelFormats,
 }
 
 var commandCodeModelFormats = map[string]ModelFormats{
-	"claude-opus-4-7": openCodeZenFormats(FormatClaude, FormatClaude),
-	"claude-fable-5": openCodeZenFormats(FormatClaude, FormatClaude),
-	"claude-opus-4-6": openCodeZenFormats(FormatClaude, FormatClaude),
-	"claude-sonnet-5-5": openCodeZenFormats(FormatClaude, FormatClaude),
-	"claude-sonnet-4-6": openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-opus-4-7":           openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-fable-5":            openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-opus-4-6":           openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-sonnet-5-5":         openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-sonnet-4-6":         openCodeZenFormats(FormatClaude, FormatClaude),
 	"claude-haiku-4-5-20251001": openCodeZenFormats(FormatClaude, FormatClaude),
 }
 

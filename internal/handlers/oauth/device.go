@@ -303,7 +303,7 @@ func workbuddyStart(ctx context.Context) (map[string]any, error) {
 		"https://www.workbuddy.ai/v2/plugin/auth/state?platform=CLI",
 		map[string]string{"platform": "CLI"}, headers)
 	if err != nil || status != http.StatusOK {
-		return nil, fmt.Errorf("WorkBuddy state request failed: %v status=%d", err, status)
+		return nil, fmt.Errorf("WorkBuddy state request failed: %w status=%d", err, status)
 	}
 	inner, _ := data["data"].(map[string]any)
 	state, authURL := strVal(inner, "state"), strVal(inner, "authUrl")
@@ -330,7 +330,7 @@ func workbuddyStart(ctx context.Context) (map[string]any, error) {
 func megabrainStart(ctx context.Context) (map[string]any, error) {
 	data, status, err := postJSON(ctx, "https://api.getmegabrain.com/api/device-auth/codes", map[string]string{}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("device auth initiation failed: %v", err)
+		return nil, fmt.Errorf("device auth initiation failed: %w", err)
 	}
 	if status == http.StatusTooManyRequests {
 		return nil, fmt.Errorf("too many pending authorization requests, try again later")
@@ -795,9 +795,9 @@ func megabrainPoll(ctx context.Context, code string) (deviceTokens, error) {
 	req.Header.Set("Accept", "application/json")
 	resp, err := deviceClient.Do(req)
 	if err != nil {
-		return t, fmt.Errorf("poll_failed: %v", err)
+		return t, fmt.Errorf("poll_failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	switch resp.StatusCode {
 	case 202:
 		return t, fmt.Errorf("authorization_pending")
@@ -830,9 +830,9 @@ func workbuddyPoll(ctx context.Context, state string) (deviceTokens, error) {
 	req.Header.Set("X-Product", "SaaS")
 	resp, err := deviceClient.Do(req)
 	if err != nil {
-		return t, fmt.Errorf("poll_failed: %v", err)
+		return t, fmt.Errorf("poll_failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	out, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
 	var data struct {
 		Code float64 `json:"code"`

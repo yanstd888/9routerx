@@ -66,7 +66,7 @@ func (h *DashboardHandler) handleGHEModels(w http.ResponseWriter, r *http.Reques
 		handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		handlerutil.WriteJSONError(w, resp.StatusCode, fmt.Sprintf("GHE model catalog returned HTTP %d", resp.StatusCode))
 		return

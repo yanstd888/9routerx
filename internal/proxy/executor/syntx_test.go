@@ -46,10 +46,10 @@ func TestForwardSyntx(t *testing.T) {
 	defer server.Close()
 
 	req := &Request{
-		Ctx:     proxy.WithAllowLoopback(context.Background()),
-		Client:  server.Client(),
-		APIKey:  "Bearer syntx-token",
-		Body:    []byte(`{"model":"syntx/claude-fable-5-1","messages":[{"role":"user","content":"hi"}]}`),
+		Ctx:    proxy.WithAllowLoopback(context.Background()),
+		Client: server.Client(),
+		APIKey: "Bearer syntx-token",
+		Body:   []byte(`{"model":"syntx/claude-fable-5-1","messages":[{"role":"user","content":"hi"}]}`),
 		Config: &providers.ProviderConfig{BaseURL: server.URL, AuthHeader: "Authorization", AuthScheme: "bearer"},
 	}
 	rec := httptest.NewRecorder()

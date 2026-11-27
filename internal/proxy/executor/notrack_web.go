@@ -70,13 +70,13 @@ func ForwardNotrackWeb(w http.ResponseWriter, req *Request) error {
 	response, err := proxy.DoRequest(ctx, client, http.MethodPost, base+"/api/dispatch", map[string]string{
 		"content-type": "application/json", "accept": "*/*",
 		"accept-language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-		"origin": notrackDefaultBaseURL, "referer": notrackDefaultBaseURL + "/zh-CN/chat",
+		"origin":          notrackDefaultBaseURL, "referer": notrackDefaultBaseURL + "/zh-CN/chat",
 		"user-agent": notrackUserAgent, "cookie": cookie,
 	}, payload)
 	if err != nil {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "NoTrack request failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		return proxy.UpstreamFailure(notrackStatus(response.StatusCode), notrackErrorText(response.StatusCode))
 	}

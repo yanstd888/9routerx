@@ -46,7 +46,7 @@ func TestProviderBatchClaudeWireFormat(t *testing.T) {
 			if err := h.tryForwardWithConnection(forwardRequestParams{
 				Ctx: t.Context(), W: rec, Provider: provider, Model: "fixture-model",
 				ConnData: &ConnectionData{APIKey: "fixture-key", BaseURL: server.URL + "/v1/messages"},
-				Body: []byte(`{"model":"fixture-model","messages":[{"role":"system","content":"fixture-system"},{"role":"user","content":"hello"}],"max_tokens":20}`),
+				Body:     []byte(`{"model":"fixture-model","messages":[{"role":"system","content":"fixture-system"},{"role":"user","content":"hello"}],"max_tokens":20}`),
 				Endpoint: "/v1/chat/completions",
 			}); err != nil {
 				t.Fatal(err)
@@ -84,7 +84,7 @@ func TestProviderBatchLocalOptionalKey(t *testing.T) {
 			if err := h.tryForwardWithConnection(forwardRequestParams{
 				Ctx: t.Context(), W: rec, Provider: "lm-studio", Model: "fixture-model",
 				ConnData: &ConnectionData{APIKey: key, BaseURL: server.URL + "/v1/chat/completions"},
-				Body: []byte(`{"model":"fixture-model","messages":[{"role":"user","content":"hello"}]}`), Endpoint: "/v1/chat/completions",
+				Body:     []byte(`{"model":"fixture-model","messages":[{"role":"user","content":"hello"}]}`), Endpoint: "/v1/chat/completions",
 			}); err != nil {
 				t.Fatal(err)
 			}

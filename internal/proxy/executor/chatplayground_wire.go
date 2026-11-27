@@ -53,7 +53,7 @@ func chatplaygroundToken(ctx context.Context, req *Request) (string, error) {
 	}
 	sid := chatplaygroundSID(session)
 	if sid == "" || clientCookie == "" {
-		return "", fmt.Errorf("Clerk cookie export missing __client or session id")
+		return "", fmt.Errorf("clerk cookie export missing __client or session id")
 	}
 	chatplaygroundJWTMu.Lock()
 	if cached, ok := chatplaygroundJWTs[sid]; ok && time.Until(cached.expiry) > 15*time.Second {
@@ -88,18 +88,18 @@ func chatplaygroundToken(ctx context.Context, req *Request) (string, error) {
 	}
 	response, err := client.Do(httpReq)
 	if err != nil {
-		return "", fmt.Errorf("Clerk token mint failed")
+		return "", fmt.Errorf("clerk token mint failed")
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	body, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil || response.StatusCode < 200 || response.StatusCode >= 300 {
-		return "", fmt.Errorf("Clerk token mint failed")
+		return "", fmt.Errorf("clerk token mint failed")
 	}
 	var parsed struct {
 		JWT string `json:"jwt"`
 	}
 	if json.Unmarshal(body, &parsed) != nil || parsed.JWT == "" {
-		return "", fmt.Errorf("Clerk token mint returned no jwt")
+		return "", fmt.Errorf("clerk token mint returned no jwt")
 	}
 	expiry := chatplaygroundJWTExpiry(parsed.JWT)
 	chatplaygroundJWTMu.Lock()

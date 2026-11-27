@@ -63,7 +63,7 @@ func ForwardGHECopilot(w http.ResponseWriter, req *Request) error {
 	if err != nil {
 		return fmt.Errorf("GHE inference: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
 		return proxy.UpstreamFailure(http.StatusBadGateway, "GHE inference redirects are not allowed")
 	}
@@ -84,7 +84,7 @@ func ForwardGHECopilot(w http.ResponseWriter, req *Request) error {
 		copy.StartTime = time.Now()
 	}
 	stream := proxy.NewStallReaderWithContext(copy.Ctx, resp.Body, cfg.ResolveStallTimeout(proxy.ResolveDefaultStallTimeout()), "ghe-copilot")
-	defer stream.Close()
+	defer func() { _ = stream.Close() }()
 	_, replay, err := proxy.PeekFirstStreamEvent(copy.Ctx, stream, 0)
 	if err != nil {
 		return err

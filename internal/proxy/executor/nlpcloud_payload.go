@@ -12,13 +12,13 @@ type nlpcloudHistory struct {
 }
 
 type nlpcloudPayloadBody struct {
-	Input       string             `json:"input"`
-	Context     string             `json:"context,omitempty"`
-	History     []nlpcloudHistory  `json:"history,omitempty"`
-	Stream      bool               `json:"stream,omitempty"`
-	Temperature *float64           `json:"temperature,omitempty"`
-	TopP        *float64           `json:"top_p,omitempty"`
-	Model       string             `json:"model"`
+	Input       string            `json:"input"`
+	Context     string            `json:"context,omitempty"`
+	History     []nlpcloudHistory `json:"history,omitempty"`
+	Stream      bool              `json:"stream,omitempty"`
+	Temperature *float64          `json:"temperature,omitempty"`
+	TopP        *float64          `json:"top_p,omitempty"`
+	Model       string            `json:"model"`
 }
 
 func nlpcloudPayload(body []byte, model string, stream bool) ([]byte, error) {
