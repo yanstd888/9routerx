@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket", "tokenreply"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -385,6 +385,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if len(ProviderModels["tokenmarket"]) != 0 {
 		t.Errorf("tokenmarket catalog = %d models, want a passthrough-only catalog", len(ProviderModels["tokenmarket"]))
+	}
+	trpMeta := ProviderRegistry["tokenreply"]
+	if trpMeta.Name != "TokenReply" || trpMeta.Alias != "tokenreply" || trpMeta.Icon != "router" || trpMeta.Color != "#3B82F6" || trpMeta.Website != "https://www.tokenreply.com" {
+		t.Errorf("tokenreply metadata = %+v", trpMeta)
+	}
+	trpCfg := KnownProviders["tokenreply"]
+	if trpCfg.BaseURL != "https://api.tokenreply.com/v1/chat/completions" || trpCfg.AuthHeader != "Authorization" || trpCfg.AuthScheme != "bearer" {
+		t.Errorf("tokenreply config = %+v", trpCfg)
+	}
+	if len(ProviderModels["tokenreply"]) != 0 {
+		t.Errorf("tokenreply catalog = %d models, want a passthrough-only catalog", len(ProviderModels["tokenreply"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

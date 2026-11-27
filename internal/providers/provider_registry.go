@@ -2389,6 +2389,26 @@ var ProviderRegistry = map[string]ProviderMeta{
 		PassthroughModels: true,
 		ModelsFetcher: &Fetcher{URL: "https://api.tokensmarket.ai/v1/models", Type: "openai"},
 	},
+	"tokenreply": {
+		// TokenReply (OmniRoute apikey metadata, pinned 632d84f5):
+		// OpenAI-compatible Bearer aggregator over api.tokenreply.com with a
+		// passthrough catalog — no pinned static models; the live /v1/models
+		// endpoint feeds the list. Verified live 2026-11-27: the catalog
+		// answers with a structured "Token not provided" error before a key.
+		ID:           "tokenreply",
+		Name:         "TokenReply",
+		Alias:        "tokenreply",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#3B82F6",
+		Icon:         "router",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://www.tokenreply.com",
+		AuthHint:     "Paste your TokenReply API key as a Bearer token.",
+		Notice:       &Notice{Text: "TokenReply is a fully OpenAI-compatible aggregator over api.tokenreply.com; the model list comes from the live /v1/models catalog, which requires the key. Free-tagged models carry model- and campaign-specific daily limits; no fixed global free quota is published.", APIKeyURL: "https://www.tokenreply.com"},
+		PassthroughModels: true,
+		ModelsFetcher: &Fetcher{URL: "https://api.tokenreply.com/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",
