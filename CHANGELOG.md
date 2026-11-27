@@ -14,6 +14,12 @@ Release history up to the fork point is archived in the upstream repo's
   the pending-fragment splice now lands under this Unreleased heading instead
   of above the file title.
 
+## [v1.5.63] - 2026-11-27
+
+### Fixed
+- **CodeBuddy token refresh** — CN and International use their site-specific JSON refresh API headers and endpoints; successful device authorization persists token expiry.
+- **OpenCode Free overload handling** — retry overload responses with bounded backoff while preserving usage-limit rotation; retire a newly rotated stable session if upstream rejects it too.
+
 ## [v1.5.6] - 2026-11-21
 
 ### Added
