@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -257,6 +257,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("cpl"); got != "chatplayground" {
 		t.Errorf("cpl resolved to %q", got)
+	}
+	syntxMeta := ProviderRegistry["syntx"]
+	if syntxMeta.Name != "SYNTX.ai (Unofficial/Experimental)" || syntxMeta.Alias != "stx" || syntxMeta.Icon != "auto_awesome" || syntxMeta.Color != "#FF4D00" || syntxMeta.Website != "https://syntx.ai" {
+		t.Errorf("syntx metadata = %+v", syntxMeta)
+	}
+	syntxCfg := KnownProviders["syntx"]
+	if syntxCfg.BaseURL != "https://api.syntx.ai" || syntxCfg.AuthScheme != "bearer" || syntxCfg.Format != FormatOpenAI {
+		t.Errorf("syntx config = %+v", syntxCfg)
+	}
+	if len(ProviderModels["syntx"]) != len(syntxModelsForTest()) || len(ProviderModels["stx"]) != len(syntxModelsForTest()) {
+		t.Errorf("syntx catalog = %d/%d models", len(ProviderModels["syntx"]), len(ProviderModels["stx"]))
+	}
+	if got := ResolveAlias("stx"); got != "syntx" {
+		t.Errorf("stx resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

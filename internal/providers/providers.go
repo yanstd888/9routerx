@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"syntx": {
+		BaseURL:    "https://api.syntx.ai",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"chatplayground": {
 		BaseURL:    "https://app.chatplayground.ai/api/chat",
 		AuthHeader: "Authorization",

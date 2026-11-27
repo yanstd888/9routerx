@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "syntx": "stx",
   "chatplayground": "cpl",
   "notrack-web": "ntw",
   "keenable": "keenable",
@@ -9469,6 +9470,206 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "stx": [
+  {
+    "id": "claude-fable-5-1",
+    "name": "claude-fable-5-1",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-haiku-4-5-20251001",
+    "name": "claude-haiku-4-5-20251001",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-opus-5",
+    "name": "claude-opus-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-fable-5",
+    "name": "claude-fable-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-opus-4-6",
+    "name": "claude-opus-4-6",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-opus-4-7",
+    "name": "claude-opus-4-7",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.4-mini",
+    "name": "gpt-5.4-mini",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.5",
+    "name": "gpt-5.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-sol",
+    "name": "gpt-5.6-sol",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-luna",
+    "name": "gpt-5.6-luna",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-terra",
+    "name": "gpt-5.6-terra",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-oss-120b",
+    "name": "gpt-oss-120b",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gemini-3.7-flash",
+    "name": "gemini-3.7-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gemini-3.8-flash",
+    "name": "gemini-3.8-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "kimi-k2.6",
+    "name": "kimi-k2.6",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "kimi-k2.7-code",
+    "name": "kimi-k2.7-code",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek-v4-pro",
+    "name": "deepseek-v4-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek-v4-flash",
+    "name": "deepseek-v4-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "mimo-v2.5-pro",
+    "name": "mimo-v2.5-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "mimo-v2.5",
+    "name": "mimo-v2.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "minimax-m3",
+    "name": "minimax-m3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.8-max",
+    "name": "qwen3.8-max",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.7-plus",
+    "name": "qwen3.7-plus",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.6-plus",
+    "name": "qwen3.6-plus",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "glm-5.2",
+    "name": "glm-5.2",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "glm-5.3",
+    "name": "glm-5.3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "glm-5.3-flash",
+    "name": "glm-5.3-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "grok-4.6",
+    "name": "grok-4.6",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "grok-4.7",
+    "name": "grok-4.7",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar-reasoning-pro",
+    "name": "perplexity-sonar-reasoning-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar-pro",
+    "name": "perplexity-sonar-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar",
+    "name": "perplexity-sonar",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "command-a",
+    "name": "command-a",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
   ],
   "cpl": [
   {
