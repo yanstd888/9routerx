@@ -2046,6 +2046,15 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme: "bearer",
 		StaticHeaders: map[string]string{"User-Agent": "OpenClaude/1.0 (linux; x86_64)", "X-Title": "OpenClaude CLI", "HTTP-Referer": "https://github.com/Gitlawb/openclaude"},
 	},
+	// Cheaper Inference: dual-surface gateway (OmniRoute pin 632d84f5). The
+	// executor swaps this base for /v1/responses on the six GPT-5.x models
+	// tagged openai-responses and runs the CI payload transport (gzip /
+	// chunked reservation) on both surfaces.
+	"cheaperinference": {
+		BaseURL:    "https://api.cheaperinference.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,

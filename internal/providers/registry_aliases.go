@@ -41,6 +41,7 @@ var RegistryAliases = map[string]string{
 	"friendliai":            "friendli",
 	"token-kiosk":           "tk",
 	"gitlawb-gmi":           "glb-gmi",
+	"cheaperinference":      "cinf",
 	"tencent-aistudio-web": "tasw",
 	"haiper":            "hp",
 	"clova-studio":      "clova",

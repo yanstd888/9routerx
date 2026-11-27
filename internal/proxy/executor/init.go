@@ -30,6 +30,7 @@ func RegisterAll() {
 	Register("tokenreply", func() Executor { return ForwardOpenAI })
 	Register("unifically", func() Executor { return ForwardOpenAI })
 	Register("gitlawb-gmi", func() Executor { return ForwardOpenAI })
+	Register("cheaperinference", func() Executor { return ForwardCheaperInference })
 	Register("deepseek", func() Executor { return ForwardOpenAI })
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })

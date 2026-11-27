@@ -292,6 +292,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "tokenreply": "tokenreply",
   "unifically": "unifically",
   "gitlawb-gmi": "glb-gmi",
+  "cheaperinference": "cinf",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10216,6 +10217,242 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
   "tokenmarket": [],
   "tokenreply": [],
   "unifically": [],
+  "cinf": [
+    {
+      "id": "aion-labs.aion-2-0",
+      "name": "Aion 2.0",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-fable-5",
+      "name": "Claude Fable 5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-haiku-4.5",
+      "name": "Claude Haiku 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4-7-fast",
+      "name": "Claude Opus 4.7 Fast",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4-8-fast",
+      "name": "Claude Opus 4.8 Fast",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4.5",
+      "name": "Claude Opus 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4.6",
+      "name": "Claude Opus 4.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4.7",
+      "name": "Claude Opus 4.7",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-4.8",
+      "name": "Claude Opus 4.8",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-5",
+      "name": "Claude Opus 5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-opus-5-fast",
+      "name": "Claude Opus 5 Fast",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-sonnet-4.5",
+      "name": "Claude Sonnet 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-sonnet-4.6",
+      "name": "Claude Sonnet 4.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-sonnet-5",
+      "name": "Claude Sonnet 5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-v4-flash",
+      "name": "DeepSeek V4 Flash",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "name": "DeepSeek V4 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-2.5-flash",
+      "name": "Gemini 2.5 Flash",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-3.7-flash",
+      "name": "Gemini 3.7 Flash",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-3-flash-preview",
+      "name": "Gemini 3 Flash Preview",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-3.1-flash-lite",
+      "name": "Gemini 3.1 Flash Lite",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-3.1-pro",
+      "name": "Gemini 3.1 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gemini-3.1-pro-preview",
+      "name": "Gemini 3.1 Pro Preview",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-4.5",
+      "name": "GLM-4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-4.5-air",
+      "name": "GLM-4.5 Air",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-4.6",
+      "name": "GLM-4.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-4.7",
+      "name": "GLM-4.7",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-5",
+      "name": "GLM-5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-5.1",
+      "name": "GLM-5.1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "glm-5.2",
+      "name": "GLM-5.2",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "google/gemini-3.5-flash-lite",
+      "name": "Gemini 3.5 Flash Lite",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.4",
+      "name": "GPT-5.4",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.4-mini",
+      "name": "GPT-5.4 Mini",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.5",
+      "name": "GPT-5.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.6-luna",
+      "name": "GPT-5.6 Luna",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "name": "GPT-5.6 Sol",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "gpt-5.6-terra",
+      "name": "GPT-5.6 Terra",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "grok-4.5",
+      "name": "Grok 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "kimi-k3",
+      "name": "Kimi K3",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "minimax-m2.7",
+      "name": "MiniMax M2.7",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
   "glb-gmi": [
     {
       "id": "XiaomiMiMo/MiMo-V2.5-Pro",

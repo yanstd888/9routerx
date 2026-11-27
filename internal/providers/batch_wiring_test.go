@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket", "tokenreply", "unifically", "gitlawb-gmi"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket", "tokenreply", "unifically", "gitlawb-gmi", "cheaperinference"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -421,6 +421,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("glb-gmi"); got != "gitlawb-gmi" {
 		t.Errorf("glb-gmi resolved to %q", got)
+	}
+	cinfMeta := ProviderRegistry["cheaperinference"]
+	if cinfMeta.Name != "Cheaper Inference" || cinfMeta.Alias != "cinf" || cinfMeta.Icon != "savings" || cinfMeta.Color != "#31F889" || cinfMeta.Website != "https://cheaperinference.com" {
+		t.Errorf("cheaperinference metadata = %+v", cinfMeta)
+	}
+	cinfCfg := KnownProviders["cheaperinference"]
+	if cinfCfg.BaseURL != "https://api.cheaperinference.com/v1/chat/completions" || cinfCfg.AuthHeader != "Authorization" || cinfCfg.AuthScheme != "bearer" {
+		t.Errorf("cheaperinference config = %+v", cinfCfg)
+	}
+	if len(ProviderModels["cheaperinference"]) != 39 || len(ProviderModels["cinf"]) != 39 {
+		t.Errorf("cheaperinference catalog = %d/%d models, want 39/39", len(ProviderModels["cheaperinference"]), len(ProviderModels["cinf"]))
+	}
+	if got := ResolveAlias("cinf"); got != "cheaperinference" {
+		t.Errorf("cinf resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

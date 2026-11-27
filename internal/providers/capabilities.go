@@ -825,6 +825,52 @@ var providerCapabilities = map[string]map[string]Capabilities{
 	"uncloseai": {
 		"Qwen3.8-27B-exl3": {ContextWindow: 65536},
 	},
+	// Cheaper Inference (OmniRoute pin 632d84f5, catalog captured live
+	// 2026-07-31): supportsVision/supportsReasoning mirror each entry's
+	// capabilities object verbatim — 27 of the 39 models carry vision, all 39
+	// reason and take tools. No thinking format is pinned, so reasoning rides
+	// the default lane shape.
+	"cheaperinference": {
+		"aion-labs.aion-2-0":            {Reasoning: true, Tools: true},
+		"claude-fable-5":                {Vision: true, Reasoning: true, Tools: true},
+		"claude-haiku-4.5":              {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4-7-fast":          {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4-8-fast":          {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.5":               {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.6":               {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.7":               {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.8":               {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-5":                 {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-5-fast":            {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-4.5":             {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-4.6":             {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-5":               {Vision: true, Reasoning: true, Tools: true},
+		"deepseek-v4-flash":             {Reasoning: true, Tools: true},
+		"deepseek-v4-pro":               {Reasoning: true, Tools: true},
+		"gemini-2.5-flash":              {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.7-flash":              {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3-flash-preview":        {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-flash-lite":         {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-pro":                {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-pro-preview":        {Reasoning: true, Tools: true},
+		"glm-4.5":                       {Reasoning: true, Tools: true},
+		"glm-4.5-air":                   {Reasoning: true, Tools: true},
+		"glm-4.6":                       {Reasoning: true, Tools: true},
+		"glm-4.7":                       {Reasoning: true, Tools: true},
+		"glm-5":                         {Reasoning: true, Tools: true},
+		"glm-5.1":                       {Reasoning: true, Tools: true},
+		"glm-5.2":                       {Reasoning: true, Tools: true},
+		"gemini-3.5-flash-lite":         {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.4":                       {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.4-mini":                  {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.5":                       {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-luna":                  {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-sol":                   {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-terra":                 {Vision: true, Reasoning: true, Tools: true},
+		"grok-4.5":                      {Vision: true, Reasoning: true, Tools: true},
+		"kimi-k3":                       {Vision: true, Reasoning: true, Tools: true},
+		"minimax-m2.7":                  {Reasoning: true, Tools: true},
+	},
 }
 
 func init() {

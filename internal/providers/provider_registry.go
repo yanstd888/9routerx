@@ -2452,6 +2452,31 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Notice:       &Notice{Text: "Gitlawb Opengateway's GMI Cloud lane is a fully OpenAI-compatible gateway; chat is served at /v1/gmi-cloud/chat/completions and unknown model ids are passed through unvalidated. Model availability follows GMI Cloud credit.", APIKeyURL: "https://opengateway.gitlawb.com"},
 		PassthroughModels: true,
 	},
+	"cheaperinference": {
+		// Cheaper Inference (OmniRoute apikey metadata, pinned 632d84f5):
+		// cost-ranked OpenAI-compatible gateway. The catalog was captured
+		// live upstream (GET /v1/models 2026-07-31): 39 text models here plus
+		// 3 image models living in the image registry — sending an image
+		// model id to this lane answers 400 "Use POST /v1/images/generations".
+		// supportsVision/supportsReasoning mirror each entry's capabilities
+		// verbatim (27 vision, 39 reasoning). Six GPT-5.x models are tagged
+		// openai-responses and ride the stateless /v1/responses endpoint
+		// (store:false required — see the executor), while everything else
+		// uses chat completions; the payload transport gzips bodies >=32KiB
+		// and chunk-uploads wire bodies over 4MiB (verified upstream).
+		ID:           "cheaperinference",
+		Name:         "Cheaper Inference",
+		Alias:        "cinf",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#31F889",
+		Icon:         "savings",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://cheaperinference.com",
+		AuthHint:     "Paste your Cheaper Inference API key from cheaperinference.com as a Bearer token.",
+		Notice:       &Notice{Text: "Cheaper Inference serves chat at /v1/chat/completions and a stateless /v1/responses endpoint (six GPT-5.x models, store:false enforced). Inline audio rides only gemini-3.7-flash; no model has a verified pdf/video transport, and those requests are refused before dispatch. Large prompts are gzipped, and wire bodies over 4MiB go through the chunked payload-upload protocol (20MiB ceiling). Image models live on /v1/images/generations, not this lane.", APIKeyURL: "https://cheaperinference.com"},
+		ModelsFetcher: &Fetcher{URL: "https://api.cheaperinference.com/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",
