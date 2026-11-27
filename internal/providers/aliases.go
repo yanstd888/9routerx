@@ -55,6 +55,7 @@ var ProviderAliasMap = map[string]string{
 	"unc":            "uncloseai",
 	"friendli":       "friendliai",
 	"tk":             "token-kiosk",
+	"glb-gmi":        "gitlawb-gmi",
 	"hp":             "haiper",
 	"nlpc":           "nlpcloud",
 	"cmc-goat":       "commandcode-goat",

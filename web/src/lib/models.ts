@@ -291,6 +291,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "tokenmarket": "tokenmarket",
   "tokenreply": "tokenreply",
   "unifically": "unifically",
+  "gitlawb-gmi": "glb-gmi",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10215,6 +10216,248 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
   "tokenmarket": [],
   "tokenreply": [],
   "unifically": [],
+  "glb-gmi": [
+    {
+      "id": "XiaomiMiMo/MiMo-V2.5-Pro",
+      "name": "MiMo-V2.5-Pro (GMI)",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "XiaomiMiMo/MiMo-V2.5",
+      "name": "MiMo-V2.5 (GMI)",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.5",
+      "name": "GPT-5.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.4-pro",
+      "name": "GPT-5.4 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.4",
+      "name": "GPT-5.4",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.4-mini",
+      "name": "GPT-5.4 Mini",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.4-nano",
+      "name": "GPT-5.4 Nano",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.3-codex",
+      "name": "GPT-5.3 Codex",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.2-codex",
+      "name": "GPT-5.2 Codex",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.2",
+      "name": "GPT-5.2",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5.1",
+      "name": "GPT-5.1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-5",
+      "name": "GPT-5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-4o",
+      "name": "GPT-4o",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "openai/gpt-4o-mini",
+      "name": "GPT-4o Mini",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-opus-4.7",
+      "name": "Claude Opus 4.7",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-opus-4.6",
+      "name": "Claude Opus 4.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-opus-4.5",
+      "name": "Claude Opus 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-opus-4.1",
+      "name": "Claude Opus 4.1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-sonnet-4.6",
+      "name": "Claude Sonnet 4.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-sonnet-4.5",
+      "name": "Claude Sonnet 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-sonnet-4",
+      "name": "Claude Sonnet 4",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "anthropic/claude-haiku-4.5",
+      "name": "Claude Haiku 4.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4-Pro",
+      "name": "DeepSeek V4 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4-Flash",
+      "name": "DeepSeek V4 Flash",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-R1-0528",
+      "name": "DeepSeek R1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V3.2",
+      "name": "DeepSeek V3.2",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "google/gemini-3.1-pro-preview",
+      "name": "Gemini 3.1 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "google/gemini-3.1-flash-lite-preview",
+      "name": "Gemini 3.1 Flash Lite",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "google/gemini-3-flash-preview",
+      "name": "Gemini 3 Flash",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "zai-org/GLM-5.1-FP8",
+      "name": "GLM-5.1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "zai-org/GLM-5-FP8",
+      "name": "GLM-5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "moonshotai/Kimi-K2.6",
+      "name": "Kimi K2.6",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "moonshotai/Kimi-K2.5",
+      "name": "Kimi K2.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "MiniMaxAI/MiniMax-M2.7",
+      "name": "MiniMax M2.7",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "MiniMaxAI/MiniMax-M2.5",
+      "name": "MiniMax M2.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "Qwen/Qwen3.6-Max-Preview",
+      "name": "Qwen3.6 Max",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "Qwen/Qwen3.6-Plus",
+      "name": "Qwen3.6 Plus",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "Qwen/Qwen3.5-397B-A17B",
+      "name": "Qwen3.5 397B",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8",
+      "name": "Qwen3 Coder 480B",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "nvidia/NVIDIA-Nemotron-3-Nano-Omni",
+      "name": "Nemotron 3 Nano",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
   "keenable": [],
   "1min": [
     {

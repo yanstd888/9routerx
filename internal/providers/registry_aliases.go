@@ -40,6 +40,7 @@ var RegistryAliases = map[string]string{
 	"uncloseai":             "unc",
 	"friendliai":            "friendli",
 	"token-kiosk":           "tk",
+	"gitlawb-gmi":           "glb-gmi",
 	"tencent-aistudio-web": "tasw",
 	"haiper":            "hp",
 	"clova-studio":      "clova",

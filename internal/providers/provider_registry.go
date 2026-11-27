@@ -2430,6 +2430,28 @@ var ProviderRegistry = map[string]ProviderMeta{
 		PassthroughModels: true,
 		ModelsFetcher: &Fetcher{URL: "https://api.unifically.com/v1/models?category=llm", Type: "openai"},
 	},
+	"gitlawb-gmi": {
+		// Gitlawb Opengateway GMI Cloud lane (OmniRoute apikey metadata,
+		// pinned 632d84f5): Bearer OpenAI-compatible gateway carrying the
+		// OpenClaude identification headers, passthrough catalog with 40
+		// pinned models and per-model limits. Verified live 2026-11-28: the
+		// lane serves chat at /v1/gmi-cloud/chat/completions (the bare lane
+		// prefix answers "Not found. Use POST /v1/chat/completions.", and
+		// the suffixed route reaches authentication, answering "Invalid API
+		// key" for a test credential).
+		ID:           "gitlawb-gmi",
+		Name:         "Gitlawb Opengateway (GMI Cloud)",
+		Alias:        "glb-gmi",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#10B981",
+		Icon:         "hub",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://opengateway.gitlawb.com",
+		AuthHint:     "Use your Gitlawb Opengateway API key in Authorization: Bearer <key>. The free Nemotron promo ended 2026-06 — the GMI Cloud route is now pay-as-you-go credit only.",
+		Notice:       &Notice{Text: "Gitlawb Opengateway's GMI Cloud lane is a fully OpenAI-compatible gateway; chat is served at /v1/gmi-cloud/chat/completions and unknown model ids are passed through unvalidated. Model availability follows GMI Cloud credit.", APIKeyURL: "https://opengateway.gitlawb.com"},
+		PassthroughModels: true,
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

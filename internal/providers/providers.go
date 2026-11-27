@@ -2037,6 +2037,15 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	// Gitlawb GMI Cloud: passthrough gateway (OmniRoute pin 632d84f5). The
+	// chat route was verified live 2026-11-28: the bare lane prefix answers
+	// "Not found", the /chat/completions suffix reaches authentication.
+	"gitlawb-gmi": {
+		BaseURL:    "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		StaticHeaders: map[string]string{"User-Agent": "OpenClaude/1.0 (linux; x86_64)", "X-Title": "OpenClaude CLI", "HTTP-Referer": "https://github.com/Gitlawb/openclaude"},
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,
