@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket", "tokenreply"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket", "tokenreply", "unifically"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -396,6 +396,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if len(ProviderModels["tokenreply"]) != 0 {
 		t.Errorf("tokenreply catalog = %d models, want a passthrough-only catalog", len(ProviderModels["tokenreply"]))
+	}
+	unfMeta := ProviderRegistry["unifically"]
+	if unfMeta.Name != "Unifically" || unfMeta.Alias != "unifically" || unfMeta.Icon != "hub" || unfMeta.Color != "#10B981" || unfMeta.Website != "https://unifically.com" {
+		t.Errorf("unifically metadata = %+v", unfMeta)
+	}
+	unfCfg := KnownProviders["unifically"]
+	if unfCfg.BaseURL != "https://api.unifically.com/v1/chat/completions" || unfCfg.AuthHeader != "Authorization" || unfCfg.AuthScheme != "bearer" {
+		t.Errorf("unifically config = %+v", unfCfg)
+	}
+	if len(ProviderModels["unifically"]) != 0 {
+		t.Errorf("unifically catalog = %d models, want a passthrough-only catalog", len(ProviderModels["unifically"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

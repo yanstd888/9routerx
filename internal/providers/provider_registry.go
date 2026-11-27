@@ -2409,6 +2409,27 @@ var ProviderRegistry = map[string]ProviderMeta{
 		PassthroughModels: true,
 		ModelsFetcher: &Fetcher{URL: "https://api.tokenreply.com/v1/models", Type: "openai"},
 	},
+	"unifically": {
+		// Unifically (OmniRoute apikey metadata, pinned 632d84f5):
+		// OpenAI-compatible Bearer aggregator over api.unifically.com with a
+		// passthrough catalog — no pinned static models; the live
+		// /v1/models?category=llm endpoint feeds the list. Verified live
+		// 2026-11-27: the catalog answers with a structured
+		// "API key is required" error before a key.
+		ID:           "unifically",
+		Name:         "Unifically",
+		Alias:        "unifically",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#10B981",
+		Icon:         "hub",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://unifically.com",
+		AuthHint:     "Paste your Unifically API key as a Bearer token.",
+		Notice:       &Notice{Text: "Unifically is a fully OpenAI-compatible aggregator over api.unifically.com; the model list comes from the live /v1/models?category=llm catalog, which requires the key.", APIKeyURL: "https://unifically.com"},
+		PassthroughModels: true,
+		ModelsFetcher: &Fetcher{URL: "https://api.unifically.com/v1/models?category=llm", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

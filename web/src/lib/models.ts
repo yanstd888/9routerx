@@ -290,6 +290,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "token-kiosk": "tk",
   "tokenmarket": "tokenmarket",
   "tokenreply": "tokenreply",
+  "unifically": "unifically",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10213,6 +10214,7 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
   ],
   "tokenmarket": [],
   "tokenreply": [],
+  "unifically": [],
   "keenable": [],
   "1min": [
     {
