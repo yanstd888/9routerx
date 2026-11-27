@@ -2,10 +2,12 @@
 package oauth
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"9routerx/proxy/internal/db"
 )
@@ -38,6 +40,53 @@ func TestHandleDeviceStart_bad(t *testing.T) {
 		if rec.Code == http.StatusOK {
 			t.Errorf("expected error for %s, got %s", payload, rec.Body.String())
 		}
+	}
+}
+
+func TestCodeBuddyPollCapturesExpiresIn(t *testing.T) {
+	original := deviceClient.Transport
+	deviceClient.Transport = deviceRoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		if req.Method != http.MethodGet || req.URL.Host != "copilot.tencent.com" {
+			t.Errorf("request = %s %s", req.Method, req.URL)
+		}
+		rec := httptest.NewRecorder()
+		rec.Header().Set("Content-Type", "application/json")
+		_, _ = rec.WriteString(`{"code":0,"data":{"accessToken":"access","refreshToken":"refresh","expiresIn":3600}}`)
+		return rec.Result(), nil
+	})
+	t.Cleanup(func() { deviceClient.Transport = original })
+
+	tokens, err := codebuddyPoll(t.Context(), "codebuddy-cn", "device-state")
+	if err != nil {
+		t.Fatalf("codebuddyPoll: %v", err)
+	}
+	if tokens.access != "access" || tokens.refresh != "refresh" || tokens.expiresIn != 3600 {
+		t.Fatalf("tokens = %+v", tokens)
+	}
+}
+
+func TestSaveDeviceConnectionCodeBuddyPersistsExpiry(t *testing.T) {
+	database, cleanup := setupTestDB(t)
+	defer cleanup()
+	handler := NewOAuthHandler(db.NewRepo(database))
+	before := time.Now()
+	conn := handler.saveDeviceConnection("codebuddy-cn", deviceTokens{access: "access", refresh: "refresh", expiresIn: 3600})
+	if conn.id == "" {
+		t.Fatal("CodeBuddy connection not saved")
+	}
+	var raw string
+	if err := database.QueryRow("SELECT data FROM providerConnections WHERE id = ?", conn.id).Scan(&raw); err != nil {
+		t.Fatalf("read connection data: %v", err)
+	}
+	var data struct {
+		ExpiresAt string `json:"expiresAt"`
+	}
+	if err := json.Unmarshal([]byte(raw), &data); err != nil {
+		t.Fatalf("parse data: %v", err)
+	}
+	parsed, err := time.Parse(time.RFC3339, data.ExpiresAt)
+	if err != nil || parsed.Before(before.Add(59*time.Minute)) {
+		t.Fatalf("expiresAt=%q err=%v", data.ExpiresAt, err)
 	}
 }
 

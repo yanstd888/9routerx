@@ -731,7 +731,7 @@ func ForwardOpencode(w http.ResponseWriter, req *Request) error {
 		if ctx == nil {
 			ctx = context.Background()
 		}
-		resp, err := forwardOpenCodeRotating(ctx, func() (*http.Response, error) {
+		resp, err := forwardOpenCodeRotatingWithExpiry(ctx, func() (*http.Response, error) {
 			return forwardOpencodeRequest(ctx, req.Client, &cfg, apiKey, transformedBody, req.IsStream)
 		}, func() (*http.Response, error) {
 			return forwardOpencodeRequestDirect(ctx, &cfg, apiKey, transformedBody, req.IsStream)
@@ -811,7 +811,7 @@ func ForwardOpencode(w http.ResponseWriter, req *Request) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	resp, err := forwardOpenCodeRotating(ctx, func() (*http.Response, error) {
+	resp, err := forwardOpenCodeRotatingWithExpiry(ctx, func() (*http.Response, error) {
 		return forwardOpencodeRequest(ctx, req.Client, &cfg, apiKey, body, true)
 	}, func() (*http.Response, error) {
 		return forwardOpencodeRequestDirect(ctx, &cfg, apiKey, body, true)
@@ -1741,7 +1741,7 @@ func forwardOpencodeGoFree(w http.ResponseWriter, req *Request, cleanModel strin
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	resp, err := forwardOpenCodeRotating(ctx, func() (*http.Response, error) {
+	resp, err := forwardOpenCodeRotatingWithExpiry(ctx, func() (*http.Response, error) {
 		return forwardOpencodeRequest(ctx, req.Client, &cfg, "public", body, true)
 	}, func() (*http.Response, error) {
 		return forwardOpencodeRequestDirect(ctx, &cfg, "public", body, true)

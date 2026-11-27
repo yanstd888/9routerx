@@ -4,8 +4,10 @@ package executor
 import (
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -18,7 +20,65 @@ import (
 // same request on a repeat. These tests pin that exactly one repeat is made,
 // that it leaves over the direct egress, and that nothing else is retried.
 
-const gateRefusalBody = `{"type":"error","error":{"type":"FreeTierError","message":"OpenCode's free tier can only be used from within OpenCode. Download it at https://opencode.ai and keep building."}}`
+const gateRefusalBody = `{"type":"error","error":{"type":"FreeTierError","message":"OpenCode's free tier can only be used from within OpenCode."}}`
+
+func TestForwardOpenCodeRetriesOverloadUntilSuccess(t *testing.T) {
+	restore := setOpenCodeRetryWaitForTest(func(context.Context, time.Duration) bool { return true })
+	defer restore()
+	calls := 0
+	resp, err := forwardOpenCode(context.Background(), func() (*http.Response, error) {
+		calls++
+		if calls < 4 {
+			return &http.Response{StatusCode: http.StatusServiceUnavailable, Body: io.NopCloser(strings.NewReader(`{"error":{"message":"temporarily overloaded"}}`))}, nil
+		}
+		return okResponse()
+	}, func() (*http.Response, error) {
+		t.Fatal("overload retry must stay on the original egress")
+		return nil, nil
+	})
+	if err != nil {
+		t.Fatalf("overload retries should recover: %v", err)
+	}
+	resp.Body.Close()
+	if calls != 4 {
+		t.Fatalf("attempts = %d, want initial + 3 retries", calls)
+	}
+}
+
+func TestForwardOpenCodeOverloadRetryCapsAtEightAttempts(t *testing.T) {
+	restore := setOpenCodeRetryWaitForTest(func(context.Context, time.Duration) bool { return true })
+	defer restore()
+	calls := 0
+	_, err := forwardOpenCode(context.Background(), func() (*http.Response, error) {
+		calls++
+		return &http.Response{StatusCode: http.StatusServiceUnavailable, Body: io.NopCloser(strings.NewReader(`gateway overloaded`))}, nil
+	}, func() (*http.Response, error) { t.Fatal("should not use direct sender for overload"); return nil, nil })
+	if err == nil || calls != 8 {
+		t.Fatalf("err=%v attempts=%d, want failure after 8 attempts", err, calls)
+	}
+}
+
+func TestForwardOpenCodeOverloadRetryStopsWhenAborted(t *testing.T) {
+	calls := 0
+	ctx, cancel := context.WithCancel(context.Background())
+	resp, err := forwardOpenCode(ctx, func() (*http.Response, error) {
+		calls++
+		cancel()
+		return &http.Response{StatusCode: http.StatusServiceUnavailable, Body: io.NopCloser(strings.NewReader(`overloaded`))}, nil
+	}, func() (*http.Response, error) { t.Fatal("should not use direct sender after abort"); return nil, nil })
+	if err == nil || resp != nil || calls != 1 {
+		t.Fatalf("resp=%v err=%v attempts=%d, want error after one aborted attempt", resp, err, calls)
+	}
+}
+
+func TestOpenCodeRetryBackoffSchedule(t *testing.T) {
+	want := []time.Duration{800 * time.Millisecond, 1600 * time.Millisecond, 2400 * time.Millisecond, 4 * time.Second, 4 * time.Second, 4 * time.Second, 4 * time.Second}
+	for i, expected := range want {
+		if got := openCodeOverloadBackoff(i + 1); got < expected || got > expected+250*time.Millisecond {
+			t.Errorf("retry %d delay=%v, want [%v,%v]", i+1, got, expected, expected+250*time.Millisecond)
+		}
+	}
+}
 
 // gateStub answers with the scripted handler per attempt, repeating the last.
 func gateStub(t *testing.T, handlers ...http.HandlerFunc) (*httptest.Server, *int32) {

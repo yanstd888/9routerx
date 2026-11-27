@@ -285,7 +285,7 @@ func forwardZenChat(w http.ResponseWriter, req *Request, cleanModel, sourceForma
 	// whichever stack the first attempt used, because the free tier only
 	// answers the stealth client and a plain-HTTP repeat would fail for a
 	// different reason than the refusal it is retrying.
-	resp, err := forwardOpenCodeRotating(reqCtx(req), func() (*http.Response, error) {
+	resp, err := forwardOpenCodeRotatingWithExpiry(reqCtx(req), func() (*http.Response, error) {
 		if free {
 			return forwardOpencodeRequest(reqCtx(req), req.Client, &cfg, req.APIKey, body, true)
 		}
@@ -367,7 +367,7 @@ func forwardZenResponses(w http.ResponseWriter, req *Request, cleanModel, source
 		// bridge's line protocol does not apply.
 		w = NewOpenCodeExecuteBridgeWriter(w)
 	}
-	resp, err := forwardOpenCodeRotating(ctx, func() (*http.Response, error) {
+	resp, err := forwardOpenCodeRotatingWithExpiry(ctx, func() (*http.Response, error) {
 		if free {
 			return forwardOpencodeRequest(ctx, req.Client, &cfg, req.APIKey, body, req.IsStream)
 		}
@@ -455,7 +455,7 @@ func forwardZenMessages(w http.ResponseWriter, req *Request, cleanModel string, 
 		msgCfg := *req.Config
 		msgCfg.BaseURL = messagesURL
 		msgCfg.StaticHeaders = headers
-		resp, err = forwardOpenCodeRotating(ctx, func() (*http.Response, error) {
+		resp, err = forwardOpenCodeRotatingWithExpiry(ctx, func() (*http.Response, error) {
 			return forwardOpencodeRequest(ctx, req.Client, &msgCfg, "public", body, req.IsStream)
 		}, func() (*http.Response, error) {
 			return forwardOpencodeRequestDirect(ctx, &msgCfg, "public", body, req.IsStream)

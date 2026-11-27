@@ -912,6 +912,9 @@ func codebuddyPoll(ctx context.Context, provider, state string) (deviceTokens, e
 	if code == 0 && strVal(inner, "accessToken") != "" {
 		t.access = strVal(inner, "accessToken")
 		t.refresh = strVal(inner, "refreshToken")
+		if expiry, ok := inner["expiresIn"].(float64); ok && expiry > 0 {
+			t.expiresIn = int(expiry)
+		}
 		return t, nil
 	}
 	if code == 11217 {
