@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -22,6 +23,16 @@ func resetModelScopeDB(t *testing.T, database *sql.DB) {
 	if _, err := database.Exec(`DELETE FROM kv WHERE scope='disabledModels'`); err != nil {
 		t.Fatalf("delete disabled: %v", err)
 	}
+}
+
+// modelLookupTarget builds a request target for an arbitrary catalog id.
+// Catalog ids may contain spaces (display rows like baseten's "Kimi K2.7
+// Code"), and a raw space breaks the HTTP/1.0 request line that
+// httptest.NewRequest synthesizes. Percent-encoding the segment is what a
+// real client puts on the wire; the handler decodes the suffix via
+// url.PathUnescape.
+func modelLookupTarget(id string) string {
+	return "/v1/models/" + url.PathEscape(id)
 }
 
 // seedActiveKiro inserts one active connection row, which is what makes the
@@ -89,9 +100,41 @@ func TestModelLookup_FreshInstallStaysPermissive(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	h.HandleModelLookup(w, httptest.NewRequest("GET", "/v1/models/"+probe, nil))
+	h.HandleModelLookup(w, httptest.NewRequest("GET", modelLookupTarget(probe), nil))
 	if w.Code != http.StatusOK {
 		t.Fatalf("fresh-install lookup of catalog model %q = %d, want 200: %s",
+			probe, w.Code, w.Body.String())
+	}
+}
+
+// TestModelLookup_CatalogIdWithSpace pins lookups of catalog ids that contain
+// spaces (display rows such as baseten's "Kimi K2.7 Code"): the probe path is
+// percent-encoded the way a real client sends it and must still resolve.
+func TestModelLookup_CatalogIdWithSpace(t *testing.T) {
+	database, cleanup := setupChatTestDB(t)
+	defer cleanup()
+	resetModelScopeDB(t, database)
+
+	h := NewChatHandler(db.NewRepo(database))
+	catalog := fetchModels(t, h, "").idSet()
+
+	// Pick a spaced catalog id from a provider that is not noAuth, mirroring
+	// the fresh-install probe above.
+	var probe string
+	for id := range catalog {
+		if prefix, _, ok := strings.Cut(id, "/"); ok && !providers.IsNoAuthProvider(prefix) && strings.Contains(id, " ") {
+			probe = id
+			break
+		}
+	}
+	if probe == "" {
+		t.Skip("no spaced catalog id published in this build")
+	}
+
+	w := httptest.NewRecorder()
+	h.HandleModelLookup(w, httptest.NewRequest("GET", modelLookupTarget(probe), nil))
+	if w.Code != http.StatusOK {
+		t.Fatalf("lookup of spaced catalog id %q = %d, want 200: %s",
 			probe, w.Code, w.Body.String())
 	}
 }
@@ -120,7 +163,7 @@ func TestModelLookup_ConnectedModelStillResolves(t *testing.T) {
 		t.Skip("kiro published no models in this environment")
 	}
 	w := httptest.NewRecorder()
-	h.HandleModelLookup(w, httptest.NewRequest("GET", "/v1/models/"+probe, nil))
+	h.HandleModelLookup(w, httptest.NewRequest("GET", modelLookupTarget(probe), nil))
 	if w.Code != http.StatusOK {
 		t.Fatalf("lookup of a connected provider model = %d, want 200: %s",
 			w.Code, w.Body.String())
