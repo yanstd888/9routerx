@@ -1405,13 +1405,6 @@ var KnownProviders = map[string]ProviderConfig{
 		UpstreamIsAnthropic: true,
 		StaticHeaders: map[string]string{"Anthropic-Version": "2023-06-01"},
 	},
-	// AI/ML API: mechanical passthrough from the OmniRoute open-sse registry
-	// (pinned 632d84f5).
-	"aimlapi": {
-		BaseURL:    "https://api.aimlapi.com/v1/chat/completions",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
 	// AnyAPI AI: mechanical passthrough from the OmniRoute open-sse registry
 	// (pinned 632d84f5).
 	"anyapi": {

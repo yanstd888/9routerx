@@ -246,7 +246,6 @@ var ProviderModels = map[string][]string{
 	"scaleway": {"qwen3-235b-a22b-instruct-2507", "llama-3.1-70b-instruct", "llama-3.1-8b-instruct", "mistral-small-3.2-24b-instruct-2506", "deepseek-v3-0324", "gpt-oss-120b"},
 	"tabitoken": {"claude-opus-5", "claude-opus-5-thinking", "claude-opus-4-8", "claude-opus-4-8-thinking"},
 	"agentrouter": {"claude-opus-4-8", "claude-opus-5", "gpt-5.6-sol"},
-	"aimlapi": {"gpt-5", "claude-sonnet-4.6", "gemini-2.5-pro", "glm-5", "deepseek-chat", "mistral-large"},
 	"ainative": {"qwen3-235b-cerebras", "qwen3-32b", "qwen3-14b", "qwen3-8b", "llama-4-maverick", "llama3.1-8b-cerebras", "deepseek-r1", "nous-coder", "gemini-flash"},
 	"aion": {"aion-labs/aion-3.0", "aion-labs/aion-3.0-mini", "aion-labs/aion-2.5", "aion-labs/aion-2.0", "aion-labs/aion-rp-llama-3.1-8b"},
 	"apmix": {"claude-haiku-4-5", "claude-sonnet-5", "claude-opus-5", "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-fable-5", "claude-sonnet-4-6", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-luna", "gpt-5.5", "gpt-6-astra", "gpt-6-sol", "gpt-6-luna", "gpt-6-luna-free", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.1-pro", "grok-4.5", "grok-4.6", "grok-4.7", "deepseek-v4-pro", "deepseek-v4-flash", "deepseek-v4.1-flash", "deepseek-v4-flash-free", "qwen3.8-flash", "qwen3.8-max", "glm-5.3-flash", "glm-5.3", "glm-5.2", "glm-5-turbo", "kimi-k2.7-code", "kimi-k3", "mimo-v2.5-pro", "mimo-v2.5", "hy4-preview", "composer-2.5-fast", "minimax-m3", "MiniMax M3", "muse-spark-1.3"},

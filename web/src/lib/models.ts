@@ -168,7 +168,6 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "aion": "aion",
   "ainative": "ainative",
   "anyapi": "anyapi",
-  "aimlapi": "aiml",
   "agentrouter": "agentrouter",
   "naga-ai": "naga-ai",
   "speka": "speka",
@@ -6119,32 +6118,6 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "gpt-5.6-sol",
       "name": "Gpt 5.6 Sol"
-    }
-  ],
-  "aimlapi": [
-    {
-      "id": "gpt-5",
-      "name": "Gpt 5"
-    },
-    {
-      "id": "claude-sonnet-4.6",
-      "name": "Claude Sonnet 4.6"
-    },
-    {
-      "id": "gemini-2.5-pro",
-      "name": "Gemini 2.5 Pro"
-    },
-    {
-      "id": "glm-5",
-      "name": "Glm 5"
-    },
-    {
-      "id": "deepseek-chat",
-      "name": "Deepseek Chat"
-    },
-    {
-      "id": "mistral-large",
-      "name": "Mistral Large"
     }
   ],
   "ainative": [

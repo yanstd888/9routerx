@@ -1238,18 +1238,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:      "https://agentrouter.org",
 		PassthroughModels: true,
 	},
-	"aimlapi": {
-		ID:           "aimlapi",
-		Name:         "AI/ML API",
-		Alias:        "aiml",
-		Category:     CategoryAPIKey,
-		AuthType:     "apikey",
-		Color:        "#6366F1",
-		Icon:         "hub",
-		ServiceKinds: []string{"llm"},
-		Website:      "https://aimlapi.com",
-		PassthroughModels: true,
-	},
 	"anyapi": {
 		ID:           "anyapi",
 		Name:         "AnyAPI AI",

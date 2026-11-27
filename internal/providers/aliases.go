@@ -214,7 +214,6 @@ var ProviderAliasMap = map[string]string{
 	"fmd":             "freemodel-dev",
 	"faik":            "freeaiapikey",
 	"dai":             "dit",
-	"aiml":            "aimlapi",
 	"ska":             "seekai",
 	"scw":             "scaleway",
 	"mdl":             "modal",
