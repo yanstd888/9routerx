@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"9routerx/proxy/internal/log"
 	"9routerx/proxy/internal/providers"
 )
 
@@ -58,7 +59,11 @@ func refreshCodebuddy(ctx context.Context, p *Params, provider string) (*TokenRe
 	if err != nil {
 		return nil, fmt.Errorf("%s: token refresh request failed: %w", provider, err)
 	}
-	defer response.Body.Close()
+	defer func() {
+		if err := response.Body.Close(); err != nil {
+			log.Warn("oauth", "close CodeBuddy token response body", "provider", provider, "error", err)
+		}
+	}()
 	body, err := io.ReadAll(io.LimitReader(response.Body, 1<<20))
 	if err != nil {
 		return nil, fmt.Errorf("%s: read token refresh response: %w", provider, err)
