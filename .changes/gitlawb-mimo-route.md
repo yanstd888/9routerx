@@ -1,0 +1,2 @@
+# Gitlawb MiMo lane chat route fix
+Point the Gitlawb Opengateway MiMo lane at its real chat route, `/v1/xiaomi-mimo/chat/completions`. The registered BaseURL carried the bare lane prefix, and the gateway answers POSTs to that path with 404 `Not found. Use POST /v1/chat/completions.` — every MiMo chat request through the router failed before this fix. The suffixed route is verified live against the gateway: it returns 401 `Invalid API key` for an invalid key, i.e. it reaches authentication and serves the lane. No other lane config changes.

@@ -1606,9 +1606,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme: "bearer",
 	},
 	// Gitlawb Opengateway (MiMo): mechanical passthrough from the OmniRoute open-sse registry
-	// (pinned 632d84f5).
+	// (pinned 632d84f5). Chat is served at the suffixed lane route: the bare
+	// /v1/xiaomi-mimo prefix answers 404 "Not found. Use POST /v1/chat/completions."
+	// while /v1/xiaomi-mimo/chat/completions reaches authentication (verified live).
 	"gitlawb": {
-		BaseURL:    "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+		BaseURL:    "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 		StaticHeaders: map[string]string{"User-Agent": "OpenClaude/1.0 (linux; x86_64)", "X-Title": "OpenClaude CLI", "HTTP-Referer": "https://github.com/Gitlawb/openclaude"},

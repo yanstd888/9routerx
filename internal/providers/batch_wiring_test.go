@@ -422,6 +422,12 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("glb-gmi"); got != "gitlawb-gmi" {
 		t.Errorf("glb-gmi resolved to %q", got)
 	}
+	// The MiMo lane must carry the suffixed chat route: the bare /v1/xiaomi-mimo
+	// prefix answers 404 from the gateway (verified live 2026-11-28).
+	mimoCfg := KnownProviders["gitlawb"]
+	if mimoCfg.BaseURL != "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions" || mimoCfg.AuthHeader != "Authorization" || mimoCfg.AuthScheme != "bearer" {
+		t.Errorf("gitlawb config = %+v", mimoCfg)
+	}
 	cinfMeta := ProviderRegistry["cheaperinference"]
 	if cinfMeta.Name != "Cheaper Inference" || cinfMeta.Alias != "cinf" || cinfMeta.Icon != "savings" || cinfMeta.Color != "#31F889" || cinfMeta.Website != "https://cheaperinference.com" {
 		t.Errorf("cheaperinference metadata = %+v", cinfMeta)
