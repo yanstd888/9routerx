@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "adapta-web": "adp-web",
   "syntx": "stx",
   "chatplayground": "cpl",
   "notrack-web": "ntw",
@@ -9470,6 +9471,50 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "adp-web": [
+  {
+    "id": "adapta-one",
+    "name": "Adapta ONE (Auto)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-gpt",
+    "name": "GPT-5 (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-claude",
+    "name": "Claude Sonnet 4.6 (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-gemini",
+    "name": "Gemini 2.5 Pro (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-grok",
+    "name": "Grok 4 (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-deepseek",
+    "name": "DeepSeek R2 (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "adapta-llama",
+    "name": "Llama 4 (via Adapta)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
   ],
   "stx": [
   {

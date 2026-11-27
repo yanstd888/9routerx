@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -271,6 +271,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("stx"); got != "syntx" {
 		t.Errorf("stx resolved to %q", got)
+	}
+	adpMeta := ProviderRegistry["adapta-web"]
+	if adpMeta.Name != "Adapta.org (Adapta One Web)" || adpMeta.Alias != "adp-web" || adpMeta.Icon != "auto_awesome" || adpMeta.Color != "#6E3AD3" || adpMeta.Website != "https://agent.adapta.one" {
+		t.Errorf("adapta-web metadata = %+v", adpMeta)
+	}
+	adpCfg := KnownProviders["adapta-web"]
+	if adpCfg.BaseURL != "https://agent.adapta.one" || adpCfg.AuthScheme != "bearer" || adpCfg.Format != FormatOpenAI {
+		t.Errorf("adapta-web config = %+v", adpCfg)
+	}
+	if len(ProviderModels["adapta-web"]) != 7 || len(ProviderModels["adp-web"]) != 7 {
+		t.Errorf("adapta catalog = %d/%d models", len(ProviderModels["adapta-web"]), len(ProviderModels["adp-web"]))
+	}
+	if got := ResolveAlias("adp-web"); got != "adapta-web" {
+		t.Errorf("adp-web resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

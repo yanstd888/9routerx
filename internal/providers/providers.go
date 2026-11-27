@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"adapta-web": {
+		BaseURL:    "https://agent.adapta.one",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"syntx": {
 		BaseURL:    "https://api.syntx.ai",
 		AuthHeader: "Authorization",

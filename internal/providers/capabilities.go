@@ -498,6 +498,15 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		"claude-opus-4.8":  {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
 		"gemini-3.0-pro":   {Tools: true},
 	},
+	"adapta-web": {
+		"adapta-one": {},
+		"adapta-gpt": {},
+		"adapta-claude": {},
+		"adapta-gemini": {},
+		"adapta-grok": {},
+		"adapta-deepseek": {},
+		"adapta-llama": {},
+	},
 	"syntx": {
 		"claude-fable-5-1": {},
 		"claude-haiku-4-5-20251001": {},
