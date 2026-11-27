@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -360,6 +360,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if len(ProviderModels["charm-hyper"]) != 1 {
 		t.Errorf("charm-hyper catalog = %d models, want 1", len(ProviderModels["charm-hyper"]))
+	}
+	tkiMeta := ProviderRegistry["token-kiosk"]
+	if tkiMeta.Name != "Token Kiosk" || tkiMeta.Alias != "tk" || tkiMeta.Icon != "hub" || tkiMeta.Color != "#6366F1" || tkiMeta.Website != "https://agent-router.gaib.ai" {
+		t.Errorf("token-kiosk metadata = %+v", tkiMeta)
+	}
+	tkiCfg := KnownProviders["token-kiosk"]
+	if tkiCfg.BaseURL != "https://agent-router.gaib.ai/v1/chat/completions" || tkiCfg.AuthHeader != "Authorization" || tkiCfg.AuthScheme != "bearer" {
+		t.Errorf("token-kiosk config = %+v", tkiCfg)
+	}
+	if len(ProviderModels["token-kiosk"]) != 5 || len(ProviderModels["tk"]) != 5 {
+		t.Errorf("token-kiosk catalog = %d/%d models, want 5/5", len(ProviderModels["token-kiosk"]), len(ProviderModels["tk"]))
+	}
+	if got := ResolveAlias("tk"); got != "token-kiosk" {
+		t.Errorf("tk resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

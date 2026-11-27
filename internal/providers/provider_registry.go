@@ -2347,6 +2347,25 @@ var ProviderRegistry = map[string]ProviderMeta{
 		PassthroughModels: true,
 		ModelsFetcher: &Fetcher{URL: "https://hyper.charm.land/v1/models", Type: "openai"},
 	},
+	"token-kiosk": {
+		// Token Kiosk (OmniRoute apikey metadata, pinned 632d84f5): fully
+		// OpenAI-compatible gateway over agent-router.gaib.ai/v1 with Bearer
+		// auth. The pinned snapshot lists five models; the live /v1/models
+		// endpoint serves the real roster and feeds refreshes. Verified live
+		// 2026-11-27: GET /v1/models answers the public catalog.
+		ID:           "token-kiosk",
+		Name:         "Token Kiosk",
+		Alias:        "tk",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#6366F1",
+		Icon:         "hub",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://agent-router.gaib.ai",
+		AuthHint:     "Use your Token Kiosk API key in Authorization: Bearer <key>. Fully OpenAI-compatible gateway. API base URL: https://agent-router.gaib.ai/v1.",
+		Notice:       &Notice{Text: "Token Kiosk is a fully OpenAI-compatible gateway over agent-router.gaib.ai; the model list comes from the live /v1/models catalog.", APIKeyURL: "https://agent-router.gaib.ai"},
+		ModelsFetcher: &Fetcher{URL: "https://agent-router.gaib.ai/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

@@ -287,6 +287,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "databricks": "databricks",
   "snowflake": "snowflake",
   "charm-hyper": "charm-hyper",
+  "token-kiosk": "tk",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10172,6 +10173,38 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "hyper/auto",
       "name": "Charm Hyper Auto",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
+  "tk": [
+    {
+      "id": "claude-3-5-sonnet",
+      "name": "Claude 3.5 Sonnet",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-v3",
+      "name": "DeepSeek V3",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-r1",
+      "name": "DeepSeek R1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "kimi-k1.5",
+      "name": "Kimi K1.5",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "minimax-m6",
+      "name": "MiniMax M6",
       "supportedFormats": ["openai"],
       "capabilities": []
     }

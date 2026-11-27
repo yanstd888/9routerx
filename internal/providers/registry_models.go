@@ -354,6 +354,8 @@ var ProviderModels = map[string][]string{
 	"databricks":          {"databricks-gpt-5", "databricks-meta-llama-3-3-70b-instruct", "databricks-claude-sonnet-4", "databricks-gemini-2-5-pro"},
 	"snowflake":           {"llama3.1-70b", "llama3.3-70b", "deepseek-r1", "claude-3-5-sonnet"},
 	"charm-hyper":         {"hyper/auto"},
+	"token-kiosk":         {"claude-3-5-sonnet", "deepseek-v3", "deepseek-r1", "kimi-k1.5", "minimax-m6"},
+	"tk":                  {"claude-3-5-sonnet", "deepseek-v3", "deepseek-r1", "kimi-k1.5", "minimax-m6"},
 	"notrack-web":         {"notrack-c"},
 	"keenable":            {},
 	"1min":                {"gpt-4o-mini"},

@@ -54,6 +54,7 @@ var ProviderAliasMap = map[string]string{
 	"ntw":            "notrack-web",
 	"unc":            "uncloseai",
 	"friendli":       "friendliai",
+	"tk":             "token-kiosk",
 	"hp":             "haiper",
 	"nlpc":           "nlpcloud",
 	"cmc-goat":       "commandcode-goat",
