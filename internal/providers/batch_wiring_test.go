@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake", "charm-hyper", "token-kiosk", "tokenmarket"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -374,6 +374,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("tk"); got != "token-kiosk" {
 		t.Errorf("tk resolved to %q", got)
+	}
+	tkmMeta := ProviderRegistry["tokenmarket"]
+	if tkmMeta.Name != "Token Market" || tkmMeta.Alias != "tokenmarket" || tkmMeta.Icon != "hub" || tkmMeta.Color != "#2563EB" || tkmMeta.Website != "https://www.tokensmarket.ai" {
+		t.Errorf("tokenmarket metadata = %+v", tkmMeta)
+	}
+	tkmCfg := KnownProviders["tokenmarket"]
+	if tkmCfg.BaseURL != "https://api.tokensmarket.ai/v1/chat/completions" || tkmCfg.AuthHeader != "Authorization" || tkmCfg.AuthScheme != "bearer" {
+		t.Errorf("tokenmarket config = %+v", tkmCfg)
+	}
+	if len(ProviderModels["tokenmarket"]) != 0 {
+		t.Errorf("tokenmarket catalog = %d models, want a passthrough-only catalog", len(ProviderModels["tokenmarket"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

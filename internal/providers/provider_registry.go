@@ -2366,6 +2366,29 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Notice:       &Notice{Text: "Token Kiosk is a fully OpenAI-compatible gateway over agent-router.gaib.ai; the model list comes from the live /v1/models catalog.", APIKeyURL: "https://agent-router.gaib.ai"},
 		ModelsFetcher: &Fetcher{URL: "https://agent-router.gaib.ai/v1/models", Type: "openai"},
 	},
+	"tokenmarket": {
+		// Token Market (OmniRoute apikey metadata, pinned 632d84f5):
+		// OpenAI-compatible Bearer aggregator over api.tokensmarket.ai with
+		// a passthrough catalog — no pinned static models; the live
+		// /v1/models endpoint feeds the list. Verified live 2026-11-27: the
+		// pinned modelsUrl host (www.tokensmarket.ai) answers 404, while the
+		// pinned chat host (api.tokensmarket.ai) answers the catalog with a
+		// structured 401 before a key, so the fetcher points at the chat
+		// host.
+		ID:           "tokenmarket",
+		Name:         "Token Market",
+		Alias:        "tokenmarket",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#2563EB",
+		Icon:         "hub",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://www.tokensmarket.ai",
+		AuthHint:     "Create an API key in the Token Market console, then paste it here as a Bearer token.",
+		Notice:       &Notice{Text: "Token Market is a fully OpenAI-compatible aggregator over api.tokensmarket.ai; the model list comes from the live /v1/models catalog, which requires the key.", APIKeyURL: "https://www.tokensmarket.ai"},
+		PassthroughModels: true,
+		ModelsFetcher: &Fetcher{URL: "https://api.tokensmarket.ai/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

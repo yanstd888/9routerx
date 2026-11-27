@@ -26,6 +26,7 @@ func RegisterAll() {
 	Register("snowflake", func() Executor { return ForwardSnowflake })
 	Register("charm-hyper", func() Executor { return ForwardOpenAI })
 	Register("token-kiosk", func() Executor { return ForwardOpenAI })
+	Register("tokenmarket", func() Executor { return ForwardOpenAI })
 	Register("deepseek", func() Executor { return ForwardOpenAI })
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })
