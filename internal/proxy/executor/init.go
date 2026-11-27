@@ -20,6 +20,7 @@ func RegisterAll() {
 	Register("bai", func() Executor { return ForwardOpenAI })
 	Register("atria", func() Executor { return ForwardOpenAI })
 	Register("agnes", func() Executor { return ForwardOpenAI })
+	Register("uncloseai", func() Executor { return ForwardOpenAI })
 	Register("deepseek", func() Executor { return ForwardOpenAI })
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })

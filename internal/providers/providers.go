@@ -1976,6 +1976,16 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	// UncloseAI: free anonymous hermes lane (OmniRoute pin 632d84f5). Auth
+	// stays optional: the API accepts any non-empty key for identification
+	// and the public beta currently requires one, so a saved key is sent
+	// and an anonymous request is still attempted rather than blocked.
+	"uncloseai": {
+		BaseURL:      "https://hermes.ai.unturf.com/v1/chat/completions",
+		AuthHeader:   "Authorization",
+		AuthScheme:   "bearer",
+		AuthOptional: true,
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,

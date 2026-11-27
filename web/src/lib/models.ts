@@ -282,6 +282,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "syntx": "stx",
   "chatplayground": "cpl",
   "notrack-web": "ntw",
+  "uncloseai": "unc",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10087,6 +10088,14 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "NoTrack C",
       "supportedFormats": ["openai"],
       "capabilities": ["tools"]
+    }
+  ],
+  "unc": [
+    {
+      "id": "turboderp/Qwen3.8-27B-exl3",
+      "name": "Qwen3.8 27B exl3 (Free)",
+      "supportedFormats": ["openai"],
+      "capabilities": []
     }
   ],
   "keenable": [],

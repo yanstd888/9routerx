@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -300,6 +300,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	if got := ResolveAlias("cnl"); got != "conol-web" {
 		t.Errorf("cnl resolved to %q", got)
 	}
+	uncMeta := ProviderRegistry["uncloseai"]
+	if uncMeta.Name != "UncloseAI" || uncMeta.Alias != "unc" || uncMeta.Icon != "smart_toy" || uncMeta.Color != "#43A047" || uncMeta.Website != "https://uncloseai.com" {
+		t.Errorf("uncloseai metadata = %+v", uncMeta)
+	}
+	uncCfg := KnownProviders["uncloseai"]
+	if uncCfg.BaseURL != "https://hermes.ai.unturf.com/v1/chat/completions" || uncCfg.AuthHeader != "Authorization" || uncCfg.AuthScheme != "bearer" || !uncCfg.AuthOptional {
+		t.Errorf("uncloseai config = %+v", uncCfg)
+	}
+	if len(ProviderModels["uncloseai"]) != 1 || len(ProviderModels["unc"]) != 1 {
+		t.Errorf("uncloseai catalog = %d/%d models, want 1/1", len(ProviderModels["uncloseai"]), len(ProviderModels["unc"]))
+	}
+	if got := ResolveAlias("unc"); got != "uncloseai" {
+		t.Errorf("unc resolved to %q", got)
+	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
 	}
@@ -309,7 +323,7 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 }
 
 func TestProviderBatchOptionalAuthConfig(t *testing.T) {
-	for _, id := range []string{"docker-model-runner", "lemonade", "llama-cpp", "llamafile", "lm-studio", "mlx-gemma", "mlx-qwen", "oobabooga", "triton", "xinference", "aihorde", "ovhcloud"} {
+	for _, id := range []string{"docker-model-runner", "lemonade", "llama-cpp", "llamafile", "lm-studio", "mlx-gemma", "mlx-qwen", "oobabooga", "triton", "xinference", "aihorde", "ovhcloud", "uncloseai"} {
 		cfg := KnownProviders[id]
 		if !cfg.AuthOptional || cfg.NoAuth {
 			t.Errorf("%s must permit anonymous access without suppressing supplied credentials", id)

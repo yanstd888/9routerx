@@ -2234,6 +2234,30 @@ var ProviderRegistry = map[string]ProviderMeta{
 		PassthroughModels: true,
 		ModelsFetcher: &Fetcher{URL: "https://api.synthetic.new/openai/v1/models", Type: "openai"},
 	},
+	"uncloseai": {
+		// UncloseAI free hermes lane (OmniRoute noauth metadata, pinned
+		// 632d84f5): OpenAI-compatible chat over hermes.ai.unturf.com. The
+		// API accepts any non-empty key for identification, so auth stays
+		// optional. Live probe 2026-11-27: the endpoint answers, but the
+		// public beta is currently closed (key registration closed, 401
+		// "public_beta_closed"), so the notice states that status instead
+		// of advertising keyless access that 401s today. The roster rotates
+		// every few weeks; the pinned id is the snapshot and the live
+		// /v1/models endpoint feeds refreshes, with discovery overrides
+		// winning after a sync. Tool calling is emulated upstream.
+		ID:           "uncloseai",
+		Name:         "UncloseAI",
+		Alias:        "unc",
+		Category:     CategoryFree,
+		AuthType:     "none",
+		Color:        "#43A047",
+		Icon:         "smart_toy",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://uncloseai.com",
+		AuthHint:     "No key is required while the public beta is open; the API accepts any non-empty string as a key for identification. Paste your uncloseai.com key if you have one.",
+		Notice:       &Notice{Text: "UncloseAI is a free anonymous lane on hermes.ai.unturf.com. The roster rotates every few weeks: if the pinned id 404s, refresh models from /v1/models or Auto-Sync. Verified live 2026-11-27: the public beta is currently closed and key registration is shut, so a 401 public_beta_closed answer means wait for the reopen; existing keys keep working. Tool calling is emulated.", APIKeyURL: "https://uncloseai.com"},
+		ModelsFetcher: &Fetcher{URL: "https://hermes.ai.unturf.com/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

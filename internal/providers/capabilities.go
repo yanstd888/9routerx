@@ -813,6 +813,18 @@ var providerCapabilities = map[string]map[string]Capabilities{
 	"zed": {
 		"claude-haiku-5-5": {Vision: true, Reasoning: true, Search: true, Tools: true, ThinkingFormat: "claude-adaptive", ContextWindow: 1000000, MaxOutput: 128000},
 	},
+	// UncloseAI (OmniRoute pin 632d84f5): the hermes backend is a vLLM server
+	// with max_model_len 65536. The upstream comment explicitly warns against
+	// hanging the window on a pinned model id because the roster rotates every
+	// few weeks — resolveTokenLimit would miss a rotated id and fall through to
+	// the generic catch-all, handing out a budget that overflows the real
+	// window and 400s. Keying the row by basename keeps the 65536 window for
+	// rotated ids sharing the basename; a discovery sync (max_model_len) still
+	// overrides per model. Tool calling is emulated upstream, so Tools stays
+	// off here rather than advertising a native tool loop.
+	"uncloseai": {
+		"Qwen3.8-27B-exl3": {ContextWindow: 65536},
+	},
 }
 
 func init() {
