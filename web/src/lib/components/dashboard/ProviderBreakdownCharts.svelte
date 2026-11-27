@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../../lib/i18n.svelte'
   // /* via shadcn-svelte (MIT) */ — bar + donut grid over the usage stats the
   // Overview already holds (stats.byProvider): requests per provider as bars,
   // token share as a donut. Zero new endpoints; aggregation is frontend-side
@@ -102,8 +103,8 @@
          without rotating labels; the bar color follows each provider's slot. -->
     <div class="glyph-surface flex min-w-0 flex-col p-4 sm:p-5">
       <div class="mb-3 flex min-w-0 flex-col">
-        <h3 class="font-headline text-sm font-bold text-text-main">Requests by provider</h3>
-        <p class="font-body text-xs text-text-muted">Selected window, live totals</p>
+        <h3 class="font-headline text-sm font-bold text-text-main">{t('Requests by provider')}</h3>
+        <p class="font-body text-xs text-text-muted">{t('Selected window, live totals')}</p>
       </div>
       <Chart.Container config={barConfig} class="h-[280px] w-full">
         <BarChart
@@ -131,8 +132,8 @@
     <!-- Token share donut with the tremor center total. -->
     <div class="glyph-surface flex min-w-0 flex-col p-4 sm:p-5">
       <div class="mb-3 flex min-w-0 flex-col">
-        <h3 class="font-headline text-sm font-bold text-text-main">Token share</h3>
-        <p class="font-body text-xs text-text-muted">Input + output tokens by provider</p>
+        <h3 class="font-headline text-sm font-bold text-text-main">{t('Token share')}</h3>
+        <p class="font-body text-xs text-text-muted">{t('Input + output tokens by provider')}</p>
       </div>
       <Chart.Container config={donutConfig} class="mx-auto aspect-square max-h-[260px] w-full">
         <PieChart

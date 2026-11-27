@@ -286,13 +286,13 @@
         </label>
         <Input
           label={t('URL')}
-          placeholder="https://discord.com/api/webhooks/…"
+          placeholder={t('https://discord.com/api/webhooks/…')}
           bind:value={formUrl}
           error={formError}
         />
         <Input
           label={t('Events (comma-separated, empty = all)')}
-          placeholder="notification.quota, notification.security"
+          placeholder={t('notification.quota, notification.security')}
           bind:value={formFilter}
           class="sm:col-span-2"
         />

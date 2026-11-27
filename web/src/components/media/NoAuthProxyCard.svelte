@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { api } from '../../api/client'
   import Badge from '../../lib/ui/Badge.svelte'
@@ -88,34 +89,34 @@
       <span class="material-symbols-outlined text-[20px]">lock_open</span>
     </div>
     <div class="flex-1">
-      <p class="text-sm font-medium text-text-main">No authentication required</p>
-      <p class="text-xs text-text-muted">This provider is ready to use. Optionally route requests through a proxy pool to bypass IP-based limits.</p>
+      <p class="text-sm font-medium text-text-main">{t('No authentication required')}</p>
+      <p class="text-xs text-text-muted">{t('This provider is ready to use. Optionally route requests through a proxy pool to bypass IP-based limits.')}</p>
     </div>
     {#if savedFlash}
-      <Badge variant="success" size="sm">Saved</Badge>
+      <Badge variant="success" size="sm">{t('Saved')}</Badge>
     {/if}
   </div>
 
   <div class="flex flex-col gap-1.5 mb-4">
-    <label class="text-sm font-medium text-text-main">Proxy Pool</label>
+    <label class="text-sm font-medium text-text-main">{t('Proxy Pool')}</label>
     <select
       value={proxyPoolId}
       onchange={(e) => handlePoolChange(e.currentTarget.value)}
       disabled={saving || isRotation}
       class="py-2 px-3 text-sm text-text-main bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-md focus:ring-1 focus:ring-primary/30 focus:border-primary/50 focus:outline-none transition-all disabled:opacity-50"
     >
-      <option value={NONE_PROXY_POOL_VALUE}>None (direct)</option>
+      <option value={NONE_PROXY_POOL_VALUE}>{t('None (direct)')}</option>
       {#each proxyPools as pool}
         <option value={pool.id}>{pool.name}</option>
       {/each}
     </select>
     {#if isRotation}
-      <p class="text-xs text-text-muted">Pool selector is ignored when rotation is active — all active pools are used.</p>
+      <p class="text-xs text-text-muted">{t('Pool selector is ignored when rotation is active — all active pools are used.')}</p>
     {/if}
   </div>
 
   <div class="flex flex-col gap-2">
-    <label class="text-sm font-medium text-text-main">Rotation Strategy</label>
+    <label class="text-sm font-medium text-text-main">{t('Rotation Strategy')}</label>
     <select
       value={rotateStrategy}
       onchange={(e) => handleStrategyChange(e.currentTarget.value)}

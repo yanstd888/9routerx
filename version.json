@@ -1,21 +1,21 @@
 {
-  "latestVersion": "1.5.6",
+  "latestVersion": "1.5.63",
   "downloadUrl": "https://github.com/yanstd888/9routerx/releases/latest",
   "downloadUrls": {
-    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.6/9routerx-linux-amd64",
-    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.6/9routerx-linux-arm64",
-    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.6/9routerx-darwin-amd64",
-    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.6/9routerx-darwin-arm64",
-    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.6/9routerx-windows-amd64.exe"
+    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.63/9routerx-linux-amd64",
+    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.63/9routerx-linux-arm64",
+    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.63/9routerx-darwin-amd64",
+    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.63/9routerx-darwin-arm64",
+    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.63/9routerx-windows-amd64.exe"
   },
   "sha256s": {
-    "darwin_amd64": "b854c7f6fa31d6aa1ea5ba57ba0bc0d249e3516863acdf0419f181c4736edd74",
-    "darwin_arm64": "b411dd12393324b878192defd2a691845bc3c5585a3759d8467508b3f5bb4f54",
-    "linux_amd64": "376bafe6948cfadcf08d9be32ed2a27aec6a24c26be075a5868f5246d8969bcf",
-    "linux_arm64": "de33725305309c18f61c52742445a9ae3f1f5bde86cf0de956b78693162be4c9",
-    "windows_amd64": "fc009e6e08aac90a75dc595d914242b84e208145c4af55c58bc78feb9cbdb1d9"
+    "darwin_amd64": "59ef891dbce1d9dbf4c5f29f59fd0bcecf15528b745f785aa4ff1c494a08829c",
+    "darwin_arm64": "bc950bb38735d5b6ff7ad369a5d7ebc86735e02ce09bea208baf1082c402bb2d",
+    "linux_amd64": "58d2a1044b6bec6c485d252317c3ca5f05dd48c4e380410a69ec8732d9488d99",
+    "linux_arm64": "e8a9e64b6ffd374ef651e64b1449bb6136baead724204e1fcaacd7e6dbf52374",
+    "windows_amd64": "ed55833c2a96a02bc2de87c823209070e79fc3c9b4d12eb32ed66277788a9828"
   },
-  "releaseNotes": "\n\n### Added\n- **OMP connect from an empty models.yml** — a fresh oh-my-pi install's empty (0-byte), whitespace-only, BOM-prefixed or comment-only `~/.omp/agent/models.yml` no longer fails connect with the raw `yaml: line 1: did not find expected <document start>` parser error: the patcher builds the whole nested `providers.9router` document from scratch (flow object value written verbatim, verified by re-decoding), and a file whose first content line is genuinely not a mapping is refused with an actionable message naming the file (issue #7).\n- **Dual-cookie browser capture** — throwaway-browser and import-chrome results fill both dual-cookie fields for gemini-web and grok-web (the captured session used to be discarded on submit), the combined header keeps exact cookie names through Base64-padded values, and a missing timestamp/`sso-rw` cookie keeps the form open with a paste-it-manually note.\n- **ZCode plan quota for pasted connections** — the quota tracker resolves the billing JWT from provider data (`zcodeJwtToken` → `zaiBusinessToken` → `accessToken` → `apiKey`) so legacy plan-JWT connections read their balance, and billing rejections (401/403, codes 3001/3012/401, `token_version`) answer with reconnect-via-OAuth guidance instead of a bare error.\n- **Credential encryption guidance** — the OFF banner links \"How to set it\" straight to the README's Credential encryption section (32-byte padded-Base64 key, gateway-process env, persistence, `ROUTER_MASTER_KEY_PREVIOUS` rotation), and the command palette finds the section via `ROUTER_MASTER_KEY` (issue #8).\n- **Confirmed `service take-over` migration** — shared port/process diagnostics, first-run alternative-port selection and actionable noninteractive conflict errors; legacy autostart is inspected read-only and disabled only on exact legacy gateway path matches, preserving unrelated Node apps and 9RouterX entries, with per-OS autostart discovery and migration documented.\n\n### Fixed\n- **Wiki navbar spacing** — the published wiki's top navigation regains flex spacing and 44px link targets after the homepage menu moved to `.site-nav`, without touching the mobile sheet behavior.\n- **Space-safe daemon pidfiles** — executable paths containing spaces are preserved in daemon pidfiles.\n- **Service autostart details** — the effective service port/data paths persist, supervised Windows launches stay out of the terminal picker, long scheduled-task commands import via UTF-16 XML, and cron/desktop global flags precede `start`.\n- **Site icon sync** — the site renderer's icon annotations match the current README, with every current section pinned in a regression test so the Pages gate keeps holding.\n",
-  "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.6",
-  "publishedAt": "2026-11-20T19:40:00Z"
+  "releaseNotes": "\n\n### Fixed\n- **CodeBuddy token refresh** — CN and International use their site-specific JSON refresh API headers and endpoints; successful device authorization persists token expiry.\n- **OpenCode Free overload handling** — retry overload responses with bounded backoff while preserving usage-limit rotation; retire a newly rotated stable session if upstream rejects it too.\n",
+  "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.63",
+  "publishedAt": "2026-11-27T15:22:06Z"
 }

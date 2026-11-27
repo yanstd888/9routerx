@@ -99,7 +99,10 @@ func TestEncodeGoldenBlock(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read golden %s (first run? regenerate with -update-golden): %v", path, err)
 		}
-		want := strings.TrimRight(string(raw), "\n")
+		// A Windows checkout with core.autocrlf=true lands the fixture on disk
+		// with CRLF endings; the encoder emits LF. Normalize before comparing so
+		// the test judges the wire format, not the checkout's EOL policy.
+		want := strings.TrimRight(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n")
 		if want != block {
 			t.Errorf("GCF block drifted from golden:\n--- golden\n%s\n--- current\n%s\n"+
 				"If the wire-format change is intentional, re-run with -update-golden and commit "+

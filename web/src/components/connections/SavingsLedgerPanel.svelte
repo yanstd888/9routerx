@@ -1,5 +1,6 @@
 <!-- 9RouterX — ported & modified by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import Card from '../../lib/ui/Card.svelte'
   import Button from '../../lib/ui/Button.svelte'
@@ -64,7 +65,7 @@
 <Card padding="md" class="space-y-3">
   <div class="flex items-center justify-between pb-2 border-b border-border">
     <div class="flex items-center gap-2">
-      <h3 class="text-sm font-semibold text-text-main">Savings Ledger</h3>
+      <h3 class="text-sm font-semibold text-text-main">{t('Savings Ledger')}</h3>
       <span class="text-[11px] text-text-subtle">
         {summary ? `${summary.totalTokensSaved.toLocaleString()} tokens saved` : ''}
       </span>
@@ -86,7 +87,7 @@
   </div>
 
   {#if failed}
-    <p class="text-xs text-text-muted">Savings summary unavailable right now.</p>
+    <p class="text-xs text-text-muted">{t('Savings summary unavailable right now.')}</p>
   {:else if summary}
     <div class="rounded-[10px] bg-bg border border-border p-3">
       <p class="text-[10px] uppercase tracking-wider text-text-subtle font-mono font-semibold">
@@ -99,9 +100,9 @@
     <table class="glyph-table w-full text-left text-xs">
       <thead class="text-text-muted">
         <tr class="border-b border-border-subtle">
-          <th scope="col" class="py-2 px-3 font-medium">Source</th>
-          <th scope="col" class="py-2 px-3 font-medium text-right">Tokens saved</th>
-          <th scope="col" class="py-2 px-3 font-medium text-right">USD</th>
+          <th scope="col" class="py-2 px-3 font-medium">{t('Source')}</th>
+          <th scope="col" class="py-2 px-3 font-medium text-right">{t('Tokens saved')}</th>
+          <th scope="col" class="py-2 px-3 font-medium text-right">{t('USD')}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-border-subtle">
@@ -121,7 +122,7 @@
     </table>
     {#if summary.sources.some((s) => s.top5 && s.top5.length > 0)}
       <details class="text-xs">
-        <summary class="cursor-pointer text-text-muted hover:text-text-main transition-colors">Top 5 breakdown</summary>
+        <summary class="cursor-pointer text-text-muted hover:text-text-main transition-colors">{t('Top 5 breakdown')}</summary>
         {#each summary.sources.filter((s) => s.top5?.length) as s (s.source)}
           <p class="mt-2 font-semibold text-text-main">{sourceLabel[s.source] ?? s.source}</p>
           {#each s.top5 ?? [] as row (row.provider ?? row.model)}
@@ -134,6 +135,6 @@
       </details>
     {/if}
   {:else}
-    <p class="py-6 text-center text-xs text-text-muted">Loading savings…</p>
+    <p class="py-6 text-center text-xs text-text-muted">{t('Loading savings…')}</p>
   {/if}
 </Card>

@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Usage trend chart for the Overview section (issue #280: visualization under
   // Recent Requests, above the usage breakdown filter). Port of
   // techysy/10router's UsageChart, drawn as plain SVG — the dashboard ships no
@@ -220,16 +221,14 @@
 <div class="flex min-w-0 flex-col gap-3">
   {#if loading}
     <div class="flex items-center justify-center py-12 text-text-muted text-xs">
-      <span class="material-symbols-outlined animate-spin text-[20px] mr-2" aria-hidden="true">progress_activity</span>
-      Loading chart...
-    </div>
+      <span class="material-symbols-outlined animate-spin text-[20px] mr-2" aria-hidden="true">progress_activity</span>{t('Loading chart...')}</div>
   {:else if failed}
-    <div class="py-10 text-center text-xs text-text-muted">Usage chart could not be loaded.</div>
+    <div class="py-10 text-center text-xs text-text-muted">{t('Usage chart could not be loaded.')}</div>
   {:else if !hasData}
-    <div class="py-10 text-center text-xs text-text-muted">No usage recorded in this period.</div>
+    <div class="py-10 text-center text-xs text-text-muted">{t('No usage recorded in this period.')}</div>
   {:else}
     <div class="min-w-0">
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} class="w-full h-auto" role="img" aria-label="Usage trend chart">
+      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} class="w-full h-auto" role="img" aria-label={t('Usage trend chart')}>
         {#each families as s, band (s.family)}
           <path d={areaPath(band)} fill={s.color} fill-opacity="0.45" stroke={s.color} stroke-width="1" />
         {/each}
@@ -275,11 +274,11 @@
         >
           <div class="font-semibold text-text-muted">{stack[hovered].bucket.label}</div>
           <div class="mt-1 flex items-center justify-between gap-3">
-            <span>Tokens</span>
+            <span>{t('Tokens')}</span>
             <span class="font-mono font-bold">{fmtTokens(stack[hovered].bucket.tokens)}</span>
           </div>
           <div class="flex items-center justify-between gap-3 text-warning">
-            <span>Est. cost</span>
+            <span>{t('Est. cost')}</span>
             <span class="font-mono font-bold">~{costIn(stack[hovered].bucket.cost ?? 0)}</span>
           </div>
           {#each families as s, band (s.family)}
@@ -316,14 +315,14 @@
     <!-- The drawn areas carry no text a screen reader can read and the tooltip
          only opens under a pointer, so the same numbers are here as a table. -->
     <details class="text-[11px] text-text-muted" bind:open={tableOpen}>
-      <summary class="cursor-pointer select-none">View table</summary>
+      <summary class="cursor-pointer select-none">{t('View table')}</summary>
       {#if tableOpen}
-        <table class="glyph-table mt-2 w-full border-collapse text-left" aria-label="Usage trend table">
+        <table class="glyph-table mt-2 w-full border-collapse text-left" aria-label={t('Usage trend table')}>
           <thead>
             <tr class="border-b border-border-subtle">
               <th scope="col" class="py-1 pr-2 font-medium">{hourly ? 'Hour' : 'Day'}</th>
-              <th scope="col" class="py-1 pr-2 text-right font-medium">Tokens</th>
-              <th scope="col" class="py-1 text-right font-medium">Est. cost</th>
+              <th scope="col" class="py-1 pr-2 text-right font-medium">{t('Tokens')}</th>
+              <th scope="col" class="py-1 text-right font-medium">{t('Est. cost')}</th>
             </tr>
           </thead>
           <tbody>
@@ -335,8 +334,8 @@
             {#each stack as point, i (i)}
               <tr class="border-b border-border-subtle/60">
                 <th scope="row" class="py-1 pr-2 font-normal text-text-main">{point.bucket.label}</th>
-                <td data-label="Tokens" class="py-1 pr-2 text-right font-mono">{fmtTokens(point.bucket.tokens)}</td>
-                <td data-label="Est. cost" class="py-1 text-right font-mono">~{costIn(point.bucket.cost ?? 0)}</td>
+                <td data-label={t('Tokens')} class="py-1 pr-2 text-right font-mono">{fmtTokens(point.bucket.tokens)}</td>
+                <td data-label={t('Est. cost')} class="py-1 text-right font-mono">~{costIn(point.bucket.cost ?? 0)}</td>
               </tr>
             {/each}
           </tbody>

@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import {
     OAUTH_CHANNEL,
@@ -75,9 +76,9 @@
 <div class="min-h-screen flex items-center justify-center bg-bg p-4">
   <div class="max-w-xl w-full rounded-xl border border-border bg-surface-1 p-6 text-center">
     {#if status === 'working'}
-      <p class="text-text-muted">Memproses callback…</p>
+      <p class="text-text-muted">{t('Memproses callback…')}</p>
     {:else if status === 'ok'}
-      <p class="text-lg font-semibold text-green-500">Login successful!</p>
+      <p class="text-lg font-semibold text-green-500">{t('Login successful!')}</p>
       <p class="text-sm text-text-muted mt-2">{message}</p>
       <p class="text-xs text-text-muted mt-1">
         This tab {countdown > 0 ? `closes automatically in ${countdown}…` : 'can be closed.'} The connection is processed automatically in the dashboard tab.
@@ -87,14 +88,12 @@
           type="button"
           onclick={copyRaw}
           class="mt-4 px-4 py-2 text-xs font-semibold rounded-lg bg-surface-2 hover:bg-surface-3 border border-border cursor-pointer"
-        >
-          Copy manually (if auto-submit fails)
-        </button>
+        >{t('Copy manually (if auto-submit fails)')}</button>
       {/if}
     {:else}
-      <p class="text-lg font-semibold text-red-500">Callback failed</p>
+      <p class="text-lg font-semibold text-red-500">{t('Callback failed')}</p>
       <p class="text-sm text-text-muted mt-2">{message}</p>
-      <p class="text-xs text-text-muted mt-1">Close this tab and repeat the login from the dashboard.</p>
+      <p class="text-xs text-text-muted mt-1">{t('Close this tab and repeat the login from the dashboard.')}</p>
     {/if}
   </div>
 </div>

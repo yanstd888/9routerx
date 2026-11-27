@@ -165,20 +165,16 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px] text-brand-500">cloud</span>
-          <p class="font-semibold text-text-main text-sm">Claude Web (Unofficial)</p>
+          <p class="font-semibold text-text-main text-sm">{t('Claude Web (Unofficial)')}</p>
           <Badge tone={claudeWebOn ? 'success' : 'neutral'} size="sm">{claudeWebOn ? 'enabled' : 'off'}</Badge>
         </div>
-        <p class="text-[11px] text-text-subtle mt-1">
-          Opt-in claude.ai lane via the sessionKey browser cookie. Unofficial — violates Claude's terms of service, may break
-          or be rate limited anytime, and the account risks a ban. Off by default; CLAUDE_WEB_ENABLED=true is the operator
-          kill-switch and always wins over this toggle.
-        </p>
+        <p class="text-[11px] text-text-subtle mt-1">{t('Opt-in claude.ai lane via the sessionKey browser cookie. Unofficial — violates Claude\'s terms of service, may break or be rate limited anytime, and the account risks a ban. Off by default; CLAUDE_WEB_ENABLED=true is the operator kill-switch and always wins over this toggle.')}</p>
       </div>
       <Toggle
         checked={claudeWebOn}
         size="sm"
         disabled={!claudeWebLoaded || claudeWebSaving}
-        label="Enable claude-web"
+        label={t('Enable claude-web')}
         onChange={(v) => toggleClaudeWeb(v)}
       />
     </div>
@@ -252,7 +248,7 @@
             </Button>
             {#if result}
               {#if result.ok}
-                <Badge tone="success">{t('OK')} · {result.accounts} {t('accounts')}</Badge>
+                <Badge tone="success">{t('OK')} · {result.accounts} accounts</Badge>
               {:else}
                 <Badge tone="danger">{t('Failed')}</Badge>
               {/if}

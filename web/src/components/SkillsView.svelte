@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { copyToClipboard } from '../lib/clipboard'
 
   interface Skill {
@@ -114,7 +115,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
   <!-- Top instruction banner -->
   <div class="p-5 rounded-[14px] bg-surface border border-border-subtle shadow-[var(--shadow-soft)]">
-    <div class="text-xs font-medium text-text-muted mb-2">Paste this to your AI:</div>
+    <div class="text-xs font-medium text-text-muted mb-2">{t('Paste this to your AI:')}</div>
     <div
       class="px-3.5 py-2.5 rounded-lg bg-surface-2 border border-border-subtle font-mono text-[12px] text-text-main flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap"
     >
@@ -160,9 +161,7 @@
             {#if skill.isEntry}
               <span
                 class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30"
-              >
-                START HERE
-              </span>
+              >{t('START HERE')}</span>
             {/if}
 
             {#if skill.endpoint}
@@ -207,8 +206,8 @@
   <div class="p-5 rounded-[14px] bg-surface border border-border-subtle shadow-[var(--shadow-soft)]">
     <div class="flex items-center justify-between gap-3 flex-wrap">
       <div>
-        <h2 class="text-sm font-semibold text-text-main">More on GitHub</h2>
-        <p class="text-xs text-text-muted mt-0.5">Browse source, README, and examples.</p>
+        <h2 class="text-sm font-semibold text-text-main">{t('More on GitHub')}</h2>
+        <p class="text-xs text-text-muted mt-0.5">{t('Browse source, README, and examples.')}</p>
       </div>
 
       <a
@@ -217,7 +216,7 @@
         rel="noopener noreferrer"
         class="text-sm font-medium text-brand-500 hover:text-brand-600 hover:underline inline-flex items-center gap-1.5 transition-colors"
       >
-        <span>View on GitHub</span>
+        <span>{t('View on GitHub')}</span>
         <span class="material-symbols-outlined text-[16px]">open_in_new</span>
       </a>
     </div>

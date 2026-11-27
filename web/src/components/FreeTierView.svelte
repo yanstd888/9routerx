@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import Badge from '../lib/ui/Badge.svelte'
   import Card from '../lib/ui/Card.svelte'
   import FreeProviderHealth from './FreeProviderHealth.svelte'
@@ -79,12 +80,10 @@
   <Card>
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
       <div>
-        <p class="text-xs font-medium text-text-muted uppercase tracking-wide">
-          Combined steady-monthly free tokens
-        </p>
+        <p class="text-xs font-medium text-text-muted uppercase tracking-wide">{t('Combined steady-monthly free tokens')}</p>
         <p class="text-3xl font-bold text-text-main mt-1">
           {formatTokenEstimate(headline)}
-          <span class="text-sm font-medium text-text-muted">tokens / month</span>
+          <span class="text-sm font-medium text-text-muted">{t('tokens / month')}</span>
         </p>
         <p class="text-xs text-text-muted mt-2 max-w-xl leading-relaxed">
           Recurring tiers only, each capacity pool counted once at its largest
@@ -99,18 +98,15 @@
 
   <div class="overflow-x-auto">
     <table class="glyph-table w-full text-left text-xs min-w-[760px]">
-      <caption class="sr-only">
-        Provider free tiers with monthly token estimates, live usage this period,
-        reset regime and terms-of-service verdict
-      </caption>
+      <caption class="sr-only">{t('Provider free tiers with monthly token estimates, live usage this period, reset regime and terms-of-service verdict')}</caption>
       <thead>
         <tr class="text-text-muted border-b border-border-subtle">
-          <th scope="col" class="py-2.5 pr-3 font-medium">Provider</th>
-          <th scope="col" class="py-2.5 pr-3 font-medium hidden md:table-cell">Models</th>
-          <th scope="col" class="py-2.5 pr-3 font-medium">Est. tokens / month</th>
-          <th scope="col" class="py-2.5 pr-3 font-medium">Used this period</th>
-          <th scope="col" class="py-2.5 pr-3 font-medium hidden md:table-cell">Regime</th>
-          <th scope="col" class="py-2.5 font-medium">Terms of service</th>
+          <th scope="col" class="py-2.5 pr-3 font-medium">{t('Provider')}</th>
+          <th scope="col" class="py-2.5 pr-3 font-medium hidden md:table-cell">{t('Models')}</th>
+          <th scope="col" class="py-2.5 pr-3 font-medium">{t('Est. tokens / month')}</th>
+          <th scope="col" class="py-2.5 pr-3 font-medium">{t('Used this period')}</th>
+          <th scope="col" class="py-2.5 pr-3 font-medium hidden md:table-cell">{t('Regime')}</th>
+          <th scope="col" class="py-2.5 font-medium">{t('Terms of service')}</th>
         </tr>
       </thead>
       <tbody>
@@ -121,11 +117,11 @@
               <span class="font-semibold text-text-main text-[13px]">{row.provider}</span>
               <p class="text-text-muted mt-1 leading-relaxed max-w-[240px]">{row.notes}</p>
             </td>
-            <td data-label="Models" class="py-3 pr-3 text-text-muted whitespace-nowrap hidden md:table-cell">{row.models.length}</td>
-            <td data-label="Est. tokens / month" class="py-3 pr-3 font-mono font-bold text-text-main whitespace-nowrap">
+            <td data-label={t('Models')} class="py-3 pr-3 text-text-muted whitespace-nowrap hidden md:table-cell">{row.models.length}</td>
+            <td data-label={t('Est. tokens / month')} class="py-3 pr-3 font-mono font-bold text-text-main whitespace-nowrap">
               {row.monthlyTokens > 0 ? formatTokenEstimate(row.monthlyTokens) : 'unpublished'}
             </td>
-            <td data-label="Used this period" class="py-3 pr-3 whitespace-nowrap">
+            <td data-label={t('Used this period')} class="py-3 pr-3 whitespace-nowrap">
               {#if live}
                 {#if live.low}
                   <Badge tone="danger" dot>
@@ -145,10 +141,10 @@
                 <span class="text-text-subtle">—</span>
               {/if}
             </td>
-            <td data-label="Regime" class="py-3 pr-3 hidden md:table-cell">
+            <td data-label={t('Regime')} class="py-3 pr-3 hidden md:table-cell">
               <Badge tone="info">{REGIME_LABELS[row.freeType]}</Badge>
             </td>
-            <td data-label="Terms of service" class="py-3">
+            <td data-label={t('Terms of service')} class="py-3">
               <Badge tone={tosTones[row.tos]} dot>{TOS_LABELS[row.tos]}</Badge>
             </td>
           </tr>
@@ -158,10 +154,7 @@
   </div>
 
   {#if liveFailed && liveLoaded}
-    <p class="text-[11px] text-text-muted border border-border-subtle rounded-lg px-3 py-2">
-      Live usage is stale — the last refresh failed and the numbers on screen are
-      the most recent ones served. It retries every 60 seconds.
-    </p>
+    <p class="text-[11px] text-text-muted border border-border-subtle rounded-lg px-3 py-2">{t('Live usage is stale — the last refresh failed and the numbers on screen are the most recent ones served. It retries every 60 seconds.')}</p>
   {/if}
 
   <p class="text-[11px] text-text-muted leading-relaxed">
@@ -169,7 +162,5 @@
     on them. Estimates convert published request caps at
     {TOKENS_PER_REQUEST_ASSUMPTION.toLocaleString()} tokens per request; a tier
     whose cap the provider does not publish shows no number at all. The
-    <span class="font-code">used this period</span> column is tracked live by the
-    gateway (60s refresh) and badges a tier that drops under 10% of its quota.
-  </p>
+    <span class="font-code">{t('used this period')}</span>{t('column is tracked live by the gateway (60s refresh) and badges a tier that drops under 10% of its quota.')}</p>
 </div>

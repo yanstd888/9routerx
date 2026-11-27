@@ -46,7 +46,7 @@ var KnownOAuthConfigs = map[string]OAuthClientConfig{
 			"1071006060591-tmhssin2h21lcre235vtolojh4g403ep"+".apps.googleusercontent.com"),
 		ClientSecret: envOr("ANTIGRAVITY_OAUTH_CLIENT_SECRET",
 			"GOCSPX-"+"K58FWR486LdLJ1mLB8sXC4z6qDAf"),
-		TokenURL:     "https://oauth2.googleapis.com/token",
+		TokenURL: "https://oauth2.googleapis.com/token",
 	},
 	"xai": {
 		ClientID:     envOr("XAI_OAUTH_CLIENT_ID", "b1a00492-073a-47ea-816f-4c329264a828"),
@@ -106,7 +106,7 @@ var KnownOAuthConfigs = map[string]OAuthClientConfig{
 	"codebuddy-intl": {
 		ClientID:     envOr("CODEBUDDY_INTL_OAUTH_CLIENT_ID", ""),
 		ClientSecret: envOr("CODEBUDDY_INTL_OAUTH_CLIENT_SECRET", ""),
-		TokenURL:     "https://copilot.tencent.com/v2/plugin/auth/token/refresh",
+		TokenURL:     "https://www.codebuddy.ai/v2/plugin/auth/token/refresh",
 	},
 	"cline": {
 		ClientID:     envOr("CLINE_OAUTH_CLIENT_ID", ""),

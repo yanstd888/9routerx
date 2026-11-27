@@ -759,11 +759,12 @@ func validateOllamaLocal(ctx context.Context, psd map[string]any) validateOutcom
 }
 
 // validateXiaomiTokenplanBase maps Token Plan regions to their API base URLs.
-var validateXiaomiTokenplanBase = map[string]string{
-	"sgp": "https://token-plan-sgp.xiaomimimo.com/v1",
-	"cn":  "https://token-plan-cn.xiaomimimo.com/v1",
-	"ams": "https://token-plan-ams.xiaomimimo.com/v1",
-}
+//
+// The table lives in providers so the chat lane resolves the same origins. The
+// copy that used to sit here is how the two lanes drifted apart: a connection
+// with region=cn was probed against the CN host and then chat-routed to the
+// registry's Singapore one, which answers "Invalid API Key" for a valid key.
+var validateXiaomiTokenplanBase = providers.XiaomiTokenplanRegionHosts
 
 func validateXiaomiTokenplan(ctx context.Context, apiKey string, psd map[string]any) validateOutcome {
 	region := psdStr(psd, "region")

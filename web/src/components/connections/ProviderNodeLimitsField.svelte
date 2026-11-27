@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Capacity limits, as a section inside the OpenAI/Anthropic-compatible node
   // dialogs — not a card of its own: the fields use the same Input as Name, Prefix
   // and Base URL, separated from them by a rule, and collapsed to one header line
@@ -81,7 +82,7 @@
     onclick={() => (open = !open)}
   >
     <span class="flex flex-col gap-0.5">
-      <span class="text-sm font-medium text-text-main">Capacity limits</span>
+      <span class="text-sm font-medium text-text-main">{t('Capacity limits')}</span>
       <span class="text-xs text-text-muted">
         {#if open}Optional. Applied to every request routed through this node.{:else}{nodeLimitsSummary(draft)}{/if}
       </span>
@@ -94,11 +95,11 @@
   {#if open}
     <div id="node-limits-fields" class="mt-4 flex flex-col gap-4">
       <div class="grid gap-4 sm:grid-cols-2">
-        <Input id="node-limits-rpm" label="Requests / minute" type="number" min="0" bind:value={draft.rpm} placeholder="0" />
-        <Input id="node-limits-tpm" label="Prompt tokens / minute" type="number" min="0" bind:value={draft.tpm} placeholder="0" />
+        <Input id="node-limits-rpm" label={t('Requests / minute')} type="number" min="0" bind:value={draft.rpm} placeholder="0" />
+        <Input id="node-limits-tpm" label={t('Prompt tokens / minute')} type="number" min="0" bind:value={draft.tpm} placeholder="0" />
         <Input
           id="node-limits-concurrency"
-          label="Concurrent requests"
+          label={t('Concurrent requests')}
           type="number"
           min="0"
           bind:value={draft.concurrency}
@@ -106,7 +107,7 @@
         />
         <Input
           id="node-limits-queue"
-          label="Queue wait (ms)"
+          label={t('Queue wait (ms)')}
           type="number"
           min="0"
           bind:value={draft.queueTimeoutMs}
@@ -115,7 +116,7 @@
         />
         <Input
           id="node-limits-quota"
-          label="Lifetime token quota"
+          label={t('Lifetime token quota')}
           type="number"
           min="0"
           bind:value={draft.tokenQuota}
@@ -124,32 +125,26 @@
         />
         <Input
           id="node-limits-expiry"
-          label="Contract ends (optional)"
+          label={t('Contract ends (optional)')}
           type="date"
           bind:value={draft.contractExpiresAt}
           hint="Last day the subscription is valid. Empty means no expiry."
         />
       </div>
 
-      <p class="text-xs text-text-muted">
-        0 means unlimited. A request that cannot get a slot is served by another candidate; 429 only appears once no
-        candidate is left.
-      </p>
+      <p class="text-xs text-text-muted">{t('0 means unlimited. A request that cannot get a slot is served by another candidate; 429 only appears once no candidate is left.')}</p>
 
       {#if usage}
         <div class="flex flex-col gap-2 border-t border-border pt-3">
           <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-            <span class="text-xs font-medium text-text-main">Token count</span>
+            <span class="text-xs font-medium text-text-main">{t('Token count')}</span>
             <span class="text-xs text-text-muted font-mono">{nodeLimitsUsageSummary(usage)}</span>
           </div>
           {#if confirmingReset}
-            <p class="text-xs text-text-main">
-              Reset the counter to zero from this moment? The node's usage history is not deleted — the Usage page keeps
-              every request, and only the number this quota is measured against restarts.
-            </p>
+            <p class="text-xs text-text-main">{t('Reset the counter to zero from this moment? The node\'s usage history is not deleted — the Usage page keeps every request, and only the number this quota is measured against restarts.')}</p>
             <div class="flex gap-2">
-              <Button variant="danger" size="sm" loading={resetting} onclick={handleReset}>Yes, reset the count</Button>
-              <Button variant="ghost" size="sm" onclick={() => (confirmingReset = false)}>Cancel</Button>
+              <Button variant="danger" size="sm" loading={resetting} onclick={handleReset}>{t('Yes, reset the count')}</Button>
+              <Button variant="ghost" size="sm" onclick={() => (confirmingReset = false)}>{t('Cancel')}</Button>
             </div>
           {:else}
             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -160,16 +155,14 @@
                   Set a lifetime quota above, then this counter is what it is measured against.
                 {/if}
               </p>
-              <Button variant="secondary" size="sm" onclick={() => (confirmingReset = true)} disabled={!nodeId}>
-                Reset token count
-              </Button>
+              <Button variant="secondary" size="sm" onclick={() => (confirmingReset = true)} disabled={!nodeId}>{t('Reset token count')}</Button>
             </div>
           {/if}
         </div>
         {#if usage.expired}
-          <p class="text-xs text-red-500">The contract has ended, so this node is skipped until the date is moved forward.</p>
+          <p class="text-xs text-red-500">{t('The contract has ended, so this node is skipped until the date is moved forward.')}</p>
         {:else if usage.tokenQuota > 0 && usage.usedTokens >= usage.tokenQuota}
-          <p class="text-xs text-red-500">The lifetime quota is spent; requests to this node answer 403.</p>
+          <p class="text-xs text-red-500">{t('The lifetime quota is spent; requests to this node answer 403.')}</p>
         {/if}
       {/if}
 

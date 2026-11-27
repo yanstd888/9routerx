@@ -24,21 +24,18 @@ func geminiStream(w http.ResponseWriter, upstream io.Reader, ctx context.Context
 	hw := proxy.NewHeartbeatWriter(ctx, w, 0)
 	defer hw.Close()
 	flusher := proxy.WriteSSEHeaders(hw)
-	firstLine := true
 	state := &translator.GeminiStreamState{SessionID: handlerutil.GetSessionID(ctx)}
+	// ScanStream delivers each event's payload with the data: prefix already
+	// stripped (an empty keep-alive never reaches the callback), so chunks are
+	// handed to the translator as they arrive. The first-line skip and the
+	// "data: " prefix check this copy once carried belong to a raw-line reader
+	// it outlived: both made geminiStream drop every event and answer silence.
 	return proxy.ScanStream(upstream, func(chunk []byte) {
-		if firstLine {
-			firstLine = false
-			return
-		}
 		cs := strings.TrimSpace(string(chunk))
-		if cs == "" || cs == "data: [DONE]" {
+		if cs == "" || cs == "[DONE]" {
 			return
 		}
-		if !strings.HasPrefix(cs, "data: ") {
-			return
-		}
-		oc, err := translator.TranslateGeminiChunkToOpenAI([]byte(strings.TrimPrefix(cs, "data: ")), state)
+		oc, err := translator.TranslateGeminiChunkToOpenAI(chunk, state)
 		if err != nil || oc == nil {
 			return
 		}

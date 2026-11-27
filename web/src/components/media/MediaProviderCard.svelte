@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import type { ProviderConnection } from '../../api/client'
   import type { ProviderCatalogItem } from '../../lib/providers'
   import Badge from '../../lib/ui/Badge.svelte'
@@ -93,14 +94,14 @@
           <h3 class="font-semibold text-sm text-text-main truncate">{provider.name}</h3>
           <div class="flex items-center gap-2 mt-0.5 flex-wrap">
             {#if isCustom}
-              <Badge variant="default" size="sm">Custom</Badge>
+              <Badge variant="default" size="sm">{t('Custom')}</Badge>
             {/if}
             {#if isNoAuth}
-              <Badge variant="success" size="sm">Ready</Badge>
+              <Badge variant="success" size="sm">{t('Ready')}</Badge>
             {:else if allDisabled}
-              <Badge variant="default" size="sm">Disabled</Badge>
+              <Badge variant="default" size="sm">{t('Disabled')}</Badge>
             {:else if total === 0}
-              <span class="text-xs text-text-muted">No connections</span>
+              <span class="text-xs text-text-muted">{t('No connections')}</span>
             {:else}
               {#if connected > 0}
                 <Badge variant="success" size="sm" dot>{connected} Connected</Badge>

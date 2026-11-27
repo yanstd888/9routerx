@@ -164,11 +164,29 @@ func Start(url string, extraArgs []string) (StartResult, error) {
 	}
 
 	if err := waitHealthy(url, pid); err != nil {
-		clearPID()
-		return StartResult{PID: pid}, err
+		return StartResult{PID: pid}, cleanupFailedStart(pid, execPath, err, proc.ForceKill)
 	}
 
 	return StartResult{PID: pid, URL: url}, nil
+}
+
+func cleanupFailedStart(pid int, execPath string, startErr error, forceKill func(int) error) error {
+	if proc.Alive(pid) {
+		if err := forceKill(pid); err != nil {
+			return errors.Join(startErr, fmt.Errorf("daemon.Start: kill failed startup pid %d: %w", pid, err))
+		}
+		if !waitExit(pid, 2000) {
+			return errors.Join(startErr, fmt.Errorf("daemon.Start: pid %d is still alive after forced startup cleanup", pid))
+		}
+	}
+
+	// A replacement can claim the file while the failed child is exiting.
+	if c := readClaim(); c.pid == pid && c.exePath == execPath {
+		if err := os.Remove(PIDFile()); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return errors.Join(startErr, fmt.Errorf("daemon.Start: remove failed startup pid file: %w", err))
+		}
+	}
+	return fmt.Errorf("daemon.Start: failed startup daemon stopped (pid %d): %w", pid, startErr)
 }
 
 // Stop terminates the daemon, escalating to a kill when it does not exit

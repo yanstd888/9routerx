@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Port of upstream src/app/(dashboard)/dashboard/proxy-pools/page.js
   import { onMount } from 'svelte'
   import Badge from '../lib/ui/Badge.svelte'
@@ -759,12 +760,12 @@
 <!-- The one-pool form is shared by the Single tab and the edit dialog, so the
      fields live in one snippet rather than being written twice. -->
 {#snippet singleFields()}
-  <Input label="Name" bind:value={formData.name} placeholder="Office Proxy" />
-  <Input label="Proxy URL" bind:value={formData.proxyUrl} placeholder="http://127.0.0.1:7897" />
+  <Input label={t('Name')} bind:value={formData.name} placeholder={t('Office Proxy')} />
+  <Input label={t('Proxy URL')} bind:value={formData.proxyUrl} placeholder={t('http://127.0.0.1:7897')} />
   <Input
-    label="No Proxy"
+    label={t('No Proxy')}
     bind:value={formData.noProxy}
-    placeholder="localhost,127.0.0.1,.internal"
+    placeholder={t('localhost,127.0.0.1,.internal')}
     hint="Comma-separated hosts/domains to bypass proxy"
   />
 
@@ -772,8 +773,8 @@
     class="flex flex-col gap-3 rounded-lg border border-border/50 p-3 sm:flex-row sm:items-center sm:justify-between"
   >
     <div>
-      <p class="font-medium text-sm">Active</p>
-      <p class="text-xs text-text-muted">Inactive pools are ignored by runtime resolution.</p>
+      <p class="font-medium text-sm">{t('Active')}</p>
+      <p class="text-xs text-text-muted">{t('Inactive pools are ignored by runtime resolution.')}</p>
     </div>
     <Toggle
       checked={formData.isActive === true}
@@ -786,10 +787,8 @@
     class="flex flex-col gap-3 rounded-lg border border-border/50 p-3 sm:flex-row sm:items-center sm:justify-between"
   >
     <div>
-      <p class="font-medium text-sm">Strict Proxy</p>
-      <p class="text-xs text-text-muted">
-        Fail request if proxy is unreachable instead of falling back to direct.
-      </p>
+      <p class="font-medium text-sm">{t('Strict Proxy')}</p>
+      <p class="text-xs text-text-muted">{t('Fail request if proxy is unreachable instead of falling back to direct.')}</p>
     </div>
     <Toggle
       checked={formData.strictProxy === true}
@@ -808,7 +807,7 @@
   <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-1 sm:gap-6 sm:px-0">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div class="min-w-0">
-        <h1 class="text-xl font-semibold sm:text-2xl">Proxy Pools</h1>
+        <h1 class="text-xl font-semibold sm:text-2xl">{t('Proxy Pools')}</h1>
       </div>
 
       <!-- Test All, Batch Import and Add Proxy Pool moved into one menu: the
@@ -823,9 +822,7 @@
             variant="secondary"
             onclick={() => (showRelayMenu = !showRelayMenu)}
           >
-            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
-            Deploy Relay
-            <span class="material-symbols-outlined ml-1 text-[18px]">
+            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>{t('Deploy Relay')}<span class="material-symbols-outlined ml-1 text-[18px]">
               {showRelayMenu ? 'expand_less' : 'expand_more'}
             </span>
           </Button>
@@ -842,9 +839,7 @@
                 }}
                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-main transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[20px] text-orange-500">cloud</span>
-                Cloudflare Relay
-              </button>
+                <span class="material-symbols-outlined text-[20px] text-orange-500">cloud</span>{t('Cloudflare Relay')}</button>
               <button
                 type="button"
                 onclick={() => {
@@ -853,9 +848,7 @@
                 }}
                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-main transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[20px] text-blue-500">cloud_upload</span>
-                Vercel Relay
-              </button>
+                <span class="material-symbols-outlined text-[20px] text-blue-500">cloud_upload</span>{t('Vercel Relay')}</button>
               <button
                 type="button"
                 onclick={() => {
@@ -864,9 +857,7 @@
                 }}
                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-main transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[20px] text-green-500">terminal</span>
-                Deno Relay
-              </button>
+                <span class="material-symbols-outlined text-[20px] text-green-500">terminal</span>{t('Deno Relay')}</button>
               <button
                 type="button"
                 onclick={() => {
@@ -875,14 +866,12 @@
                 }}
                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-main transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[20px] text-teal-500">deployed_code</span>
-                Netlify Relay
-              </button>
+                <span class="material-symbols-outlined text-[20px] text-teal-500">deployed_code</span>{t('Netlify Relay')}</button>
             </div>
           {/if}
         </div>
 
-        <Menu label="Proxy pool actions" triggerIcon="menu" minWidth="15rem">
+        <Menu label={t('Proxy pool actions')} triggerIcon="menu" minWidth="15rem">
           <MenuItem
             label={healthChecking
               ? `Testing ${healthProgress.current}/${healthProgress.total}`
@@ -894,8 +883,8 @@
 
           <div class="my-1 border-t border-border-subtle" role="separator"></div>
 
-          <MenuItem label="Add Proxy Pool" icon="add" onSelect={() => openCreateModal('single')} />
-          <MenuItem label="Batch Import" icon="upload" onSelect={() => openCreateModal('bulk')} />
+          <MenuItem label={t('Add Proxy Pool')} icon="add" onSelect={() => openCreateModal('single')} />
+          <MenuItem label={t('Batch Import')} icon="upload" onSelect={() => openCreateModal('bulk')} />
         </Menu>
       </div>
     </div>
@@ -904,7 +893,7 @@
       <!-- Filter & Sort Controls & Quick Cleanup -->
       <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div class="flex items-center gap-1.5">
-          <span class="text-xs text-text-muted shrink-0">Filter:</span>
+          <span class="text-xs text-text-muted shrink-0">{t('Filter:')}</span>
           <CountedSelect
             value={statusFilter}
             options={statusOptions}
@@ -916,16 +905,16 @@
         <!-- Sort & Quick Cleanup -->
         <div class="flex items-center gap-2 flex-wrap">
           <div class="flex items-center gap-1.5">
-            <span class="text-xs text-text-muted shrink-0">Sort:</span>
+            <span class="text-xs text-text-muted shrink-0">{t('Sort:')}</span>
             <select
               bind:value={sortOption}
               class="h-8 rounded-lg border border-border-subtle bg-surface-2 px-2 text-xs text-text-main outline-none transition-colors hover:bg-surface-3 cursor-pointer"
-              aria-label="Sort proxy pools"
+              aria-label={t('Sort proxy pools')}
             >
-              <option value="default">Default</option>
-              <option value="fastest">Fastest (Latency asc)</option>
-              <option value="recently_tested">Recently Tested</option>
-              <option value="name">Name (A-Z)</option>
+              <option value="default">{t('Default')}</option>
+              <option value="fastest">{t('Fastest (Latency asc)')}</option>
+              <option value="recently_tested">{t('Recently Tested')}</option>
+              <option value="name">{t('Name (A-Z)')}</option>
             </select>
           </div>
 
@@ -935,9 +924,7 @@
             onclick={handleDisableFailed}
             disabled={failedCount === 0 || bulkBusy || healthChecking}
           >
-            <span class="material-symbols-outlined text-[16px]">pause_circle</span>
-            Disable Failed
-          </Button>
+            <span class="material-symbols-outlined text-[16px]">pause_circle</span>{t('Disable Failed')}</Button>
 
           <Button
             size="sm"
@@ -945,9 +932,7 @@
             onclick={handleDeleteFailed}
             disabled={failedCount === 0 || bulkBusy || healthChecking}
           >
-            <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
-            Delete Failed
-          </Button>
+            <span class="material-symbols-outlined text-[16px]">delete_sweep</span>{t('Delete Failed')}</Button>
         </div>
       </div>
 
@@ -1005,30 +990,22 @@
                 onclick={() => bulkSetActive(true)}
                 disabled={bulkBusy || healthChecking}
               >
-                <span class="material-symbols-outlined text-[18px]">toggle_on</span>
-                Activate
-              </Button>
+                <span class="material-symbols-outlined text-[18px]">toggle_on</span>{t('Activate')}</Button>
               <Button
                 size="sm"
                 variant="secondary"
                 onclick={() => bulkSetActive(false)}
                 disabled={bulkBusy || healthChecking}
               >
-                <span class="material-symbols-outlined text-[18px]">toggle_off</span>
-                Deactivate
-              </Button>
+                <span class="material-symbols-outlined text-[18px]">toggle_off</span>{t('Deactivate')}</Button>
               <Button
                 size="sm"
                 variant="danger"
                 onclick={bulkDelete}
                 disabled={bulkBusy || healthChecking}
               >
-                <span class="material-symbols-outlined text-[18px]">delete</span>
-                Delete
-              </Button>
-              <Button size="sm" variant="ghost" onclick={clearSelection} disabled={bulkBusy || healthChecking}>
-                Clear
-              </Button>
+                <span class="material-symbols-outlined text-[18px]">delete</span>{t('Delete')}</Button>
+              <Button size="sm" variant="ghost" onclick={clearSelection} disabled={bulkBusy || healthChecking}>{t('Clear')}</Button>
             {/if}
           </div>
         </div>
@@ -1036,24 +1013,16 @@
 
       {#if proxyPools.length === 0}
         <div class="text-center py-10">
-          <p class="text-text-main font-medium mb-1">No proxy pool entries yet</p>
-          <p class="text-sm text-text-muted mb-4">
-            Create a proxy pool entry, then assign it to connections.
-          </p>
+          <p class="text-text-main font-medium mb-1">{t('No proxy pool entries yet')}</p>
+          <p class="text-sm text-text-muted mb-4">{t('Create a proxy pool entry, then assign it to connections.')}</p>
           <Button onclick={() => openCreateModal('single')}>
-            <span class="material-symbols-outlined text-[18px]">add</span>
-            Add Proxy Pool
-          </Button>
+            <span class="material-symbols-outlined text-[18px]">add</span>{t('Add Proxy Pool')}</Button>
         </div>
       {:else if displayedPools.length === 0}
         <div class="text-center py-10">
-          <p class="text-text-main font-medium mb-1">No proxy pools match current filter</p>
-          <p class="text-sm text-text-muted mb-4">
-            Try selecting a different filter option or reset filters.
-          </p>
-          <Button variant="secondary" onclick={() => (statusFilter = 'all')}>
-            Reset Filter
-          </Button>
+          <p class="text-text-main font-medium mb-1">{t('No proxy pools match current filter')}</p>
+          <p class="text-sm text-text-muted mb-4">{t('Try selecting a different filter option or reset filters.')}</p>
+          <Button variant="secondary" onclick={() => (statusFilter = 'all')}>{t('Reset Filter')}</Button>
         </div>
       {:else}
         <div class="flex flex-col divide-y divide-black/[0.04] dark:divide-white/[0.05]">
@@ -1084,16 +1053,16 @@
                       {pool.isActive ? 'active' : 'inactive'}
                     </Badge>
                     {#if pool.type === 'vercel'}
-                      <Badge size="sm">vercel relay</Badge>
+                      <Badge size="sm">{t('vercel relay')}</Badge>
                     {/if}
                     {#if pool.type === 'cloudflare'}
-                      <Badge size="sm">cloudflare relay</Badge>
+                      <Badge size="sm">{t('cloudflare relay')}</Badge>
                     {/if}
                     {#if pool.type === 'deno'}
-                      <Badge size="sm">deno relay</Badge>
+                      <Badge size="sm">{t('deno relay')}</Badge>
                     {/if}
                     {#if pool.type === 'netlify'}
-                      <Badge size="sm">netlify relay</Badge>
+                      <Badge size="sm">{t('netlify relay')}</Badge>
                     {/if}
                     <Badge size="sm">
                       {pool.boundConnectionCount || 0} bound
@@ -1124,8 +1093,8 @@
                     harvestText = ''
                   }}
                   class="p-2 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-muted hover:text-primary cursor-pointer"
-                  title="Harvest proxies (bulk add + probe)"
-                  aria-label="Harvest proxies"
+                  title={t('Harvest proxies (bulk add + probe)')}
+                  aria-label={t('Harvest proxies')}
                 >
                   <span class="material-symbols-outlined text-[18px]">download</span>
                 </button>
@@ -1133,7 +1102,7 @@
                   type="button"
                   onclick={() => handleTest(pool.id)}
                   class="p-2 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-muted hover:text-primary cursor-pointer disabled:opacity-50"
-                  title="Test proxy"
+                  title={t('Test proxy')}
                   disabled={testingId === pool.id}
                 >
                   <span
@@ -1147,7 +1116,7 @@
                   type="button"
                   onclick={() => openEditModal(pool)}
                   class="p-2 rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-muted hover:text-primary cursor-pointer"
-                  title="Edit"
+                  title={t('Edit')}
                 >
                   <span class="material-symbols-outlined text-[18px]">edit</span>
                 </button>
@@ -1155,16 +1124,14 @@
                   type="button"
                   onclick={() => handleDelete(pool)}
                   class="p-2 rounded hover:bg-red-500/10 text-red-500 cursor-pointer"
-                  title="Delete"
+                  title={t('Delete')}
                 >
                   <span class="material-symbols-outlined text-[18px]">delete</span>
                 </button>
               </div>
               {#if harvestPoolId === pool.id}
                 <div class="mt-3 rounded-lg border border-border bg-surface-2 p-3 space-y-2">
-                  <label class="text-xs font-medium text-text-main" for="harvest-{pool.id}">
-                    Harvest — paste proxy URLs, one per line; the pool probes them and keeps the alive ones
-                  </label>
+                  <label class="text-xs font-medium text-text-main" for="harvest-{pool.id}">{t('Harvest — paste proxy URLs, one per line; the pool probes them and keeps the alive ones')}</label>
                   <textarea
                     id="harvest-{pool.id}"
                     bind:value={harvestText}
@@ -1187,9 +1154,7 @@ http://host:port
                       type="button"
                       onclick={() => (harvestPoolId = null)}
                       class="rounded-lg px-2.5 py-1.5 text-xs text-text-muted hover:text-text-main transition-colors"
-                    >
-                      Cancel
-                    </button>
+                    >{t('Cancel')}</button>
                   </div>
                 </div>
               {/if}
@@ -1199,50 +1164,37 @@ http://host:port
       {/if}
     </Card>
 
-    <Modal isOpen={showVercelModal} title="Deploy Vercel Relay" onClose={closeVercelModal}>
+    <Modal isOpen={showVercelModal} title={t('Deploy Vercel Relay')} onClose={closeVercelModal}>
       <div class="flex flex-col gap-4">
         <div class="rounded-lg bg-blue-500/5 border border-blue-500/10 p-3 flex flex-col gap-1.5">
-          <p class="text-sm text-text-main font-medium">What is Vercel Relay?</p>
-          <p class="text-xs text-text-muted">
-            Deploys an edge relay function to Vercel. All AI provider requests will be forwarded
-            through Vercel's edge network, masking your real IP from providers.
-          </p>
+          <p class="text-sm text-text-main font-medium">{t('What is Vercel Relay?')}</p>
+          <p class="text-xs text-text-muted">{t('Deploys an edge relay function to Vercel. All AI provider requests will be forwarded through Vercel\'s edge network, masking your real IP from providers.')}</p>
           <ul class="text-xs text-text-muted list-disc pl-4 space-y-0.5">
-            <li>
-              Your IP is replaced by Vercel's dynamic edge IPs (hundreds of IPs across 20+ global
-              regions)
-            </li>
-            <li>
-              Vercel serves millions of apps — providers can't block Vercel IPs without affecting
-              legitimate traffic
-            </li>
-            <li>Free tier: 100GB bandwidth/month, 500K edge invocations</li>
-            <li>Deploy multiple relays on different accounts for more IP diversity</li>
+            <li>{t('Your IP is replaced by Vercel\'s dynamic edge IPs (hundreds of IPs across 20+ global regions)')}</li>
+            <li>{t('Vercel serves millions of apps — providers can\'t block Vercel IPs without affecting legitimate traffic')}</li>
+            <li>{t('Free tier: 100GB bandwidth/month, 500K edge invocations')}</li>
+            <li>{t('Deploy multiple relays on different accounts for more IP diversity')}</li>
           </ul>
         </div>
         <div>
           <Input
-            label="Vercel API Token"
+            label={t('Vercel API Token')}
             type="password"
             bind:value={vercelForm.vercelToken}
-            placeholder="your-vercel-api-token"
+            placeholder={t('your-vercel-api-token')}
           />
-          <p class="text-xs text-text-muted mt-1">
-            Token is used once for deployment and not stored.
-            <a
+          <p class="text-xs text-text-muted mt-1">{t('Token is used once for deployment and not stored.')}<a
               href="https://vercel.com/account/tokens"
               target="_blank"
               rel="noopener noreferrer"
               class="text-primary hover:underline"
-            >
-              Get token →
-            </a>
+            >{t('Get token →')}</a>
           </p>
         </div>
         <Input
-          label="Project Name"
+          label={t('Project Name')}
           bind:value={vercelForm.projectName}
-          placeholder="my-relay"
+          placeholder={t('my-relay')}
           hint="Unique name for your Vercel project. Leave empty for auto-generated name."
         />
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1253,72 +1205,62 @@ http://host:port
           >
             {deploying ? 'Deploying... (may take ~1 min)' : 'Deploy'}
           </Button>
-          <Button fullWidth variant="ghost" onclick={closeVercelModal} disabled={deploying}>
-            Cancel
-          </Button>
+          <Button fullWidth variant="ghost" onclick={closeVercelModal} disabled={deploying}>{t('Cancel')}</Button>
         </div>
       </div>
     </Modal>
 
     <Modal
       isOpen={showCloudflareModal}
-      title="Deploy Cloudflare Relay"
+      title={t('Deploy Cloudflare Relay')}
       onClose={closeCloudflareModal}
     >
       <div class="flex flex-col gap-4">
         <div class="rounded-lg bg-orange-500/5 border border-orange-500/10 p-3 flex flex-col gap-1.5">
-          <p class="text-sm text-text-main font-medium">What is Cloudflare Relay?</p>
-          <p class="text-xs text-text-muted">
-            Deploys a Cloudflare Worker as a proxy relay. All AI provider requests will be forwarded
-            through Cloudflare's global edge network.
-          </p>
+          <p class="text-sm text-text-main font-medium">{t('What is Cloudflare Relay?')}</p>
+          <p class="text-xs text-text-muted">{t('Deploys a Cloudflare Worker as a proxy relay. All AI provider requests will be forwarded through Cloudflare\'s global edge network.')}</p>
           <ul class="text-xs text-text-muted list-disc pl-4 space-y-0.5">
-            <li>High performance global routing and IP masking via Cloudflare Workers</li>
-            <li>Free tier: 100,000 requests per day</li>
-            <li>Requires Cloudflare Account ID and a Workers API Token (Edit Workers permission)</li>
+            <li>{t('High performance global routing and IP masking via Cloudflare Workers')}</li>
+            <li>{t('Free tier: 100,000 requests per day')}</li>
+            <li>{t('Requires Cloudflare Account ID and a Workers API Token (Edit Workers permission)')}</li>
           </ul>
           <div class="mt-2 pt-2 border-t border-orange-500/10 text-xs text-text-muted">
-            <p class="font-medium text-text-main mb-1">How to generate your API Token:</p>
+            <p class="font-medium text-text-main mb-1">{t('How to generate your API Token:')}</p>
             <ol class="list-decimal pl-4 space-y-0.5">
-              <li>Go to <b>My Profile</b> → <b>API Tokens</b> → <b>Create Token</b></li>
-              <li>Scroll down to <b>Custom Token</b> and click <b>Get started</b></li>
-              <li>Under <b>Permissions</b>: Account | Workers Scripts | Edit</li>
-              <li>
-                Under <b>Account Resources</b>: Include | Account | <i>Your Account Name</i>
+              <li>{t('Go to')} <b>{t('My Profile')}</b> → <b>{t('API Tokens')}</b> → <b>{t('Create Token')}</b></li>
+              <li>{t('Scroll down to')} <b>{t('Custom Token')}</b> {t('and click')} <b>{t('Get started')}</b></li>
+              <li>{t('Under')} <b>{t('Permissions')}</b>{t(': Account | Workers Scripts | Edit')}</li>
+              <li>{t('Under')}<b>{t('Account Resources')}</b>{t(': Include | Account |')} <i>{t('Your Account Name')}</i>
               </li>
-              <li>Click <b>Continue to summary</b> → <b>Create Token</b></li>
+              <li>{t('Click')} <b>{t('Continue to summary')}</b> → <b>{t('Create Token')}</b></li>
             </ol>
           </div>
         </div>
         <Input
-          label="Account ID"
+          label={t('Account ID')}
           bind:value={cloudflareForm.accountId}
-          placeholder="your-cloudflare-account-id"
+          placeholder={t('your-cloudflare-account-id')}
           hint="Found on the right side of the Cloudflare dashboard overview page."
         />
         <div>
           <Input
-            label="API Token"
+            label={t('API Token')}
             type="password"
             bind:value={cloudflareForm.apiToken}
-            placeholder="your-cloudflare-api-token"
+            placeholder={t('your-cloudflare-api-token')}
           />
-          <p class="text-xs text-text-muted mt-1">
-            Requires "Workers Scripts: Edit" permission.
-            <a
+          <p class="text-xs text-text-muted mt-1">{t('Requires "Workers Scripts: Edit" permission.')}<a
               href="https://dash.cloudflare.com/profile/api-tokens"
               target="_blank"
               rel="noopener noreferrer"
               class="text-primary hover:underline"
-            >
-              Get token →
-            </a>
+            >{t('Get token →')}</a>
           </p>
         </div>
         <Input
-          label="Worker Name"
+          label={t('Worker Name')}
           bind:value={cloudflareForm.projectName}
-          placeholder="my-relay"
+          placeholder={t('my-relay')}
           hint="Unique name for your Cloudflare Worker. Leave empty for auto-generated name."
         />
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1331,62 +1273,55 @@ http://host:port
           >
             {deploying ? 'Deploying...' : 'Deploy Worker'}
           </Button>
-          <Button fullWidth variant="ghost" onclick={closeCloudflareModal} disabled={deploying}>
-            Cancel
-          </Button>
+          <Button fullWidth variant="ghost" onclick={closeCloudflareModal} disabled={deploying}>{t('Cancel')}</Button>
         </div>
       </div>
     </Modal>
 
-    <Modal isOpen={showDenoModal} title="Deploy Deno Relay" onClose={closeDenoModal}>
+    <Modal isOpen={showDenoModal} title={t('Deploy Deno Relay')} onClose={closeDenoModal}>
       <div class="flex flex-col gap-4">
         <div
           class="rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-3 flex flex-col gap-1.5"
         >
-          <p class="text-sm text-text-main font-medium">What is Deno Relay?</p>
-          <p class="text-xs text-text-muted">
-            Deploys a relay worker to Deno Deploy's global edge network. All AI provider requests
-            are forwarded through Deno's edge, masking your real IP.
-          </p>
+          <p class="text-sm text-text-main font-medium">{t('What is Deno Relay?')}</p>
+          <p class="text-xs text-text-muted">{t('Deploys a relay worker to Deno Deploy\'s global edge network. All AI provider requests are forwarded through Deno\'s edge, masking your real IP.')}</p>
           <ul class="text-xs text-text-muted list-disc pl-4 space-y-0.5">
-            <li>Deno Deploy v2 runs on a high-performance global edge network</li>
+            <li>{t('Deno Deploy v2 runs on a high-performance global edge network')}</li>
             <li>Free tier: 1M requests & 100GiB outbound traffic per month</li>
-            <li>No per-request CPU time limits (unlike Vercel/Cloudflare)</li>
+            <li>{t('No per-request CPU time limits (unlike Vercel/Cloudflare)')}</li>
             <li>Support up to 20 active apps & 50 custom domains</li>
-            <li>Deploy multiple relays for maximum IP diversity</li>
+            <li>{t('Deploy multiple relays for maximum IP diversity')}</li>
           </ul>
           <div
             class="mt-2 pt-2 border-t border-black/10 dark:border-white/10 text-xs text-text-muted"
           >
-            <p class="font-medium text-text-main mb-1">How to generate API token:</p>
+            <p class="font-medium text-text-main mb-1">{t('How to generate API token:')}</p>
             <ol class="list-decimal pl-4 space-y-0.5">
-              <li>Go to <b>console.deno.com</b></li>
-              <li>Select your <b>Organization</b> → <b>Settings</b> → <b>Organization Tokens</b></li>
-              <li>Create a <b>Organization Token</b> (prefix <b>ddo_</b>)</li>
+              <li>{t('Go to')} <b>{t('console.deno.com')}</b></li>
+              <li>{t('Select your')} <b>{t('Organization')}</b> → <b>{t('Settings')}</b> → <b>{t('Organization Tokens')}</b></li>
+              <li>{t('Create a')} <b>{t('Organization Token')}</b> {t('(prefix')} <b>ddo_</b>)</li>
             </ol>
           </div>
         </div>
         <div>
           <Input
-            label="Deno Deploy API Token"
+            label={t('Deno Deploy API Token')}
             type="password"
             bind:value={denoForm.denoToken}
-            placeholder="ddo_xxxxxxxxxxxxxxxx"
+            placeholder=ddo_xxxxxxxxxxxxxxxx
           />
-          <p class="text-xs text-text-muted mt-1">
-            Token is used once for deployment, not stored. Found in Organization Settings.
-          </p>
+          <p class="text-xs text-text-muted mt-1">{t('Token is used once for deployment, not stored. Found in Organization Settings.')}</p>
         </div>
         <Input
-          label="Organization Domain"
+          label={t('Organization Domain')}
           bind:value={denoForm.orgDomain}
-          placeholder="your-org.deno.net"
+          placeholder={t('your-org.deno.net')}
           hint="Organization's default domain. Your relay URL will be in the format: https://my-relay.your-org.deno.net"
         />
         <Input
-          label="App Name"
+          label={t('App Name')}
           bind:value={denoForm.projectName}
-          placeholder="deno-relay"
+          placeholder={t('deno-relay')}
           hint="Unique app name. Leave empty for auto-generated name."
         />
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1397,59 +1332,52 @@ http://host:port
           >
             {deploying ? 'Deploying...' : 'Deploy Relay'}
           </Button>
-          <Button fullWidth variant="ghost" onclick={closeDenoModal} disabled={deploying}>
-            Cancel
-          </Button>
+          <Button fullWidth variant="ghost" onclick={closeDenoModal} disabled={deploying}>{t('Cancel')}</Button>
         </div>
       </div>
     </Modal>
 
     <Modal
       isOpen={showNetlifyModal}
-      title="Deploy Netlify Relay"
+      title={t('Deploy Netlify Relay')}
       onClose={closeNetlifyModal}
     >
       <div class="flex flex-col gap-4">
         <div
           class="rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-3 flex flex-col gap-1.5"
         >
-          <p class="text-sm text-text-main font-medium">What is Netlify Relay?</p>
-          <p class="text-xs text-text-muted">
-            Deploys a serverless relay function to Netlify's global edge network. All AI provider
-            requests are forwarded through Netlify's edge, masking your real IP.
-          </p>
+          <p class="text-sm text-text-main font-medium">{t('What is Netlify Relay?')}</p>
+          <p class="text-xs text-text-muted">{t('Deploys a serverless relay function to Netlify\'s global edge network. All AI provider requests are forwarded through Netlify\'s edge, masking your real IP.')}</p>
           <ul class="text-xs text-text-muted list-disc pl-4 space-y-0.5">
-            <li>
-              Runs on Netlify Functions with a streaming response and a 30-second execution limit
-            </li>
-            <li>Free tier: 125,000 function invocations and 100GB bandwidth per month</li>
-            <li>Relay URL format: https://your-site.netlify.app/.netlify/functions/relay</li>
-            <li>Deploy multiple relays on different accounts for more IP diversity</li>
+            <li>{t('Runs on Netlify Functions with a streaming response and a 30-second execution limit')}</li>
+            <li>{t('Free tier: 125,000 function invocations and 100GB bandwidth per month')}</li>
+            <li>{t('Relay URL format: https://your-site.netlify.app/.netlify/functions/relay')}</li>
+            <li>{t('Deploy multiple relays on different accounts for more IP diversity')}</li>
           </ul>
           <div
             class="mt-2 pt-2 border-t border-black/10 dark:border-white/10 text-xs text-text-muted"
           >
-            <p class="font-medium text-text-main mb-1">How to generate API token:</p>
+            <p class="font-medium text-text-main mb-1">{t('How to generate API token:')}</p>
             <ol class="list-decimal pl-4 space-y-0.5">
-              <li>Go to <b>User Settings</b> → <b>Applications</b> → <b>Personal access tokens</b></li>
-              <li>Select <b>New access token</b> and generate a token</li>
-              <li>Copy the token — you won't see it again after leaving the page</li>
+              <li>{t('Go to')} <b>{t('User Settings')}</b> → <b>{t('Applications')}</b> → <b>{t('Personal access tokens')}</b></li>
+              <li>{t('Select')} <b>{t('New access token')}</b> {t('and generate a token')}</li>
+              <li>{t('Copy the token — you won\'t see it again after leaving the page')}</li>
             </ol>
           </div>
         </div>
         <div>
           <Input
-            label="Netlify API Token"
+            label={t('Netlify API Token')}
             type="password"
             bind:value={netlifyForm.netlifyToken}
-            placeholder="nfp_xxxxxxxxxxxxxxxx"
+            placeholder=nfp_xxxxxxxxxxxxxxxx
           />
-          <p class="text-xs text-text-muted mt-1">Token is used once for deployment, not stored.</p>
+          <p class="text-xs text-text-muted mt-1">{t('Token is used once for deployment, not stored.')}</p>
         </div>
         <Input
-          label="Site Name"
+          label={t('Site Name')}
           bind:value={netlifyForm.projectName}
-          placeholder="netlify-relay"
+          placeholder={t('netlify-relay')}
           hint="Unique site name (lowercase letters, numbers, hyphens). Your relay URL will be https://site-name.netlify.app/.netlify/functions/relay"
         />
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1460,9 +1388,7 @@ http://host:port
           >
             {deploying ? 'Deploying...' : 'Deploy Relay'}
           </Button>
-          <Button fullWidth variant="ghost" onclick={closeNetlifyModal} disabled={deploying}>
-            Cancel
-          </Button>
+          <Button fullWidth variant="ghost" onclick={closeNetlifyModal} disabled={deploying}>{t('Cancel')}</Button>
         </div>
       </div>
     </Modal>
@@ -1483,9 +1409,7 @@ http://host:port
             >
               {saving ? 'Saving...' : 'Save'}
             </Button>
-            <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={saving}>
-              Cancel
-            </Button>
+            <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={saving}>{t('Cancel')}</Button>
           </div>
         {:else}
           <!-- Adding one pool by hand and adding a pasted list were two modals
@@ -1519,33 +1443,25 @@ http://host:port
               >
                 {saving ? 'Saving...' : 'Save'}
               </Button>
-              <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={saving}>
-                Cancel
-              </Button>
+              <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={saving}>{t('Cancel')}</Button>
             </div>
           {:else}
             <div>
-              <label for="bulk-proxies" class="text-sm font-medium text-text-main mb-1 block">
-                Paste Proxy List (One per line)
-              </label>
+              <label for="bulk-proxies" class="text-sm font-medium text-text-main mb-1 block">{t('Paste Proxy List (One per line)')}</label>
               <textarea
                 id="bulk-proxies"
                 bind:value={batchImportText}
                 placeholder={'http://user:pass@127.0.0.1:7897\n127.0.0.1:7897:user:pass'}
                 class="w-full min-h-[180px] py-2 px-3 text-sm text-text-main bg-surface-2 border border-transparent rounded-[10px] focus:ring-1 focus:ring-primary/30 focus:border-primary/50 focus:outline-none transition-all font-mono"
               ></textarea>
-              <p class="text-xs text-text-muted mt-1">
-                Supported formats: protocol://user:pass@host:port, host:port:user:pass
-              </p>
+              <p class="text-xs text-text-muted mt-1">{t('Supported formats: protocol://user:pass@host:port, host:port:user:pass')}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button fullWidth onclick={handleBatchImport} disabled={!batchImportText.trim() || importing}>
                 {importing ? 'Importing...' : 'Import'}
               </Button>
-              <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={importing}>
-                Cancel
-              </Button>
+              <Button fullWidth variant="ghost" onclick={closeFormModal} disabled={importing}>{t('Cancel')}</Button>
             </div>
           {/if}
         {/if}
@@ -1559,7 +1475,7 @@ http://host:port
       onClose={() => (confirmState = null)}
     >
       {#snippet footer()}
-        <Button variant="ghost" onclick={() => (confirmState = null)}>Cancel</Button>
+        <Button variant="ghost" onclick={() => (confirmState = null)}>{t('Cancel')}</Button>
         <Button variant="danger" onclick={() => confirmState?.onConfirm()}>
           {confirmState?.confirmText || 'Confirm'}
         </Button>

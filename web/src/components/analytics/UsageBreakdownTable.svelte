@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import Badge from '../../lib/ui/Badge.svelte'
   import Card from '../../lib/ui/Card.svelte'
   import ProviderArtwork from '../providers/ProviderArtwork.svelte'
@@ -201,27 +202,21 @@
         class="rounded-lg px-3 py-1 text-xs font-semibold transition-colors cursor-pointer {viewMode === 'costs'
           ? 'bg-brand-500 text-white shadow-sm'
           : 'text-text-muted hover:text-text-main'}"
-      >
-        Costs
-      </button>
+      >{t('Costs')}</button>
       <button
         type="button"
         onclick={() => (viewMode = 'tokens')}
         class="rounded-lg px-3 py-1 text-xs font-semibold transition-colors cursor-pointer {viewMode === 'tokens'
           ? 'bg-brand-500 text-white shadow-sm'
           : 'text-text-muted hover:text-text-main'}"
-      >
-        Tokens
-      </button>
+      >{t('Tokens')}</button>
     </div>
   </div>
 
   <!-- Breakdown Table Card -->
   <Card padding="none" class="overflow-hidden border border-border">
     {#if tableData().length === 0}
-      <div class="p-8 text-center text-text-muted text-sm font-body">
-        No usage recorded for this period.
-      </div>
+      <div class="p-8 text-center text-text-muted text-sm font-body">{t('No usage recorded for this period.')}</div>
     {:else}
       <div class="overflow-x-auto">
         <table class="glyph-table w-full text-left border-collapse text-xs font-body">
@@ -235,49 +230,35 @@
               </th>
               {#if tableView !== 'provider'}
                 <th class="py-3 px-4 hidden md:table-cell" aria-sort={sortKey === 'provider' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" class={headerClass('provider')} onclick={() => toggleSort('provider')}>
-                    Provider
-                    <span class="text-[9px]">{arrow('provider')}</span>
+                  <button type="button" class={headerClass('provider')} onclick={() => toggleSort('provider')}>{t('Provider')}<span class="text-[9px]">{arrow('provider')}</span>
                   </button>
                 </th>
               {/if}
               <th class="py-3 px-4" aria-sort={sortKey === 'requests' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                <button type="button" class={headerClass('requests', 'right')} onclick={() => toggleSort('requests')}>
-                  Requests
-                  <span class="text-[9px]">{arrow('requests')}</span>
+                <button type="button" class={headerClass('requests', 'right')} onclick={() => toggleSort('requests')}>{t('Requests')}<span class="text-[9px]">{arrow('requests')}</span>
                 </button>
               </th>
               {#if viewMode === 'costs'}
                 <th class="py-3 px-4" aria-sort={sortKey === 'cost' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" class={headerClass('cost', 'right')} onclick={() => toggleSort('cost')}>
-                    Total Cost
-                    <span class="text-[9px]">{arrow('cost')}</span>
+                  <button type="button" class={headerClass('cost', 'right')} onclick={() => toggleSort('cost')}>{t('Total Cost')}<span class="text-[9px]">{arrow('cost')}</span>
                   </button>
                 </th>
               {:else}
                 <th class="py-3 px-4" aria-sort={sortKey === 'promptTokens' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" class={headerClass('promptTokens', 'right')} onclick={() => toggleSort('promptTokens')}>
-                    In Tokens
-                    <span class="text-[9px]">{arrow('promptTokens')}</span>
+                  <button type="button" class={headerClass('promptTokens', 'right')} onclick={() => toggleSort('promptTokens')}>{t('In Tokens')}<span class="text-[9px]">{arrow('promptTokens')}</span>
                   </button>
                 </th>
                 <th class="py-3 px-4" aria-sort={sortKey === 'completionTokens' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" class={headerClass('completionTokens', 'right')} onclick={() => toggleSort('completionTokens')}>
-                    Out Tokens
-                    <span class="text-[9px]">{arrow('completionTokens')}</span>
+                  <button type="button" class={headerClass('completionTokens', 'right')} onclick={() => toggleSort('completionTokens')}>{t('Out Tokens')}<span class="text-[9px]">{arrow('completionTokens')}</span>
                   </button>
                 </th>
                 <th class="py-3 px-4" aria-sort={sortKey === 'cachedTokens' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" class={headerClass('cachedTokens', 'right')} onclick={() => toggleSort('cachedTokens')}>
-                    Cached Tokens
-                    <span class="text-[9px]">{arrow('cachedTokens')}</span>
+                  <button type="button" class={headerClass('cachedTokens', 'right')} onclick={() => toggleSort('cachedTokens')}>{t('Cached Tokens')}<span class="text-[9px]">{arrow('cachedTokens')}</span>
                   </button>
                 </th>
               {/if}
               <th class="py-3 px-4 hidden md:table-cell" aria-sort={sortKey === 'lastUsed' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                <button type="button" class={headerClass('lastUsed', 'right')} onclick={() => toggleSort('lastUsed')}>
-                  Last Used
-                  <span class="text-[9px]">{arrow('lastUsed')}</span>
+                <button type="button" class={headerClass('lastUsed', 'right')} onclick={() => toggleSort('lastUsed')}>{t('Last Used')}<span class="text-[9px]">{arrow('lastUsed')}</span>
                 </button>
               </th>
             </tr>
@@ -298,7 +279,7 @@
                   </div>
                 </td>
                 {#if tableView !== 'provider'}
-                  <td data-label="Provider" class="py-3 px-4 hidden md:table-cell">
+                  <td data-label={t('Provider')} class="py-3 px-4 hidden md:table-cell">
                     <div class="flex items-center gap-1.5">
                       {#if row.provider}
                         <ProviderArtwork
@@ -311,7 +292,7 @@
                     </div>
                   </td>
                 {/if}
-                <td data-label="Requests" class="py-3 px-4 text-right font-mono font-semibold text-text-main">
+                <td data-label={t('Requests')} class="py-3 px-4 text-right font-mono font-semibold text-text-main">
                   <div class="flex flex-col items-end gap-1">
                     <span>{fmt(row.requests)}</span>
                     {#if miniBarShare(row, 'requests') > 0}
@@ -324,7 +305,7 @@
                   </div>
                 </td>
                 {#if viewMode === 'costs'}
-                  <td data-label="Total Cost" class="py-3 px-4 text-right font-mono font-bold text-warning">
+                  <td data-label={t('Total Cost')} class="py-3 px-4 text-right font-mono font-bold text-warning">
                     <div class="flex flex-col items-end gap-1">
                       <span>{costIn(row.cost ?? 0)}</span>
                       {#if miniBarShare(row, 'cost') > 0}
@@ -337,13 +318,13 @@
                     </div>
                   </td>
                 {:else}
-                  <td data-label="In Tokens" class="py-3 px-4 text-right font-mono text-brand-500">
+                  <td data-label={t('In Tokens')} class="py-3 px-4 text-right font-mono text-brand-500">
                     {fmt(row.promptTokens)}
                   </td>
-                  <td data-label="Out Tokens" class="py-3 px-4 text-right font-mono text-success">
+                  <td data-label={t('Out Tokens')} class="py-3 px-4 text-right font-mono text-success">
                     {fmt(row.completionTokens)}
                   </td>
-                  <td data-label="Cached Tokens" class="py-3 px-4 text-right font-mono text-info">
+                  <td data-label={t('Cached Tokens')} class="py-3 px-4 text-right font-mono text-info">
                     <div class="flex flex-col items-end gap-1">
                       <span>{fmt(row.cachedTokens)}</span>
                       {#if miniBarShare(row, 'cached') > 0}
@@ -356,7 +337,7 @@
                     </div>
                   </td>
                 {/if}
-                <td data-label="Last Used" class="py-3 px-4 text-right text-text-muted whitespace-nowrap text-[11px] hidden md:table-cell">
+                <td data-label={t('Last Used')} class="py-3 px-4 text-right text-text-muted whitespace-nowrap text-[11px] hidden md:table-cell">
                   {timeAgo(row.lastUsed)}
                 </td>
               </tr>

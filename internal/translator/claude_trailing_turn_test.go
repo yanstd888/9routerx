@@ -186,6 +186,43 @@ func TestEnsureTrailingUserTurnBody(t *testing.T) {
 	}
 }
 
+func TestEnsureTrailingUserTurnBodyReplacesEmptiedTail(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		emptied string
+	}{
+		{"empty block array", `[]`},
+		{"blank string", `"   "`},
+		{"null content", `null`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			body := []byte(`{"model":"claude-sonnet","messages":[{"role":"user","content":[{"type":"text","text":"hi"}]},{"role":"assistant","content":[{"type":"text","text":"partial"}]},{"role":"user","content":` + tt.emptied + `}]}`)
+
+			got := EnsureTrailingUserTurnBody(body, false)
+			if string(got) == string(body) {
+				t.Fatal("body wrapper returned the original body; emptied tail replacement was lost")
+			}
+			if !containsPlaceholder(got) {
+				t.Fatalf("placeholder missing from repaired body: %s", got)
+			}
+			var decoded struct {
+				Messages []struct {
+					Role    string `json:"role"`
+					Content []struct {
+						Text string `json:"text"`
+					} `json:"content"`
+				} `json:"messages"`
+			}
+			if err := json.Unmarshal(got, &decoded); err != nil {
+				t.Fatalf("decode repaired body: %v", err)
+			}
+			if len(decoded.Messages) != 3 || decoded.Messages[0].Role != "user" || decoded.Messages[1].Role != "assistant" || decoded.Messages[2].Role != "user" || len(decoded.Messages[2].Content) != 1 || decoded.Messages[2].Content[0].Text != TrailingUserPlaceholder {
+				t.Fatalf("body wrapper did not replace only the emptied tail: %+v", decoded.Messages)
+			}
+		})
+	}
+}
+
 func containsPlaceholder(body []byte) bool {
 	var decoded struct {
 		Messages []struct {
@@ -206,6 +243,64 @@ func containsPlaceholder(body []byte) bool {
 		}
 	}
 	return false
+}
+
+// TestEnsureTrailingUserTurn_ReplacesEmptiedTail: a trailing user turn whose
+// content the cleanup emptied is REPLACED by the placeholder. The emptied turn
+// must not ride along next to it — Anthropic rejects empty content just as
+// hard as a missing tail, so shipping both turns answers 400 for a body the
+// client never wrote that way.
+func TestEnsureTrailingUserTurn_ReplacesEmptiedTail(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		emptied map[string]any
+	}{
+		{"empty block array", map[string]any{"role": "user", "content": []any{}}},
+		{"blank string", map[string]any{"role": "user", "content": "   "}},
+		{"null content", map[string]any{"role": "user", "content": nil}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			messages := []any{
+				claudeTurn("user", textBlock("hi")),
+				claudeTurn("assistant", textBlock("partial")),
+				tt.emptied,
+			}
+
+			repaired := EnsureTrailingUserTurn(messages, false)
+
+			if len(repaired) != len(messages) {
+				t.Fatalf("repaired length = %d, want %d (emptied tail replaced, not kept): %v",
+					len(repaired), len(messages), repaired)
+			}
+			for i, want := range []string{"user", "assistant", "user"} {
+				role, _ := repaired[i].(map[string]any)["role"].(string)
+				if role != want {
+					t.Fatalf("role[%d] = %q, want %q (messages: %v)", i, role, want, repaired)
+				}
+			}
+			if !hasContent(repaired[len(repaired)-1].(map[string]any)["content"]) {
+				t.Errorf("final turn has no usable content: %v", repaired[len(repaired)-1])
+			}
+			if !containsPlaceholder(encodeMessages(t, repaired)) {
+				t.Errorf("placeholder missing from repaired tail: %v", repaired)
+			}
+			// The caller's own slice must be untouched by the repair.
+			if _, ok := messages[2].(map[string]any)["role"]; !ok {
+				t.Errorf("caller's slice was mutated: %v", messages)
+			}
+		})
+	}
+}
+
+// encodeMessages marshals a repaired message list the way
+// EnsureTrailingUserTurnBody would, so containsPlaceholder can read it.
+func encodeMessages(t *testing.T, messages []any) []byte {
+	t.Helper()
+	out, err := json.Marshal(map[string]any{"messages": messages}, json.Deterministic(true))
+	if err != nil {
+		t.Fatalf("marshal repaired messages: %v", err)
+	}
+	return out
 }
 
 // sameTail decides whether cleanup changed the tail of a conversation, and the

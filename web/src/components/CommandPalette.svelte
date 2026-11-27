@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Global search / command palette.
   //
   // The query is staged in the input and only run when the operator asks for
@@ -106,7 +107,7 @@
   }
 </script>
 
-<Modal {isOpen} {onClose} title="Search" icon="search" size="lg">
+<Modal {isOpen} {onClose} title={t('Search')} icon="search" size="lg">
   <div class="space-y-3">
     <div class="flex items-center gap-2">
       <div class="relative flex-1">
@@ -119,8 +120,8 @@
           bind:value={draft}
           onkeydown={handleKeydown}
           type="text"
-          placeholder="Search models, providers, pages and settings…"
-          aria-label="Search query"
+          placeholder={t('Search models, providers, pages and settings…')}
+          aria-label={t('Search query')}
           class="w-full rounded-lg border border-border bg-bg pl-8 pr-3 py-2 text-sm text-text-main placeholder:text-text-subtle focus:border-brand-500 focus:outline-none"
         />
       </div>
@@ -130,15 +131,10 @@
         disabled={!draft.trim()}
         class="flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
-        <span class="material-symbols-outlined text-[16px]">search</span>
-        Search
-      </button>
+        <span class="material-symbols-outlined text-[16px]">search</span>{t('Search')}</button>
     </div>
 
-    <p class="text-[11px] text-text-subtle">
-      Press <kbd class="rounded border border-border bg-surface-2 px-1 font-code text-[10px]">Enter</kbd>
-      or the Search button to run the query — typing alone does not, so a long model list never stalls the input.
-    </p>
+    <p class="text-[11px] text-text-subtle">{t('Press')}<kbd class="rounded border border-border bg-surface-2 px-1 font-code text-[10px]">{t('Enter')}</kbd>{t('or the Search button to run the query — typing alone does not, so a long model list never stalls the input.')}</p>
 
     {#if applied}
       <div class="flex items-center justify-between text-[11px] text-text-muted">

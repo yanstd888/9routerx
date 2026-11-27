@@ -84,6 +84,10 @@ type ResponsesBridge struct {
 	finished bool
 	err      error
 	watchdog *completionWatchdog
+	// Choice and tool indices overlap; terminal output positions follow item IDs
+	// in first-announced order, with done events replacing the initial snapshots.
+	outputPositions map[string]int
+	outputItems     []map[string]any
 	// completionPending mirrors state.CompletionPending as an atomic. The scan
 	// reads it between every line of the upstream, so taking the lock there
 	// would make the watchdog's own emission wait on a lock it needs to break
@@ -195,12 +199,48 @@ func (b *ResponsesBridge) Close() {
 func (b *ResponsesBridge) writeEvents(events []translator.ResponsesEvent) error {
 	frame := make([]byte, 0, 512)
 	for _, ev := range events {
+		b.trackOutputEvent(ev)
 		frame = append(frame, translator.FormatResponsesSSE(ev)...)
 	}
 	if len(frame) == 0 {
 		return nil
 	}
 	return b.write(frame)
+}
+
+func (b *ResponsesBridge) trackOutputEvent(ev translator.ResponsesEvent) {
+	switch ev.Event {
+	case "response.output_item.added", "response.output_item.done":
+		item, ok := ev.Data["item"].(map[string]any)
+		if ok {
+			b.recordOutputItem(item)
+		}
+	case "response.completed", "response.incomplete":
+		response, ok := ev.Data["response"].(map[string]any)
+		if ok && len(b.outputItems) > 0 {
+			response["output"] = b.outputItems
+		}
+	}
+}
+
+func (b *ResponsesBridge) recordOutputItem(item map[string]any) {
+	id, ok := item["id"].(string)
+	if !ok || id == "" {
+		return
+	}
+	position, seen := b.outputPositions[id]
+	if !seen {
+		if b.outputPositions == nil {
+			b.outputPositions = make(map[string]int)
+		}
+		position = len(b.outputItems)
+		b.outputPositions[id] = position
+	}
+	if position == len(b.outputItems) {
+		b.outputItems = append(b.outputItems, item)
+		return
+	}
+	b.outputItems[position] = item
 }
 
 // Err reports the write error that stopped the bridge, if any. A producer that

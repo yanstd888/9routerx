@@ -17,6 +17,7 @@
   and clamped to the viewport (issue #224).
 -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { maxPanelWidth, placePanel, placementStyle } from '../../lib/ui/menuPosition'
   import { portal } from '../../lib/ui/portal'
   import { USAGE_SECTIONS, type UsageSection } from '../../lib/router'
@@ -116,7 +117,7 @@
       use:portal
       bind:this={panel}
       role="listbox"
-      aria-label="Usage section"
+      aria-label={t('Usage section')}
       tabindex="-1"
       style={panelStyle}
       onkeydown={onKeydown}

@@ -2,6 +2,8 @@
 package db
 
 import (
+	json "encoding/json/v2"
+	"strings"
 	"testing"
 )
 
@@ -129,6 +131,74 @@ func TestResetProviderHealth_ClearsModelLocks(t *testing.T) {
 
 	if !IsProviderHealthy(repo.RawDB(), "openai", "gpt-4") {
 		t.Error("expected healthy=true after resetting health")
+	}
+}
+
+// TestResetProviderHealth_ClearsDottedModelLocks: the lock for a model whose
+// name contains a dot (gpt-3.5-turbo, gemini-2.5-pro, …) is stored as one flat
+// key via modelLockDataKey's quoted path, but the clear paths built an
+// unquoted "$."+key path, which SQLite reads as a nested path. The reset then
+// missed the lock (the model stayed unavailable until its lock expired) and
+// wrote junk nested keys into the connection data blob.
+func TestResetProviderHealth_ClearsDottedModelLocks(t *testing.T) {
+	repo, cleanup := setupHealthConnTestDB(t)
+	defer cleanup()
+
+	insertTestConn(t, repo)
+
+	if err := repo.LockConnectionModel("conn-1", "gpt-3.5-turbo", 3600, 1); err != nil {
+		t.Fatalf("LockConnectionModel: %v", err)
+	}
+	if repo.IsProviderAvailable("openai", "gpt-3.5-turbo") {
+		t.Fatal("expected available=false while the lock is held")
+	}
+
+	if err := repo.ResetProviderHealth("openai", "gpt-3.5-turbo"); err != nil {
+		t.Fatalf("ResetProviderHealth: %v", err)
+	}
+
+	if !repo.IsProviderAvailable("openai", "gpt-3.5-turbo") {
+		t.Error("expected the dotted model lock to be cleared by the reset")
+	}
+
+	// The failed clear used to leave junk like {"modelLock_gpt-3":{"5-turbo":null}}
+	// behind; every modelLock_* key in the blob must stay a scalar (null or a
+	// timestamp string), never a nested object.
+	var data string
+	if err := repo.RawDB().QueryRow(`SELECT data FROM providerConnections WHERE id = 'conn-1'`).Scan(&data); err != nil {
+		t.Fatalf("read connection data: %v", err)
+	}
+	var decoded map[string]any
+	if err := json.Unmarshal([]byte(data), &decoded); err != nil {
+		t.Fatalf("decode connection data: %v", err)
+	}
+	for k, v := range decoded {
+		if strings.HasPrefix(k, modelLockPrefix) {
+			if _, nested := v.(map[string]any); nested {
+				t.Errorf("reset polluted the data blob with a nested junk key %q: %s", k, data)
+			}
+		}
+	}
+}
+
+// TestResetProviderHealth_ClearsAllDottedLocks covers the provider-wide arm of
+// the reset, which walks every connection's stored lock keys.
+func TestResetProviderHealth_ClearsAllDottedLocks(t *testing.T) {
+	repo, cleanup := setupHealthConnTestDB(t)
+	defer cleanup()
+
+	insertTestConn(t, repo)
+
+	if err := repo.LockConnectionModel("conn-1", "gemini-2.5-pro", 3600, 1); err != nil {
+		t.Fatalf("LockConnectionModel: %v", err)
+	}
+
+	if err := repo.ResetProviderHealth("openai", ""); err != nil {
+		t.Fatalf("ResetProviderHealth: %v", err)
+	}
+
+	if !repo.IsProviderAvailable("openai", "gemini-2.5-pro") {
+		t.Error("expected the dotted model lock to be cleared by the provider-wide reset")
 	}
 }
 

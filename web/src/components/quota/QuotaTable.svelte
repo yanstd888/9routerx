@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of Next.js ProviderLimits/QuotaTable.js for the Go dashboard.
   import {
     formatResetTime,
@@ -131,9 +132,7 @@
       {#if showSortLabel}
         <div
           class="rounded-md border border-border-subtle bg-surface-2 px-2 py-1 text-[10px] text-text-muted"
-        >
-          Sorted by account remaining
-        </div>
+        >{t('Sorted by account remaining')}</div>
       {/if}
     </div>
 
@@ -245,7 +244,7 @@
               type="button"
               onclick={() => onHideQuota?.(quota)}
               class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-3 hover:text-text-main"
-              title="Hide this quota row"
+              title={t('Hide this quota row')}
               aria-label="Hide quota {quota.name}"
             >
               <span class="material-symbols-outlined text-[15px]">visibility_off</span>
@@ -272,17 +271,13 @@
             onclick={() => (page = Math.max(1, page - 1))}
             disabled={page === 1}
             class="flex h-6 items-center rounded-md border border-border-subtle px-2 text-[10px] text-text-main transition-colors hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Prev
-          </button>
+          >{t('Prev')}</button>
           <button
             type="button"
             onclick={() => (page = Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
             class="flex h-6 items-center rounded-md border border-border-subtle px-2 text-[10px] text-text-main transition-colors hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Next
-          </button>
+          >{t('Next')}</button>
         </div>
       </div>
     {/if}

@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Import entry point. One modal for every share form: a 9routerx:// token, a
   // .9routerx.json file, or the original /add#… URL. The codec decides which is
   // which — the operator pastes whatever they were given.
@@ -92,16 +93,13 @@
   const canParse = $derived(pasted.trim().length > 0)
 </script>
 
-<Modal {isOpen} {onClose} title="Import Provider" icon="download" size="lg">
+<Modal {isOpen} {onClose} title={t('Import Provider')} icon="download" size="lg">
   {#snippet children()}
     <div class="flex flex-col gap-4">
-      <p class="text-sm text-text-muted">
-        Paste a share link, or drop a <span class="font-mono">.9routerx.json</span> file. You will review every
-        provider before anything is written.
-      </p>
+      <p class="text-sm text-text-muted">{t('Paste a share link, or drop a')}<span class="font-mono">{t('.9routerx.json')}</span>{t('file. You will review every provider before anything is written.')}</p>
 
       <label class="flex flex-col gap-1.5">
-        <span class="text-sm font-medium text-text-main">Share link or file contents</span>
+        <span class="text-sm font-medium text-text-main">{t('Share link or file contents')}</span>
         <textarea
           bind:value={pasted}
           rows={5}
@@ -119,17 +117,13 @@
 
       <div
         role="region"
-        aria-label="Drop a share file"
+        aria-label={t('Drop a share file')}
         ondragover={(e) => { e.preventDefault(); dragging = true }}
         ondragleave={() => (dragging = false)}
         ondrop={onDrop}
         class="rounded-[10px] border-2 border-dashed p-4 text-center transition-colors {dragging ? 'border-brand-500 bg-brand-500/5' : 'border-border-subtle bg-surface-2/40'}"
       >
-        <p class="text-xs text-text-muted">
-          Drop a <span class="font-mono">.9routerx.json</span> file here, or
-          <button type="button" onclick={() => fileInput?.click()} class="cursor-pointer text-brand-500 underline">
-            browse
-          </button>
+        <p class="text-xs text-text-muted">{t('Drop a')}<span class="font-mono">{t('.9routerx.json')}</span>{t('file here, or')}<button type="button" onclick={() => fileInput?.click()} class="cursor-pointer text-brand-500 underline">{t('browse')}</button>
         </p>
         <input
           bind:this={fileInput}
@@ -145,11 +139,11 @@
       </div>
 
       <div class="rounded-lg border border-border-subtle bg-surface-2/40 p-3 text-xs text-text-muted">
-        <p class="mb-1 font-medium text-text-main">Accepted forms</p>
+        <p class="mb-1 font-medium text-text-main">{t('Accepted forms')}</p>
         <ul class="flex list-disc flex-col gap-0.5 pl-4">
-          <li><span class="font-mono">9routerx://&lt;base64url&gt;</span> — one token, best for chat</li>
-          <li><span class="font-mono">/add#prov=…</span> — the original URL form</li>
-          <li><span class="font-mono">.9routerx.json</span> — for many providers or a block of keys</li>
+          <li><span class="font-mono">9routerx://&lt;base64url&gt;</span> {t('— one token, best for chat')}</li>
+          <li><span class="font-mono">{t('/add#prov=…')}</span> {t('— the original URL form')}</li>
+          <li><span class="font-mono">{t('.9routerx.json')}</span> {t('— for many providers or a block of keys')}</li>
         </ul>
       </div>
     </div>
@@ -157,8 +151,8 @@
 
   {#snippet footer()}
     <div class="flex items-center justify-end gap-2">
-      <Button variant="secondary" onclick={onClose}>Cancel</Button>
-      <Button variant="primary" disabled={!canParse} onclick={parse}>Review providers</Button>
+      <Button variant="secondary" onclick={onClose}>{t('Cancel')}</Button>
+      <Button variant="primary" disabled={!canParse} onclick={parse}>{t('Review providers')}</Button>
     </div>
   {/snippet}
 </Modal>

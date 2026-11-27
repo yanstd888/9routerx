@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { Layers, Search, X } from 'lucide-svelte'
   import { notifications } from '../../lib/notifications'
   import { api, type Combo, type ProviderConnection, type ProviderNode, type SmartRule } from '../../api/client'
@@ -599,24 +600,22 @@
       <input
         type="text"
         bind:value={searchQuery}
-        placeholder="Search combos…"
-        aria-label="Search combos"
+        placeholder={t('Search combos…')}
+        aria-label={t('Search combos')}
         class="w-full rounded-[10px] border border-transparent bg-surface-2 py-2 pl-9 pr-9 text-sm text-text-main transition-all duration-150 ease-out placeholder-text-muted/70 focus:border-brand-500/40 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
       />
       {#if searchQuery}
         <button
           type="button"
           onclick={() => (searchQuery = '')}
-          aria-label="Clear search"
+          aria-label={t('Clear search')}
           class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-text-muted transition-colors hover:text-text-main"
         >
           <X class="h-4 w-4" />
         </button>
       {/if}
     </div>
-    <Button onclick={handleReconcile} variant="ghost" size="sm" loading={isReconciling}>
-      Reconcile rules
-    </Button>
+    <Button onclick={handleReconcile} variant="ghost" size="sm" loading={isReconciling}>{t('Reconcile rules')}</Button>
     {#if reconcileNote}
       <span class="text-[11px] text-text-muted">{reconcileNote}</span>
     {/if}
@@ -654,7 +653,7 @@
                 bind:value={bulkStrategy}
                 class="w-full bg-surface-2 border border-border rounded-lg px-2.5 py-1.5 text-xs text-text-main focus:outline-none focus:ring-brand-500 focus:border-brand-500 cursor-pointer"
               >
-                <option value="" disabled>Set strategy…</option>
+                <option value="" disabled>{t('Set strategy…')}</option>
                 {#each comboStrategyOptions(globalComboStrategy) as strategy (strategy.value)}
                   <option value={strategy.value}>{strategy.label}</option>
                 {/each}
@@ -666,9 +665,7 @@
               onclick={handleApplyBulkStrategy}
               disabled={!bulkStrategy}
               class="whitespace-nowrap"
-            >
-              Apply Strategy
-            </Button>
+            >{t('Apply Strategy')}</Button>
             <Button
               icon="delete"
               size="sm"
@@ -678,9 +675,7 @@
             >
               Delete ({selectedCombos.length})
             </Button>
-            <Button size="sm" variant="ghost" onclick={clearSelection} class="whitespace-nowrap">
-              Clear
-            </Button>
+            <Button size="sm" variant="ghost" onclick={clearSelection} class="whitespace-nowrap">{t('Clear')}</Button>
           {/if}
         </div>
       {/if}
@@ -696,18 +691,18 @@
       aria-expanded={arenaResults.length > 0 || arenaRunning}
     >
       <span class="material-symbols-outlined text-[18px] text-brand-500">compare_arrows</span>
-      <span class="text-sm font-bold">Model arena</span>
-      <span class="text-xs text-text-muted">— run one prompt against several members side by side</span>
+      <span class="text-sm font-bold">{t('Model arena')}</span>
+      <span class="text-xs text-text-muted">{t('— run one prompt against several members side by side')}</span>
     </button>
     <div class="px-4 pb-4 space-y-3">
       <textarea
         rows={2}
         bind:value={arenaPrompt}
-        placeholder="Ask every selected member the same thing…"
+        placeholder={t('Ask every selected member the same thing…')}
         class="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-500"
       ></textarea>
       {#if arenaCandidates.length === 0}
-        <p class="text-xs text-text-muted">Combo members appear here once a combo has models.</p>
+        <p class="text-xs text-text-muted">{t('Combo members appear here once a combo has models.')}</p>
       {:else}
         <div class="flex flex-wrap gap-1.5">
           {#each arenaCandidates as candidate (candidate)}
@@ -773,11 +768,9 @@
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-500/10 text-brand-500 mb-4">
           <Layers class="w-8 h-8" />
         </div>
-        <p class="text-text-main font-medium mb-1">No combos yet</p>
-        <p class="text-sm text-text-muted mb-4">Create model combos with fallback support</p>
-        <Button icon="add" onclick={openCreateModal} class="w-full sm:w-auto">
-          Create Combo
-        </Button>
+        <p class="text-text-main font-medium mb-1">{t('No combos yet')}</p>
+        <p class="text-sm text-text-muted mb-4">{t('Create model combos with fallback support')}</p>
+        <Button icon="add" onclick={openCreateModal} class="w-full sm:w-auto">{t('Create Combo')}</Button>
       </div>
     </Card>
   {:else}
@@ -788,7 +781,7 @@
           <p class="text-sm text-text-muted mb-4">
             Try a shorter query, or clear the search to see all {llmCombos.length} combos.
           </p>
-          <Button variant="secondary" onclick={() => (searchQuery = '')}>Clear search</Button>
+          <Button variant="secondary" onclick={() => (searchQuery = '')}>{t('Clear search')}</Button>
         </div>
       </Card>
     {:else}
@@ -874,7 +867,7 @@
 <!-- Confirm Delete Modal (upstream ConfirmModal parity) -->
 <ConfirmModal
   isOpen={!!confirmState}
-  title="Delete Combo"
+  title={t('Delete Combo')}
   message={
     confirmState
       ? confirmState.ids.length === 1

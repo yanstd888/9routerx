@@ -120,7 +120,11 @@ func TestPIIMaskGolden(t *testing.T) {
 
 // goldenField pulls the named section out of a golden file laid out as
 // "INPUT:\n...\nMASKED:\n...". Everything after the marker is the value.
+// Line endings are normalized first: a Windows checkout with
+// core.autocrlf=true writes the fixture's markers as "MASKED:\r\n", which
+// would otherwise miss the cut and empty the section.
 func goldenField(content, marker string) string {
+	content = strings.ReplaceAll(content, "\r\n", "\n")
 	_, rest, _ := strings.Cut(content, marker+":\n")
 	return strings.TrimRight(rest, "\n")
 }

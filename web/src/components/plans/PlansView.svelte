@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { api, type Plan, type PlanInput, type PlanPeriod } from '../../api/client'
   import { Loader2, Pencil, Plus, RefreshCw, Trash2, X } from 'lucide-svelte'
 
@@ -191,27 +192,20 @@
 <div class="max-w-5xl mx-auto space-y-6">
   <div class="flex items-start justify-between gap-4 flex-wrap">
     <div>
-      <h1 class="text-2xl font-semibold text-text-main">Plans</h1>
-      <p class="text-sm text-text-muted mt-1">
-        Reusable policy templates. A key assigned to a plan inherits its limits as defaults and can
-        still override them individually.
-      </p>
+      <h1 class="text-2xl font-semibold text-text-main">{t('Plans')}</h1>
+      <p class="text-sm text-text-muted mt-1">{t('Reusable policy templates. A key assigned to a plan inherits its limits as defaults and can still override them individually.')}</p>
     </div>
     <div class="flex items-center gap-2">
       <button
         onclick={load}
         class="flex items-center gap-2 px-3 py-2 rounded-[10px] border border-border-subtle text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors text-sm"
       >
-        <RefreshCw size={16} class={isLoading ? 'animate-spin' : ''} />
-        Reload
-      </button>
+        <RefreshCw size={16} class={isLoading ? 'animate-spin' : ''} />{t('Reload')}</button>
       <button
         onclick={openCreate}
         class="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-primary text-white hover:bg-primary-hover transition-colors text-sm font-medium"
       >
-        <Plus size={16} />
-        New plan
-      </button>
+        <Plus size={16} />{t('New plan')}</button>
     </div>
   </div>
 
@@ -231,23 +225,21 @@
 
   {#if isLoading && plans.length === 0}
     <div class="flex items-center gap-2 text-text-muted text-sm py-8">
-      <Loader2 size={16} class="animate-spin" />
-      Loading plans…
-    </div>
+      <Loader2 size={16} class="animate-spin" />{t('Loading plans…')}</div>
   {:else if plans.length === 0}
     <div class="rounded-[14px] border border-border-subtle bg-surface px-5 py-8 text-center">
-      <p class="text-sm text-text-muted">No plans yet.</p>
+      <p class="text-sm text-text-muted">{t('No plans yet.')}</p>
     </div>
   {:else}
     <div class="glyph-surface overflow-hidden">
       <table class="glyph-table w-full text-sm">
         <thead class="bg-surface-2 text-text-muted">
           <tr>
-            <th class="text-left font-medium px-4 py-2.5">Name</th>
-            <th class="text-left font-medium px-4 py-2.5 hidden md:table-cell">Rate limits</th>
-            <th class="text-left font-medium px-4 py-2.5">Budget</th>
-            <th class="text-left font-medium px-4 py-2.5 hidden md:table-cell">Models</th>
-            <th class="text-left font-medium px-4 py-2.5">Keys</th>
+            <th class="text-left font-medium px-4 py-2.5">{t('Name')}</th>
+            <th class="text-left font-medium px-4 py-2.5 hidden md:table-cell">{t('Rate limits')}</th>
+            <th class="text-left font-medium px-4 py-2.5">{t('Budget')}</th>
+            <th class="text-left font-medium px-4 py-2.5 hidden md:table-cell">{t('Models')}</th>
+            <th class="text-left font-medium px-4 py-2.5">{t('Keys')}</th>
             <th class="px-4 py-2.5"></th>
           </tr>
         </thead>
@@ -262,34 +254,32 @@
                 {#if plan.hardCutoff}
                   <span
                     class="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wide bg-warning/15 text-warning"
-                  >
-                    hard cutoff
-                  </span>
+                  >{t('hard cutoff')}</span>
                 {/if}
               </td>
-              <td data-label="Rate limits" class="px-4 py-3 text-text-muted hidden md:table-cell">{describeLimits(plan)}</td>
-              <td data-label="Budget" class="px-4 py-3 text-text-muted">
+              <td data-label={t('Rate limits')} class="px-4 py-3 text-text-muted hidden md:table-cell">{describeLimits(plan)}</td>
+              <td data-label={t('Budget')} class="px-4 py-3 text-text-muted">
                 {usd(plan.limitMicros)}{#if plan.limitTokens} · {plan.limitTokens} tok{/if}
                 <div class="text-xs text-text-subtle">{plan.period}</div>
               </td>
-              <td data-label="Models" class="px-4 py-3 text-text-muted hidden md:table-cell">
+              <td data-label={t('Models')} class="px-4 py-3 text-text-muted hidden md:table-cell">
                 {plan.allowedModels?.length
                   ? `${plan.allowedModels.length} pattern(s)`
                   : 'all models'}
               </td>
-              <td data-label="Keys" class="px-4 py-3 text-text-muted">{keyCounts[plan.id] ?? 0}</td>
-              <td data-label="Actions" class="px-4 py-3">
+              <td data-label={t('Keys')} class="px-4 py-3 text-text-muted">{keyCounts[plan.id] ?? 0}</td>
+              <td data-label={t('Actions')} class="px-4 py-3">
                 <div class="flex items-center justify-end gap-1">
                   <button
                     onclick={() => openEdit(plan)}
-                    title="Edit plan"
+                    title={t('Edit plan')}
                     class="p-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2"
                   >
                     <Pencil size={15} />
                   </button>
                   <button
                     onclick={() => remove(plan)}
-                    title="Delete plan"
+                    title={t('Delete plan')}
                     class="p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error/10"
                   >
                     <Trash2 size={15} />
@@ -319,7 +309,7 @@
           type="button"
           onclick={() => (isEditorOpen = false)}
           class="p-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2"
-          title="Close"
+          title={t('Close')}
         >
           <X size={16} />
         </button>
@@ -327,15 +317,15 @@
 
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Name</span>
+          <span class="text-xs text-text-muted">{t('Name')}</span>
           <input
             bind:value={formName}
-            placeholder="Pro"
+            placeholder={t('Pro')}
             class="px-3 py-2 rounded-[10px] border border-border bg-surface-2 text-sm text-text-main"
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Budget period</span>
+          <span class="text-xs text-text-muted">{t('Budget period')}</span>
           <select
             bind:value={formPeriod}
             class="px-3 py-2 rounded-[10px] border border-border bg-surface-2 text-sm text-text-main"
@@ -352,17 +342,17 @@
       </p>
 
       <label class="flex flex-col gap-1">
-        <span class="text-xs text-text-muted">Description</span>
+        <span class="text-xs text-text-muted">{t('Description')}</span>
         <input
           bind:value={formDescription}
-          placeholder="Paid tier — 120 RPM, $5 monthly budget"
+          placeholder={t('Paid tier — 120 RPM, $5 monthly budget')}
           class="px-3 py-2 rounded-[10px] border border-border bg-surface-2 text-sm text-text-main"
         />
       </label>
 
       <div class="grid gap-4 sm:grid-cols-3">
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Requests / min (0 = unlimited)</span>
+          <span class="text-xs text-text-muted">{t('Requests / min (0 = unlimited)')}</span>
           <input
             bind:value={formRpm}
             inputmode="numeric"
@@ -370,7 +360,7 @@
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Tokens / min (0 = unlimited)</span>
+          <span class="text-xs text-text-muted">{t('Tokens / min (0 = unlimited)')}</span>
           <input
             bind:value={formTpm}
             inputmode="numeric"
@@ -378,7 +368,7 @@
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Concurrent (0 = unlimited)</span>
+          <span class="text-xs text-text-muted">{t('Concurrent (0 = unlimited)')}</span>
           <input
             bind:value={formConcurrency}
             inputmode="numeric"
@@ -389,7 +379,7 @@
 
       <div class="grid gap-4 sm:grid-cols-3">
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Budget (USD, 0 = unlimited)</span>
+          <span class="text-xs text-text-muted">{t('Budget (USD, 0 = unlimited)')}</span>
           <input
             bind:value={formBudgetUsd}
             inputmode="decimal"
@@ -397,7 +387,7 @@
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Token budget (0 = unlimited)</span>
+          <span class="text-xs text-text-muted">{t('Token budget (0 = unlimited)')}</span>
           <input
             bind:value={formTokens}
             inputmode="numeric"
@@ -405,7 +395,7 @@
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs text-text-muted">Alert at (% of budget)</span>
+          <span class="text-xs text-text-muted">{t('Alert at (% of budget)')}</span>
           <input
             bind:value={formAlertPct}
             inputmode="numeric"
@@ -415,16 +405,10 @@
       </div>
 
       <label class="flex items-center gap-2 text-sm text-text-main">
-        <input type="checkbox" bind:checked={formHardCutoff} class="rounded" />
-        Hard cutoff — refuse requests once the budget is exhausted (checked when a request starts;
-        one already in flight may overshoot slightly)
-      </label>
+        <input type="checkbox" bind:checked={formHardCutoff} class="rounded" />{t('Hard cutoff — refuse requests once the budget is exhausted (checked when a request starts; one already in flight may overshoot slightly)')}</label>
 
       <label class="flex flex-col gap-1">
-        <span class="text-xs text-text-muted">
-          Allowed models — one pattern per line, empty means every model. A trailing * is a
-          wildcard. A key's own list is added to this one.
-        </span>
+        <span class="text-xs text-text-muted">{t('Allowed models — one pattern per line, empty means every model. A trailing * is a wildcard. A key\'s own list is added to this one.')}</span>
         <textarea
           bind:value={formModels}
           rows="4"
@@ -438,9 +422,7 @@
           type="button"
           onclick={() => (isEditorOpen = false)}
           class="px-3 py-2 rounded-[10px] border border-border-subtle text-sm text-text-muted hover:text-text-main"
-        >
-          Cancel
-        </button>
+        >{t('Cancel')}</button>
         <button
           type="submit"
           disabled={isSaving}

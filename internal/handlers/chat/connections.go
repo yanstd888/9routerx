@@ -754,6 +754,22 @@ func (h *ChatHandler) getProviderConfig(provider string, connData *ConnectionDat
 		return nil, fmt.Errorf("provider %q has no baseUrl in connection data and is not in KnownProviders", provider)
 	}
 
+	// Xiaomi Token Plan is one product on three regional origins, and the
+	// registry names only the Singapore one. A connection that stored
+	// region=cn was probed against the CN host by the dashboard and then
+	// chat-routed to Singapore, which rejects a valid key with 401. Resolve
+	// the origin from the connection's region unless the operator named a
+	// baseUrl of their own, which still wins.
+	if provider == "xiaomi-tokenplan" && (connData == nil || connData.BaseURL == "") {
+		var psd map[string]any
+		if connData != nil {
+			psd = connData.ProviderSpecificData
+		}
+		cloned := *baseCfg
+		cloned.BaseURL = providers.XiaomiTokenplanChatURL(providers.XiaomiTokenplanRegionOf(psd))
+		baseCfg = &cloned
+	}
+
 	// A compatible node's wire format comes from the same table its lane comes
 	// from (providers.CompatibleNodeWires), so the two cannot drift apart —
 	// that drift was the "no choices in OpenAI response" bug: the lane sent

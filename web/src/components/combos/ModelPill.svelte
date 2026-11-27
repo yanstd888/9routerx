@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { Brain, Check, Eye } from 'lucide-svelte'
 
   interface Props {
@@ -42,16 +43,16 @@
   {/if}
   <span class="min-w-0 truncate">{label}</span>
   {#if vision}
-    <Eye class={isAdded ? 'w-3 h-3 text-white/90 shrink-0' : 'w-3 h-3 text-blue-500 shrink-0'} title="Vision — Supports image input" />
+    <Eye class={isAdded ? 'w-3 h-3 text-white/90 shrink-0' : 'w-3 h-3 text-blue-500 shrink-0'} title={t('Vision — Supports image input')} />
   {/if}
   {#if reasoning}
-    <Brain class={isAdded ? 'w-3 h-3 text-white/90 shrink-0' : 'w-3 h-3 text-amber-500 shrink-0'} title="Reasoning / Thinking" />
+    <Brain class={isAdded ? 'w-3 h-3 text-white/90 shrink-0' : 'w-3 h-3 text-amber-500 shrink-0'} title={t('Reasoning / Thinking')} />
   {/if}
   {#if deprecated}
     <span
       class="material-symbols-outlined text-[13px] leading-none shrink-0 {isAdded ? 'text-white/90' : 'text-warning'}"
-      title="Deprecated — this model was retired by the provider and cannot serve a request"
-      aria-label="Deprecated"
+      title={t('Deprecated — this model was retired by the provider and cannot serve a request')}
+      aria-label={t('Deprecated')}
     >error</span>
   {/if}
 </button>

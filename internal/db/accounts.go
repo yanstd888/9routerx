@@ -383,7 +383,10 @@ func (r *Repo) clearProviderModelLocks(provider string) error {
 }
 
 func (r *Repo) clearSpecificModelLock(provider, model string) error {
-	key := "$." + modelLockPrefix + model
+	// Use the same quoted path the lock was written with: an unquoted
+	// $.modelLock_gpt-3.5-turbo parses as a nested path, misses the flat key,
+	// and leaves the lock in place while polluting the data blob with junk.
+	key := modelLockDataKey(model)
 	pairs, err := r.listConnectionData("SELECT id, data FROM providerConnections WHERE provider = ?", provider)
 	if err != nil {
 		return err
@@ -412,7 +415,10 @@ func (r *Repo) clearConnectionModelLocks(id, data string) error {
 	args := make([]any, 0, len(fields)*2+2)
 	for _, f := range fields {
 		q += ", ?, json('null')"
-		args = append(args, "$."+f)
+		// Quote the key segment, matching modelLockDataKey: listModelLockJSONKeys
+		// returns flat keys like modelLock_gpt-3.5-turbo, and an unquoted path
+		// reads the dot as a child step instead of part of the key name.
+		args = append(args, "$.\""+f+"\"")
 	}
 	q += ", '$.backoffLevel', 0), updatedAt = datetime('now') WHERE id = ?"
 	args = append(args, id)

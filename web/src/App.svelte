@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from './lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { Loader2 } from 'lucide-svelte'
   import {
@@ -433,7 +434,7 @@
   <div class="min-h-screen flex items-center justify-center bg-bg p-4">
     <div class="text-center">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      <p class="text-text-muted mt-4">Loading...</p>
+      <p class="text-text-muted mt-4">{t('Loading...')}</p>
     </div>
   </div>
 {:else if (requireLogin && !isAuthenticatedState) || activeTab === 'login'}
@@ -491,7 +492,7 @@
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-white focus:text-sm focus:font-medium"
-    >Skip to main content</a>
+    >{t('Skip to main content')}</a>
     <!-- Mobile sidebar drawer backdrop. Escape closes the drawer from a
          <svelte:window> handler below: the backdrop div is never focused, so
          an onkeydown on it was dead wiring and the key did nothing. -->
@@ -501,7 +502,7 @@
         onclick={() => (isMobileMenuOpen = false)}
         role="button"
         tabindex="-1"
-        aria-label="Close menu backdrop"
+        aria-label={t('Close menu backdrop')}
       ></div>
     {/if}
 
@@ -609,7 +610,7 @@
           {#if isLoading}
             <div class="flex flex-col items-center justify-center h-[70vh] gap-3 text-text-muted">
               <Loader2 class="w-7 h-7 animate-spin text-brand-500" />
-              <span class="font-code text-xs">Connecting to 9RouterX Localhost Gateway (:20128)...</span>
+              <span class="font-code text-xs">{t('Connecting to 9RouterX Localhost Gateway (:20128)...')}</span>
             </div>
           {:else}
             {#if showOnboarding && activeTab === 'endpoint'}
@@ -748,9 +749,7 @@
             <!-- FASE UI-GLEPH: the tagline the rebrand had to keep, one mono
                  line at the foot of every dashboard page (spec §4). -->
             <footer class="mt-10 border-t border-[var(--app-border)] pt-4 pb-2 text-center">
-              <span class="font-code text-[10px] tracking-[0.18em] text-[var(--app-text-subtle)]">
-                9RouterX — 9R Next Go Generation
-              </span>
+              <span class="font-code text-[10px] tracking-[0.18em] text-[var(--app-text-subtle)]">{t('9RouterX — 9R Next Go Generation')}</span>
             </footer>
           {/if}
         </div>

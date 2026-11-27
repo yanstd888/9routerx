@@ -1,5 +1,6 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { api, type SystemVersionInfo } from '../api/client'
   import { marked } from 'marked'
   import { sanitizeHtml } from '../lib/sanitizeHtml'
@@ -184,7 +185,7 @@
       onkeydown={(e) => e.key === 'Escape' && dismiss()}
       role="button"
       tabindex="-1"
-      aria-label="Close background"
+      aria-label={t('Close background')}
     ></div>
 
     <div
@@ -208,7 +209,7 @@
           type="button"
           onclick={dismiss}
           class="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
-          aria-label="Close"
+          aria-label={t('Close')}
         >
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
@@ -221,7 +222,7 @@
             {#if isLoadingChangelog}
               <div class="flex items-center justify-center py-6 text-text-muted gap-2">
                 <span class="material-symbols-outlined animate-spin text-[20px] text-primary">progress_activity</span>
-                <span>Loading changes...</span>
+                <span>{t('Loading changes...')}</span>
               </div>
             {:else if releaseNotesHtml}
               <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -235,7 +236,7 @@
 
       <!-- Terminal Command Box -->
       <div class="flex flex-col gap-1.5">
-        <span class="text-xs font-medium text-text-muted">Terminal Command</span>
+        <span class="text-xs font-medium text-text-muted">{t('Terminal Command')}</span>
         <div class="flex items-center gap-2 p-2.5 rounded-xl bg-surface-2 border border-border-subtle">
           <code class="text-xs font-mono text-amber-600 dark:text-amber-400 flex-1 truncate select-all">
             {INSTALL_CMD}
@@ -275,9 +276,7 @@
           onclick={dismiss}
           disabled={isUpdating}
           class="px-3.5 py-2 text-xs font-medium rounded-lg text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
-        >
-          Cancel
-        </button>
+        >{t('Cancel')}</button>
         <button
           type="button"
           onclick={handleCopyAndShutdown}
@@ -307,17 +306,13 @@
       <div class="flex items-center justify-center size-14 rounded-full bg-red-500/20 text-red-500 mx-auto mb-4">
         <span class="material-symbols-outlined text-[28px]">power_off</span>
       </div>
-      <h2 class="text-lg font-semibold text-text-main mb-1">Server Stopped</h2>
-      <p class="text-xs text-text-muted mb-4">
-        Now run <code class="px-1.5 py-0.5 rounded bg-surface-2 font-mono text-amber-500">9routerx update</code> in your terminal.
-      </p>
+      <h2 class="text-lg font-semibold text-text-main mb-1">{t('Server Stopped')}</h2>
+      <p class="text-xs text-text-muted mb-4">{t('Now run')}<code class="px-1.5 py-0.5 rounded bg-surface-2 font-mono text-amber-500">{t('9routerx update')}</code>{t('in your terminal.')}</p>
       <button
         type="button"
         onclick={() => globalThis.location.reload()}
         class="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors cursor-pointer"
-      >
-        Reload Dashboard
-      </button>
+      >{t('Reload Dashboard')}</button>
     </div>
   </div>
 {/if}

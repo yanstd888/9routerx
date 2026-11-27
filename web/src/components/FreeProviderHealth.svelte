@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Free Provider Health: what the free-tier fallback chain sees, per
   // provider. A provider the chain would skip (cooling) shows red with the
   // time its wait ends; a provider the chain deprioritises (flaky) shows
@@ -101,7 +102,7 @@
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div class="flex items-center gap-2">
       <ShieldCheck class="w-4 h-4 text-brand-500" aria-hidden="true" />
-      <h2 class="text-sm font-semibold text-text-main">Free Provider Health</h2>
+      <h2 class="text-sm font-semibold text-text-main">{t('Free Provider Health')}</h2>
       {#if loaded && coolingCount > 0}
         <Badge tone="danger" dot>{coolingCount} cooling</Badge>
       {/if}
@@ -112,37 +113,30 @@
     <div class="flex items-center gap-2">
       {#if confirmReset}
         <Button size="sm" variant="danger" disabled={resetting} onclick={doReset}>
-          <RotateCcw class="w-3.5 h-3.5" aria-hidden="true" />
-          Confirm clear
-        </Button>
-        <Button size="sm" variant="ghost" onclick={() => (confirmReset = false)}>Cancel</Button>
+          <RotateCcw class="w-3.5 h-3.5" aria-hidden="true" />{t('Confirm clear')}</Button>
+        <Button size="sm" variant="ghost" onclick={() => (confirmReset = false)}>{t('Cancel')}</Button>
       {:else}
         <Button size="sm" variant="ghost" disabled={coolingCount === 0} onclick={() => (confirmReset = true)}>
-          <RotateCcw class="w-3.5 h-3.5" aria-hidden="true" />
-          Reset cooldowns
-        </Button>
+          <RotateCcw class="w-3.5 h-3.5" aria-hidden="true" />{t('Reset cooldowns')}</Button>
       {/if}
     </div>
   </div>
 
-  <p class="text-xs text-text-muted mt-1">
-    What the free-tier fallback chain sees. Red = skipped while its quota wait
-    runs out; amber = flaky over the last 24h; green = healthy. Polls every 30s.
-  </p>
+  <p class="text-xs text-text-muted mt-1">{t('What the free-tier fallback chain sees. Red = skipped while its quota wait runs out; amber = flaky over the last 24h; green = healthy. Polls every 30s.')}</p>
 
   {#if loaded && visible.length > 0}
     <div class="overflow-x-auto mt-3">
       <table class="glyph-table w-full text-left text-xs min-w-[560px]">
-        <caption class="sr-only">Free provider health: status, success rate, latency, recent refusals, cooldown</caption>
+        <caption class="sr-only">{t('Free provider health: status, success rate, latency, recent refusals, cooldown')}</caption>
         <thead>
           <tr class="text-text-muted border-b border-border-subtle">
-            <th scope="col" class="py-2 pr-3 font-medium">Provider</th>
-            <th scope="col" class="py-2 pr-3 font-medium">Success (24h)</th>
+            <th scope="col" class="py-2 pr-3 font-medium">{t('Provider')}</th>
+            <th scope="col" class="py-2 pr-3 font-medium">{t('Success (24h)')}</th>
             <th scope="col" class="py-2 pr-3 font-medium hidden md:table-cell">p50 / p95</th>
-            <th scope="col" class="py-2 pr-3 font-medium hidden md:table-cell">Uptime</th>
+            <th scope="col" class="py-2 pr-3 font-medium hidden md:table-cell">{t('Uptime')}</th>
             <th scope="col" class="py-2 pr-3 font-medium hidden md:table-cell">429 / 403</th>
-            <th scope="col" class="py-2 pr-3 font-medium hidden lg:table-cell">Regime</th>
-            <th scope="col" class="py-2 font-medium">Status</th>
+            <th scope="col" class="py-2 pr-3 font-medium hidden lg:table-cell">{t('Regime')}</th>
+            <th scope="col" class="py-2 font-medium">{t('Status')}</th>
           </tr>
         </thead>
         <tbody>
@@ -191,12 +185,10 @@
       </table>
     </div>
   {:else if loaded}
-    <p class="text-xs text-text-subtle mt-3">No free provider traffic recorded yet.</p>
+    <p class="text-xs text-text-subtle mt-3">{t('No free provider traffic recorded yet.')}</p>
   {:else if failed}
-    <p class="text-[11px] text-text-muted mt-3 border border-border-subtle rounded-lg px-3 py-2">
-      Health data is stale — the last refresh failed. It retries every 30 seconds.
-    </p>
+    <p class="text-[11px] text-text-muted mt-3 border border-border-subtle rounded-lg px-3 py-2">{t('Health data is stale — the last refresh failed. It retries every 30 seconds.')}</p>
   {:else}
-    <p class="text-xs text-text-subtle mt-3">Loading…</p>
+    <p class="text-xs text-text-subtle mt-3">{t('Loading…')}</p>
   {/if}
 </Card>

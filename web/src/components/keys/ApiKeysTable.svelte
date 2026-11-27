@@ -505,8 +505,8 @@
       <Key class="w-5 h-5" />
     </div>
     <div>
-      <h2 class="text-lg font-semibold text-text-main">API Keys</h2>
-      <p class="text-xs text-text-muted">Manage Bearer tokens for clients connecting to this endpoint</p>
+      <h2 class="text-lg font-semibold text-text-main">{t('API Keys')}</h2>
+      <p class="text-xs text-text-muted">{t('Manage Bearer tokens for clients connecting to this endpoint')}</p>
     </div>
   </div>
 
@@ -516,8 +516,8 @@
         <Key class="w-7 h-7" />
       </div>
       <div class="space-y-1">
-        <p class="text-text-main font-medium text-sm">No API keys yet</p>
-        <p class="text-xs text-text-muted">Create your first API key to get started</p>
+        <p class="text-text-main font-medium text-sm">{t('No API keys yet')}</p>
+        <p class="text-xs text-text-muted">{t('Create your first API key to get started')}</p>
       </div>
       <!-- The action the empty state invites. It used to live only in the
            populated branch, so an operator with no keys read "create your
@@ -526,11 +526,11 @@
       <button
         type="button"
         onclick={() => onCreate?.()}
-        aria-label="Create Key"
+        aria-label={t('Create Key')}
         class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition cursor-pointer"
       >
         <Plus class="w-3.5 h-3.5" />
-        <span>Create Key</span>
+        <span>{t('Create Key')}</span>
       </button>
     </div>
   {:else}
@@ -569,7 +569,7 @@
           ? 'border-brand-500/50 bg-brand-500/10'
           : 'border-border bg-surface-2/60 hover:bg-surface-2'}"
       >
-        <span class="block text-[11px] text-text-muted">Active</span>
+        <span class="block text-[11px] text-text-muted">{t('Active')}</span>
         <span class="mt-0.5 flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
           <span class="text-sm font-semibold font-mono text-text-main">{activeCount}</span>
@@ -587,7 +587,7 @@
           ? 'border-brand-500/50 bg-brand-500/10'
           : 'border-border bg-surface-2/60 hover:bg-surface-2'}"
       >
-        <span class="block text-[11px] text-text-muted">Requests</span>
+        <span class="block text-[11px] text-text-muted">{t('Requests')}</span>
         <span class="mt-0.5 flex items-center gap-1">
           <span class="text-sm font-semibold font-mono text-text-main">{totalReqs.toLocaleString()}</span>
           {#if requestsPill === 'forward'}
@@ -617,7 +617,7 @@
           ? 'border-brand-500/50 bg-brand-500/10'
           : 'border-border bg-surface-2/60 hover:bg-surface-2'}"
       >
-        <span class="block text-[11px] text-text-muted">Tokens</span>
+        <span class="block text-[11px] text-text-muted">{t('Tokens')}</span>
         <span class="mt-0.5 block text-sm font-semibold font-mono text-text-main">{compactTokens(totalTokens)}</span>
       </button>
       <!-- Unused: never spent. Half of a personal deployment can be keys that
@@ -632,7 +632,7 @@
           ? 'border-brand-500/50 bg-brand-500/10'
           : 'border-border bg-surface-2/60 hover:bg-surface-2'}"
       >
-        <span class="block text-[11px] text-text-muted">Unused</span>
+        <span class="block text-[11px] text-text-muted">{t('Unused')}</span>
         <span class="mt-0.5 block text-sm font-semibold font-mono {unusedCount > 0 ? 'text-warning' : 'text-text-subtle'}">
           {unusedCount}
         </span>
@@ -659,22 +659,22 @@
           type="text"
           value={searchTerm}
           oninput={(e) => (searchTerm = e.currentTarget.value)}
-          placeholder="Search keys or tokens..."
-          aria-label="Search keys"
+          placeholder={t('Search keys or tokens...')}
+          aria-label={t('Search keys')}
           class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-bg border border-border font-mono text-xs text-text-main placeholder:text-text-subtle focus:outline-none focus:border-brand-500/50 transition-colors"
         />
       </div>
       <label class="flex items-center gap-1.5 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-xs shrink-0">
-        <span class="text-text-subtle">Sort</span>
+        <span class="text-text-subtle">{t('Sort')}</span>
         <select
           value={sortKey}
           onchange={(e) => (sortKey = e.currentTarget.value as 'newest' | 'name' | 'requests')}
-          aria-label="Sort keys"
+          aria-label={t('Sort keys')}
           class="bg-transparent border-0 p-0 text-xs font-medium text-text-main focus:outline-none cursor-pointer"
         >
-          <option value="newest">Newest</option>
-          <option value="name">Name</option>
-          <option value="requests">Requests</option>
+          <option value="newest">{t('Newest')}</option>
+          <option value="name">{t('Name')}</option>
+          <option value="requests">{t('Requests')}</option>
         </select>
       </label>
       {#if isFiltered}
@@ -688,14 +688,12 @@
             unusedPill = 'off'
           }}
           class="shrink-0 rounded-lg px-2.5 py-1.5 text-xs text-text-muted hover:text-text-main hover:bg-surface-2 transition-colors cursor-pointer"
-        >
-          Clear
-        </button>
+        >{t('Clear')}</button>
       {/if}
       <button
         type="button"
         onclick={() => onCreate?.()}
-        aria-label="Create Key"
+        aria-label={t('Create Key')}
         class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition cursor-pointer"
       >
         <Plus class="w-3.5 h-3.5" />
@@ -706,8 +704,8 @@
              aria-label pins one name at every width; the visible text is
              shortened with CSS, which changes what is read off the screen
              without changing what the control is called. -->
-        <span class="hidden sm:inline">Create Key</span>
-        <span class="sm:hidden" aria-hidden="true">New</span>
+        <span class="hidden sm:inline">{t('Create Key')}</span>
+        <span class="sm:hidden" aria-hidden="true">{t('New')}</span>
       </button>
     </div>
 
@@ -725,34 +723,26 @@
             onclick={() => runBatchAction('enabled', (id) => api.setApiKeyActive(id, true))}
             class="flex items-center gap-1 rounded-lg border border-emerald-500/30 px-2 py-1 text-[11px] text-emerald-600 transition-colors hover:bg-emerald-500/10 disabled:opacity-50 dark:text-emerald-400"
           >
-            <span class="material-symbols-outlined text-[14px]">check_circle</span>
-            Enable
-          </button>
+            <span class="material-symbols-outlined text-[14px]">check_circle</span>{t('Enable')}</button>
           <button
             type="button"
             disabled={isBatchBusy(batchBusy, selectedIds)}
             onclick={() => runBatchAction('paused', (id) => api.setApiKeyActive(id, false))}
             class="flex items-center gap-1 rounded-lg border border-amber-500/30 px-2 py-1 text-[11px] text-amber-600 transition-colors hover:bg-amber-500/10 disabled:opacity-50 dark:text-amber-400"
           >
-            <span class="material-symbols-outlined text-[14px]">pause</span>
-            Pause
-          </button>
+            <span class="material-symbols-outlined text-[14px]">pause</span>{t('Pause')}</button>
           <button
             type="button"
             disabled={isBatchBusy(batchBusy, selectedIds)}
             onclick={batchDelete}
             class="flex items-center gap-1 rounded-lg border border-red-500/30 px-2 py-1 text-[11px] text-red-500 transition-colors hover:bg-red-500/10 disabled:opacity-50"
           >
-            <Trash2 class="w-3 h-3" />
-            Delete
-          </button>
+            <Trash2 class="w-3 h-3" />{t('Delete')}</button>
           <button
             type="button"
             onclick={() => (selectedIds = [])}
             class="rounded-lg px-2 py-1 text-[11px] text-text-muted transition-colors hover:bg-surface-3 hover:text-text-main"
-          >
-            Clear
-          </button>
+          >{t('Clear')}</button>
         </div>
       </div>
     {/if}
@@ -767,7 +757,7 @@
       >
         <MenuItem label="Edit key &amp; policy" icon="tune" onSelect={() => (policyKey = k)} />
         <MenuItem
-          label="Regenerate secret"
+          label={t('Regenerate secret')}
           icon="autorenew"
           disabled={busyId !== null}
           onSelect={() => handleRotate(k)}
@@ -779,7 +769,7 @@
                wants the same control as one clearing an exhausted key. The note
                says what will be cleared. -->
           <MenuItem
-            label="Reset token quota"
+            label={t('Reset token quota')}
             icon="restart_alt"
             note={compactTokens(k.usedTokens ?? 0)}
             disabled={busyId !== null}
@@ -799,7 +789,7 @@
         <div class="my-1 border-t border-border-subtle" role="separator"></div>
 
         <MenuItem
-          label="Delete key"
+          label={t('Delete key')}
           icon="delete"
           danger
           disabled={busyId !== null}
@@ -934,7 +924,7 @@
       {#if quota > 0}
         <div class="space-y-1 min-w-[110px]">
           <div class="flex justify-between items-center text-[11px]">
-            <span class="text-text-muted">Budget</span>
+            <span class="text-text-muted">{t('Budget')}</span>
             <span class="text-text-main font-medium font-mono">
               {compactTokens(used)}
               <span class="text-text-subtle">/ {compactTokens(quota)}</span>
@@ -972,8 +962,8 @@
           <Search class="w-6 h-6" />
         </div>
         <div class="space-y-1">
-          <p class="text-text-main font-medium text-sm">No keys match</p>
-          <p class="text-xs text-text-muted">Nothing matches the current search and filters.</p>
+          <p class="text-text-main font-medium text-sm">{t('No keys match')}</p>
+          <p class="text-xs text-text-muted">{t('Nothing matches the current search and filters.')}</p>
         </div>
         <button
           type="button"
@@ -986,9 +976,7 @@
           }}
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-3 text-xs font-semibold text-text-main transition cursor-pointer"
         >
-          <RotateCcw class="w-3.5 h-3.5" />
-          Clear filters
-        </button>
+          <RotateCcw class="w-3.5 h-3.5" />{t('Clear filters')}</button>
       </div>
     {:else}
     <ul class="md:hidden grid grid-cols-1 gap-3">
@@ -1051,9 +1039,7 @@
                   onclick={() => handleRotate(k)}
                   class="text-[11px] text-text-muted hover:text-text-main px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
-                  <RotateCw class="w-3.5 h-3.5" />
-                  Regenerate
-                </button>
+                  <RotateCw class="w-3.5 h-3.5" />{t('Regenerate')}</button>
                 {@render keyActions(k)}
               </div>
             </div>
@@ -1083,7 +1069,7 @@
               <input
                 type="checkbox"
                 checked={selectedIds.length > 0 && selectedIds.length === visibleKeys.length}
-                aria-label="Select all keys"
+                aria-label={t('Select all keys')}
                 onchange={() => {
                   selectedIds =
                     selectedIds.length === visibleKeys.length ? [] : visibleKeys.map((k) => k.id)
@@ -1091,11 +1077,11 @@
                 class="size-3.5 rounded border-border/60 accent-[var(--primary)] cursor-pointer"
               />
             </th>
-            <th class="py-2.5 px-3">Key</th>
-            <th class="py-2.5 px-3">Token</th>
+            <th class="py-2.5 px-3">{t('Key')}</th>
+            <th class="py-2.5 px-3">{t('Token')}</th>
             <th class="py-2.5 px-3 hidden lg:table-cell">Policy &amp; created</th>
-            <th class="py-2.5 px-3">Usage</th>
-            <th class="py-2.5 px-3 text-right">Actions</th>
+            <th class="py-2.5 px-3">{t('Usage')}</th>
+            <th class="py-2.5 px-3 text-right">{t('Actions')}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-border/40">
@@ -1111,7 +1097,7 @@
                   class="mt-1 size-3.5 rounded border-border/60 accent-[var(--primary)] cursor-pointer"
                 />
               </td>
-              <td data-label="Key" class="py-3 px-3">
+              <td data-label={t('Key')} class="py-3 px-3">
                 <div class="flex items-center gap-2 min-w-0">
                   <p class="text-sm font-semibold text-text-main truncate max-w-[150px]">
                     {k.name || 'Client Token'}
@@ -1119,16 +1105,16 @@
                   {@render statusCell(k)}
                 </div>
               </td>
-              <td data-label="Token" class="py-3 px-3">
+              <td data-label={t('Token')} class="py-3 px-3">
                 {@render secretCell(k, tokenChipWidth)}
               </td>
               <td data-label="Policy &amp; created" class="py-3 px-3 hidden lg:table-cell">
                 {@render policyCell(k)}
               </td>
-              <td data-label="Usage" class="py-3 px-3">
+              <td data-label={t('Usage')} class="py-3 px-3">
                 {@render usageCell(k)}
               </td>
-              <td data-label="Actions" class="py-3 px-3">
+              <td data-label={t('Actions')} class="py-3 px-3">
                 <div class="flex items-center justify-end">
                   {@render keyActions(k)}
                 </div>

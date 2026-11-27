@@ -735,10 +735,16 @@ func ForwardZed(w http.ResponseWriter, req *Request) error {
 	if req.IsStream {
 		streamBody := io.ReadCloser(resp.Body)
 		if !isEventStreamResponse(resp.Header) {
-			data, rerr := io.ReadAll(io.LimitReader(resp.Body, constants.MaxUpstreamBodyBytes))
+			data, rerr := io.ReadAll(io.LimitReader(resp.Body, constants.MaxUpstreamBodyBytes+1))
 			if rerr != nil {
+				_ = resp.Body.Close()
 				return fmt.Errorf("read zed response: %w", rerr)
 			}
+			_ = resp.Body.Close()
+			if int64(len(data)) > constants.MaxUpstreamBodyBytes {
+				return proxy.UpstreamFailure(http.StatusBadGateway, "zed: upstream response exceeded maximum body size")
+			}
+
 			if !proxy.LooksLikeSSE(data) && !zedLooksLikeJSONL(data) {
 				return zedWriteWhole(w, req, wire, data)
 			}
@@ -749,9 +755,12 @@ func ForwardZed(w http.ResponseWriter, req *Request) error {
 		return zedPipeStream(w, req, wire, stall)
 	}
 
-	data, rerr := io.ReadAll(io.LimitReader(resp.Body, constants.MaxUpstreamBodyBytes))
+	data, rerr := io.ReadAll(io.LimitReader(resp.Body, constants.MaxUpstreamBodyBytes+1))
 	if rerr != nil {
 		return fmt.Errorf("read zed response: %w", rerr)
+	}
+	if int64(len(data)) > constants.MaxUpstreamBodyBytes {
+		return proxy.UpstreamFailure(http.StatusBadGateway, "zed: upstream response exceeded maximum body size")
 	}
 	return zedWriteWhole(w, req, wire, data)
 }

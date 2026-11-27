@@ -1,5 +1,6 @@
 <!-- 9RouterX — source port and modifications by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of decolua/9router src/shared/components/Modal.js
   import type { Snippet } from 'svelte'
   import { pushEscapeHandler } from './escapeStack'
@@ -116,8 +117,8 @@
                 <button
                   type="button"
                   onclick={() => onClose?.()}
-                  aria-label="Close"
-                  title="Close"
+                  aria-label={t('Close')}
+                  title={t('Close')}
                   class="w-4 h-4 rounded-full bg-[#FF5F56] hover:brightness-90 transition-all cursor-pointer flex items-center justify-center"
                 >
                   <span class="text-[9px] font-bold text-white leading-none">✕</span>
@@ -138,7 +139,7 @@
           <button
             type="button"
             onclick={() => onClose?.()}
-            aria-label="Close"
+            aria-label={t('Close')}
             class="md:hidden p-1.5 rounded-[10px] text-text-muted hover:bg-surface-2 hover:text-text-main transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">close</span>

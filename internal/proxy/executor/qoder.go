@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -329,16 +330,14 @@ func ForwardQoder(w http.ResponseWriter, req *Request) error {
 			// coalescer and a clean stream just continues. The peek consumed
 			// the head, so hand the already-read bytes back instead of
 			// re-sending — one upstream call per attempt.
-			defer func() { _ = resp.Body.Close() }()
-			rewoundR, rewoundW := io.Pipe()
-			go func() {
+			rewoundR, closeRewound := qoderRewindPipe(ctx, resp.Body, func(out io.Writer) error {
 				source := io.MultiReader(bytes.NewReader(peek.consumed), peek.reader)
 				if peekErr != nil {
-					_ = rewoundW.CloseWithError(peekErr)
-					return
+					return peekErr
 				}
-				_ = rewoundW.CloseWithError(qoderSSERewrite(source, rewoundW, built.QoderKey))
-			}()
+				return qoderSSERewrite(source, out, built.QoderKey)
+			})
+			defer closeRewound()
 			if req.IsStream {
 				return execSSEStream(w, rewoundR, req)
 			}
@@ -409,6 +408,25 @@ func ForwardQoder(w http.ResponseWriter, req *Request) error {
 				return qoderQueuedTimeout(built.QoderKey, queueInfo, time.Since(queueWaitStart))
 			}
 		}
+	}
+}
+
+func qoderRewindPipe(ctx context.Context, upstream io.Closer, rewrite func(io.Writer) error) (*io.PipeReader, func()) {
+	reader, writer := io.Pipe()
+	var upstreamClose sync.Once
+	closePipe := func(err error) {
+		// Closing the HTTP body cannot release a rewrite blocked in Pipe.Write.
+		_ = reader.CloseWithError(err)
+		_ = writer.CloseWithError(err)
+		upstreamClose.Do(func() { _ = upstream.Close() })
+	}
+	stopCancel := context.AfterFunc(ctx, func() { closePipe(ctx.Err()) })
+	go func() {
+		_ = writer.CloseWithError(rewrite(writer))
+	}()
+	return reader, func() {
+		stopCancel()
+		closePipe(io.ErrClosedPipe)
 	}
 }
 

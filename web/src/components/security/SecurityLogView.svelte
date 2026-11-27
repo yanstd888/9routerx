@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { api, type SecurityLogEntry, type SecurityLogSummary } from '../../api/client'
   import Badge from '../../lib/ui/Badge.svelte'
@@ -109,9 +110,9 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <Card class="p-4 flex items-center justify-between bg-surface border border-border-subtle">
       <div>
-        <p class="text-xs font-medium text-text-muted">Total Events</p>
+        <p class="text-xs font-medium text-text-muted">{t('Total Events')}</p>
         <p class="text-2xl font-bold text-text-main mt-1">{summary.total}</p>
-        <p class="text-[11px] text-text-muted mt-0.5">Retained audit trail</p>
+        <p class="text-[11px] text-text-muted mt-0.5">{t('Retained audit trail')}</p>
       </div>
       <div class="p-2.5 rounded-xl bg-surface-2 text-text-muted">
         <Activity class="w-5 h-5" />
@@ -120,9 +121,9 @@
 
     <Card class="p-4 flex items-center justify-between bg-surface border border-red-500/20 bg-red-500/5">
       <div>
-        <p class="text-xs font-medium text-red-500">Breach / Critical</p>
+        <p class="text-xs font-medium text-red-500">{t('Breach / Critical')}</p>
         <p class="text-2xl font-bold text-red-500 mt-1">{summary.classifications.breach ?? 0}</p>
-        <p class="text-[11px] text-red-400 mt-0.5">High-severity probe signals</p>
+        <p class="text-[11px] text-red-400 mt-0.5">{t('High-severity probe signals')}</p>
       </div>
       <div class="p-2.5 rounded-xl bg-red-500/10 text-red-500">
         <AlertOctagon class="w-5 h-5" />
@@ -131,9 +132,9 @@
 
     <Card class="p-4 flex items-center justify-between bg-surface border border-amber-500/20 bg-amber-500/5">
       <div>
-        <p class="text-xs font-medium text-amber-500">Suspicious</p>
+        <p class="text-xs font-medium text-amber-500">{t('Suspicious')}</p>
         <p class="text-2xl font-bold text-amber-500 mt-1">{summary.classifications.suspicious ?? 0}</p>
-        <p class="text-[11px] text-amber-400 mt-0.5">Refusals, auth failures, 401/403</p>
+        <p class="text-[11px] text-amber-400 mt-0.5">{t('Refusals, auth failures, 401/403')}</p>
       </div>
       <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-500">
         <AlertTriangle class="w-5 h-5" />
@@ -142,7 +143,7 @@
 
     <Card class="p-4 flex items-center justify-between bg-surface border border-border-subtle">
       <div>
-        <p class="text-xs font-medium text-text-muted">Sign-in Activity</p>
+        <p class="text-xs font-medium text-text-muted">{t('Sign-in Activity')}</p>
         <p class="text-lg font-bold text-text-main mt-1">
           {summary.logins.success} <span class="text-xs font-normal text-text-muted">ok</span> /
           <span class="text-red-500">{summary.logins.failed}</span> <span class="text-xs font-normal text-text-muted">fail</span>
@@ -161,7 +162,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <div class="flex items-center gap-1.5 text-xs text-text-muted mr-1">
           <Filter class="w-3.5 h-3.5" />
-          <span>Severity:</span>
+          <span>{t('Severity:')}</span>
         </div>
         {#each [
           { id: '', label: 'All' },
@@ -190,10 +191,10 @@
           onchange={loadLogs}
           class="bg-surface-2 border border-border-subtle rounded-lg px-2.5 py-1 text-xs text-text-main focus:outline-none focus:border-primary"
         >
-          <option value={50}>50 entries</option>
-          <option value={100}>100 entries</option>
-          <option value={200}>200 entries</option>
-          <option value={500}>500 entries</option>
+          <option value={50}>{t('50 entries')}</option>
+          <option value={100}>{t('100 entries')}</option>
+          <option value={200}>{t('200 entries')}</option>
+          <option value={500}>{t('500 entries')}</option>
         </select>
       </div>
 
@@ -206,7 +207,7 @@
           class="flex items-center gap-1.5"
         >
           <RefreshCw class="w-3.5 h-3.5 {isLoading ? 'animate-spin' : ''}" />
-          <span>Reload</span>
+          <span>{t('Reload')}</span>
         </Button>
 
         <Button
@@ -217,7 +218,7 @@
           class="flex items-center gap-1.5"
         >
           <Trash2 class="w-3.5 h-3.5" />
-          <span>Clear Log</span>
+          <span>{t('Clear Log')}</span>
         </Button>
       </div>
     </div>
@@ -234,7 +235,7 @@
     {#if events.length === 0}
       <div class="p-12 text-center text-text-muted">
         <ShieldAlert class="w-8 h-8 mx-auto mb-2 opacity-40" />
-        <p class="text-sm font-medium">No security events recorded</p>
+        <p class="text-sm font-medium">{t('No security events recorded')}</p>
         <p class="text-xs text-text-muted/70 mt-1">
           {#if severityFilter}
             No events match the selected severity filter.
@@ -248,37 +249,37 @@
         <table class="glyph-table w-full text-left text-xs font-body">
           <thead class="bg-surface-2 border-b border-border-subtle text-text-muted font-medium uppercase text-[10px] tracking-wider">
             <tr>
-              <th class="px-4 py-3">Time</th>
-              <th class="px-4 py-3">Severity</th>
-              <th class="px-4 py-3 hidden md:table-cell">Class</th>
-              <th class="px-4 py-3">Type / Label</th>
-              <th class="px-4 py-3 hidden md:table-cell">Actor / IP</th>
-              <th class="px-4 py-3 hidden md:table-cell">Request</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3">Detail</th>
+              <th class="px-4 py-3">{t('Time')}</th>
+              <th class="px-4 py-3">{t('Severity')}</th>
+              <th class="px-4 py-3 hidden md:table-cell">{t('Class')}</th>
+              <th class="px-4 py-3">{t('Type / Label')}</th>
+              <th class="px-4 py-3 hidden md:table-cell">{t('Actor / IP')}</th>
+              <th class="px-4 py-3 hidden md:table-cell">{t('Request')}</th>
+              <th class="px-4 py-3">{t('Status')}</th>
+              <th class="px-4 py-3">{t('Detail')}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border-subtle/60">
             {#each events as event (event.id)}
               <tr class="hover:bg-surface-2/60 transition-colors {event.classification === 'breach' ? 'bg-red-500/[0.03]' : ''}">
-                <td data-label="Time" class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-subtle">
+                <td data-label={t('Time')} class="px-4 py-3 whitespace-nowrap font-code text-[11px] text-text-subtle">
                   {formatTime(event.at)}
                 </td>
-                <td data-label="Severity" class="px-4 py-3 whitespace-nowrap">
+                <td data-label={t('Severity')} class="px-4 py-3 whitespace-nowrap">
                   <Badge tone={severityBadgeTone(event.severity)} size="sm">
                     {event.severity}
                   </Badge>
                 </td>
-                <td data-label="Class" class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                <td data-label={t('Class')} class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                   <Badge tone={classificationBadgeTone(event.classification)} size="sm">
                     {event.classification || 'normal'}
                   </Badge>
                 </td>
-                <td data-label="Type / Label" class="px-4 py-3 whitespace-nowrap">
+                <td data-label={t('Type / Label')} class="px-4 py-3 whitespace-nowrap">
                   <div class="font-medium text-text-main">{event.label || event.type}</div>
                   <div class="text-[10px] font-code text-text-muted">{event.type}</div>
                 </td>
-                <td data-label="Actor / IP" class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                <td data-label={t('Actor / IP')} class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                   <div class="font-code text-text-main">{event.ip}</div>
                   {#if event.actor}
                     <div class="text-[10px] text-text-muted truncate max-w-[140px]" title={event.actor}>
@@ -286,7 +287,7 @@
                     </div>
                   {/if}
                 </td>
-                <td data-label="Request" class="px-4 py-3 hidden md:table-cell">
+                <td data-label={t('Request')} class="px-4 py-3 hidden md:table-cell">
                   <div class="flex items-center gap-1.5 font-code text-[11px]">
                     {#if event.method}
                       <span class="font-bold text-text-muted">{event.method}</span>
@@ -294,7 +295,7 @@
                     <span class="text-text-main truncate max-w-[200px]" title={event.path}>{event.path || '-'}</span>
                   </div>
                 </td>
-                <td data-label="Status" class="px-4 py-3 whitespace-nowrap font-code text-[11px]">
+                <td data-label={t('Status')} class="px-4 py-3 whitespace-nowrap font-code text-[11px]">
                   {#if event.status}
                     <span class="{event.status >= 400 ? 'text-red-500 font-bold' : 'text-green-500'}">
                       {event.status}
@@ -303,7 +304,7 @@
                     <span class="text-text-muted">-</span>
                   {/if}
                 </td>
-                <td data-label="Detail" class="px-4 py-3 text-text-muted break-words max-w-[260px] text-[11px]">
+                <td data-label={t('Detail')} class="px-4 py-3 text-text-muted break-words max-w-[260px] text-[11px]">
                   {event.detail || '-'}
                 </td>
               </tr>
@@ -316,7 +317,7 @@
 
   <ConfirmModal
     isOpen={isClearOpen}
-    title="Clear Security Log"
+    title={t('Clear Security Log')}
     message="Are you sure you want to delete all recorded security events? This action cannot be undone."
     confirmText="Clear Log"
     variant="danger"

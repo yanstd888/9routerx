@@ -68,7 +68,11 @@ func EnsureTrailingUserTurn(messages []any, intentionalPrefill bool) []any {
 		if msg, ok := last.(map[string]any); !ok || hasContent(msg["content"]) {
 			return messages
 		}
-		messages = append(messages[:len(messages)-1:len(messages)-1], last)
+		// Drop the emptied turn: re-appending it would ship the empty content
+		// Anthropic rejects right next to the placeholder. The full slice
+		// expression keeps the append below from writing into the caller's
+		// backing array.
+		messages = messages[: len(messages)-1 : len(messages)-1]
 	}
 	return append(messages, map[string]any{
 		"role":    "user",
@@ -121,7 +125,7 @@ func EnsureTrailingUserTurnBody(body []byte, intentionalPrefill bool) []byte {
 		return body
 	}
 	repaired := EnsureTrailingUserTurn(messages, false)
-	if len(repaired) == len(messages) {
+	if sameTail(repaired, messages) {
 		return body
 	}
 	req["messages"] = repaired

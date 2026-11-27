@@ -1,5 +1,6 @@
 <!-- 9RouterX — derived from the work of https://github.com/yanstd888/ — port and modifications by the maintainers — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   // Port of 9router src/app/(dashboard)/dashboard/providers/[id]/
   // AutoPingScheduleModal.js (Next.js) to the Go dashboard's Svelte components.
   //
@@ -123,7 +124,7 @@
   }
 </script>
 
-<Modal isOpen={open} title="Auto-ping settings" size="lg" onClose={onClose}>
+<Modal isOpen={open} title={t('Auto-ping settings')} size="lg" onClose={onClose}>
   <div class="flex flex-col gap-4">
     <p class="text-sm text-text-muted">
       Configure automated quota pings{connectionName ? ` for ${connectionName}` : ''} — pick one
@@ -154,7 +155,7 @@
     {#if mode === 'schedule'}
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Input
-          label="Anchor time"
+          label={t('Anchor time')}
           id="auto-ping-anchor"
           type="time"
           bind:value={anchor}
@@ -162,7 +163,7 @@
           inputClass="ring-1 ring-black/10 dark:ring-white/15"
         />
         <Input
-          label="Window (hours)"
+          label={t('Window (hours)')}
           id="auto-ping-window"
           type="number"
           min="0.5"
@@ -172,7 +173,7 @@
           inputClass="ring-1 ring-black/10 dark:ring-white/15"
         />
         <Input
-          label="Pings per day"
+          label={t('Pings per day')}
           id="auto-ping-slots"
           type="number"
           min="1"
@@ -204,17 +205,13 @@
         type="button"
         onclick={onClose}
         class="rounded-lg border border-border-subtle px-3 py-1.5 text-sm font-medium text-text-main transition-colors hover:bg-surface-2 cursor-pointer"
-      >
-        Cancel
-      </button>
+      >{t('Cancel')}</button>
       <button
         type="button"
         onclick={handleSave}
         disabled={!canSave}
         class="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-      >
-        Save
-      </button>
+      >{t('Save')}</button>
     </div>
   {/snippet}
 </Modal>

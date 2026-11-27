@@ -78,7 +78,7 @@
     <input
       type="text"
       bind:value={draft}
-      placeholder="deepseek"
+      placeholder=deepseek
       onkeydown={(e) => {
         if (e.key === 'Enter') add()
       }}

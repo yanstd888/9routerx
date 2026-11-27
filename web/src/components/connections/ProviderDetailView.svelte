@@ -1,5 +1,6 @@
 <!-- 9RouterX — this file is part of a port maintained by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
+  import { t } from '../../lib/i18n.svelte'
   import { onMount, untrack } from 'svelte'
   import { notifications } from '../../lib/notifications'
   import {
@@ -3391,9 +3392,7 @@
       onclick={onBack}
       class="inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary transition-colors mb-4 cursor-pointer"
     >
-      <span class="material-symbols-outlined text-lg">arrow_back</span>
-      Back to Providers
-    </button>
+      <span class="material-symbols-outlined text-lg">arrow_back</span>{t('Back to Providers')}</button>
 
     <div class="flex min-w-0 items-center justify-between gap-3 sm:gap-4">
       <div class="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -3433,9 +3432,7 @@
             {#if isProviderAllDisabled}
               <Badge variant="default" size="sm">
                 <span class="flex items-center gap-1">
-                  <PauseCircle class="w-3 h-3" />
-                  Disabled
-                </span>
+                  <PauseCircle class="w-3 h-3" />{t('Disabled')}</span>
               </Badge>
             {/if}
           </div>
@@ -3459,9 +3456,7 @@
   {#if hasRiskNotice}
     <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
       <span class="material-symbols-outlined text-[16px] text-yellow-500 mt-0.5 shrink-0">warning</span>
-      <p class="text-xs text-red-600 dark:text-yellow-400 leading-relaxed">
-        This provider uses a subscription/OAuth session not officially licensed for proxy/router use. Account may be restricted or banned. Use at your own risk.
-      </p>
+      <p class="text-xs text-red-600 dark:text-yellow-400 leading-relaxed">{t('This provider uses a subscription/OAuth session not officially licensed for proxy/router use. Account may be restricted or banned. Use at your own risk.')}</p>
     </div>
   {/if}
 
@@ -3476,9 +3471,7 @@
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex justify-center rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-600 sm:py-0.5"
-        >
-          Get API Key →
-        </a>
+        >{t('Get API Key →')}</a>
       {/if}
     </div>
   {/if}
@@ -3503,56 +3496,46 @@
             onclick={openAddKeyModal}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
           >
-            <span class="material-symbols-outlined text-[18px]">add</span>
-            Add API Key
-          </button>
+            <span class="material-symbols-outlined text-[18px]">add</span>{t('Add API Key')}</button>
           <button
             type="button"
             onclick={() => (showExportKeysModal = true)}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
           >
-            <span class="material-symbols-outlined text-[18px]">download</span>
-            Export Keys
-          </button>
+            <span class="material-symbols-outlined text-[18px]">download</span>{t('Export Keys')}</button>
           <button
             type="button"
             onclick={() => (showShareProviderModal = true)}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
           >
-            <span class="material-symbols-outlined text-[18px]">link</span>
-            Share
-          </button>
+            <span class="material-symbols-outlined text-[18px]">link</span>{t('Share')}</button>
           <button
             type="button"
             onclick={() => (showEditNodeModal = true)}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
           >
-            <span class="material-symbols-outlined text-[18px]">edit</span>
-            Edit
-          </button>
+            <span class="material-symbols-outlined text-[18px]">edit</span>{t('Edit')}</button>
           <button
             type="button"
             onclick={() => handleDeleteProviderNode(selectedNode!.id)}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
           >
-            <span class="material-symbols-outlined text-[18px]">delete</span>
-            Delete
-          </button>
+            <span class="material-symbols-outlined text-[18px]">delete</span>{t('Delete')}</button>
         </div>
       </div>
       <!-- Status only: the policy is edited in the node's dialog (the same fields as
            Name and Base URL there), so this line answers "what is this node allowed"
            without turning the page into a form. -->
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">
-        <span class="font-medium text-text-main">Capacity</span>
+        <span class="font-medium text-text-main">{t('Capacity')}</span>
         <span class="font-mono">{nodeLimitsSummary(nodeLimitsDraftOf(selectedNode.limits ?? null))}</span>
         {#if selectedNode.limits}
           <span class="text-text-subtle">·</span>
           <span class="font-mono">{nodeLimitsUsageSummary(selectedNode.limits)}</span>
           {#if selectedNode.limits.expired}
-            <Badge tone="error">Contract ended</Badge>
+            <Badge tone="error">{t('Contract ended')}</Badge>
           {:else if selectedNode.limits.tokenQuota > 0 && selectedNode.limits.usedTokens >= selectedNode.limits.tokenQuota}
-            <Badge tone="error">Quota spent</Badge>
+            <Badge tone="error">{t('Quota spent')}</Badge>
           {/if}
         {/if}
       </div>
@@ -3565,21 +3548,17 @@
       <div class="flex items-start gap-3">
         <span class="material-symbols-outlined text-[20px] text-primary mt-0.5">lock_open</span>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-text-main">No authentication required</p>
-          <p class="text-xs text-text-muted mt-0.5">
-            This provider is ready to use. Optionally route requests through a proxy pool to bypass IP-based limits.
-          </p>
+          <p class="text-sm font-medium text-text-main">{t('No authentication required')}</p>
+          <p class="text-xs text-text-muted mt-0.5">{t('This provider is ready to use. Optionally route requests through a proxy pool to bypass IP-based limits.')}</p>
         </div>
         {#if savedFreeProxy}
-          <span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-            Saved
-          </span>
+          <span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">{t('Saved')}</span>
         {/if}
       </div>
 
       <!-- Proxy Pool Selector -->
       <div class="flex flex-col gap-1.5">
-        <label for="free-proxy-pool" class="text-sm font-medium text-text-main">Proxy Pool</label>
+        <label for="free-proxy-pool" class="text-sm font-medium text-text-main">{t('Proxy Pool')}</label>
         <select
           id="free-proxy-pool"
           value={freeProxyPoolId}
@@ -3587,21 +3566,19 @@
           disabled={isSavingFreeProxy || freeRotateStrategy !== 'none'}
           class="w-full bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-text-main focus:outline-none focus:border-primary disabled:opacity-50 cursor-pointer"
         >
-          <option value="none">None (direct)</option>
+          <option value="none">{t('None (direct)')}</option>
           {#each activeProxyPools as pool}
             <option value={pool.id}>{pool.name}</option>
           {/each}
         </select>
         {#if freeRotateStrategy !== 'none'}
-          <p class="text-xs text-text-muted">
-            Pool selector is ignored when rotation is active — all active pools are used.
-          </p>
+          <p class="text-xs text-text-muted">{t('Pool selector is ignored when rotation is active — all active pools are used.')}</p>
         {/if}
       </div>
 
       <!-- Rotation Strategy -->
       <div class="flex flex-col gap-1.5">
-        <span class="text-sm font-medium text-text-main">Rotation Strategy</span>
+        <span class="text-sm font-medium text-text-main">{t('Rotation Strategy')}</span>
         <div class="flex items-center gap-2 flex-wrap">
           <button
             type="button"
@@ -3609,9 +3586,7 @@
             class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer {freeRotateStrategy === 'none'
               ? 'bg-primary text-white border-primary'
               : 'bg-surface-2 text-text-main border-border hover:bg-surface-3'}"
-          >
-            None (single pool)
-          </button>
+          >{t('None (single pool)')}</button>
           <button
             type="button"
             onclick={() => handleFreeProxyChange(freeProxyPoolId, 'round-robin')}
@@ -3619,9 +3594,7 @@
             class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed {freeRotateStrategy === 'round-robin'
               ? 'bg-primary text-white border-primary'
               : 'bg-surface-2 text-text-main border-border hover:bg-surface-3'}"
-          >
-            Round-robin
-          </button>
+          >{t('Round-robin')}</button>
           <button
             type="button"
             onclick={() => handleFreeProxyChange(freeProxyPoolId, 'random')}
@@ -3629,14 +3602,10 @@
             class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed {freeRotateStrategy === 'random'
               ? 'bg-primary text-white border-primary'
               : 'bg-surface-2 text-text-main border-border hover:bg-surface-3'}"
-          >
-            Random
-          </button>
+          >{t('Random')}</button>
         </div>
         {#if activeProxyPools.length < 2}
-          <p class="text-xs text-text-muted">
-            Need at least 2 active proxy pools for rotation.
-          </p>
+          <p class="text-xs text-text-muted">{t('Need at least 2 active proxy pools for rotation.')}</p>
         {/if}
       </div>
     </div>
@@ -3645,7 +3614,7 @@
   <div class="bg-surface border border-border-subtle rounded-[14px] shadow-[var(--shadow-soft)] p-6">
     <!-- Header -->
     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2 class="text-lg font-semibold">Connections</h2>
+      <h2 class="text-lg font-semibold">{t('Connections')}</h2>
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         {#if selectedConnIds.length > 0}
           <button
@@ -3664,9 +3633,7 @@
             onclick={() => (showApplyProxyModal = true)}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px]"
           >
-            <span class="material-symbols-outlined text-[18px]">lan</span>
-            Apply Proxy
-          </button>
+            <span class="material-symbols-outlined text-[18px]">lan</span>{t('Apply Proxy')}</button>
         {/if}
 
         <button
@@ -3692,11 +3659,11 @@
         {/if}
 
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-text-muted font-medium">Round Robin</span>
+          <span class="text-xs text-text-muted font-medium">{t('Round Robin')}</span>
           <button
             type="button"
             role="switch"
-            aria-label="Toggle Round Robin"
+            aria-label={t('Toggle Round Robin')}
             aria-checked={isRoundRobin}
             onclick={toggleRoundRobin}
             class="relative inline-flex shrink-0 cursor-pointer rounded-full border transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500/30 {isRoundRobin
@@ -3709,7 +3676,7 @@
           </button>
           {#if isRoundRobin}
             <div class="flex items-center gap-1.5">
-              <span class="text-xs text-text-muted">Sticky:</span>
+              <span class="text-xs text-text-muted">{t('Sticky:')}</span>
               <input
                 type="number"
                 min="1"
@@ -3726,9 +3693,7 @@
             onclick={() => (showHeaderOverrides = true)}
             class="inline-flex h-7 items-center gap-1.5 rounded-[8px] px-3 text-xs font-medium text-text-muted transition-colors hover:bg-surface-2 hover:text-text-main"
           >
-            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">tune</span>
-            Custom headers
-          </button>
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">tune</span>{t('Custom headers')}</button>
         </div>
       </div>
     </div>
@@ -3742,7 +3707,7 @@
           <span>Passed: {oneByOneSummary.passed}</span>
           <span>Failed: {oneByOneSummary.failed}</span>
           {#if oneByOneSummary.stopped}
-            <span class="text-amber-600 dark:text-amber-400">Stopped</span>
+            <span class="text-amber-600 dark:text-amber-400">{t('Stopped')}</span>
           {/if}
           {#if isTestingOneByOne && oneByOneCurrentId}
             <span>
@@ -3762,9 +3727,7 @@
             checked={isAllSelected}
             onchange={toggleSelectAll}
             class="h-3.5 w-3.5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
-          />
-          Select All
-        </label>
+          />{t('Select All')}</label>
 
         <!-- Sensor Email Toggle Button -->
         <button
@@ -3789,7 +3752,7 @@
             <span class="material-symbols-outlined text-[18px]">{isOAuth ? 'lock' : 'key'}</span>
           </div>
           <div class="min-w-0">
-            <p class="text-sm text-text-muted">No connections yet</p>
+            <p class="text-sm text-text-muted">{t('No connections yet')}</p>
             {#if hasDualAuthModes}
               <p class="text-xs text-text-muted">
                 Choose {oauthButtonLabel} or {apiKeyButtonLabel}.
@@ -3814,18 +3777,14 @@
             onclick={handleAddConnectionClick}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-8 px-4 text-xs rounded-[8px]"
           >
-            <span class="material-symbols-outlined text-[18px]">login</span>
-            Connect Google Account
-          </button>
+            <span class="material-symbols-outlined text-[18px]">login</span>{t('Connect Google Account')}</button>
         {:else if providerId === 'kiro'}
           <button
             type="button"
             onclick={handleAddConnectionClick}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-8 px-4 text-xs rounded-[8px]"
           >
-            <span class="material-symbols-outlined text-[18px]">login</span>
-            Connect Kiro
-          </button>
+            <span class="material-symbols-outlined text-[18px]">login</span>{t('Connect Kiro')}</button>
         {:else if hasDualAuthModes}
           <button
             type="button"
@@ -3849,9 +3808,7 @@
             onclick={handleAddConnectionClick}
             class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-8 px-4 text-xs rounded-[8px]"
           >
-            <span class="material-symbols-outlined text-[18px]">add</span>
-            Add Connection
-          </button>
+            <span class="material-symbols-outlined text-[18px]">add</span>{t('Add Connection')}</button>
         {/if}
         </div>
       </div>
@@ -3942,32 +3899,24 @@
                       {#if connBadge === 'queued'}
                         <span
                           class="inline-flex items-center gap-1.5 rounded-full font-semibold bg-surface-2 text-text-muted px-2 py-0.5 text-[10px]"
-                          title="Waiting for its turn"
+                          title={t('Waiting for its turn')}
                         >
-                          <span class="size-1.5 rounded-full bg-text-muted/50"></span>
-                          queued
-                        </span>
+                          <span class="size-1.5 rounded-full bg-text-muted/50"></span>{t('queued')}</span>
                       {:else if connBadge === 'testing'}
                         <span class="inline-flex items-center gap-1.5 rounded-full font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 text-[10px]">
-                          <span class="material-symbols-outlined text-[10px] animate-spin">progress_activity</span>
-                          testing
-                        </span>
+                          <span class="material-symbols-outlined text-[10px] animate-spin">progress_activity</span>{t('testing')}</span>
                       {:else if connBadge === 'error'}
                         <span
                           class="inline-flex items-center gap-1.5 rounded-full font-semibold bg-red-500/10 text-red-600 dark:text-red-400 px-2 py-0.5 text-[10px]"
                           title={status?.state === 'failed' && status.error ? `failed: ${status.error}` : undefined}
                         >
-                          <span class="size-1.5 rounded-full bg-red-500"></span>
-                          error
-                        </span>
+                          <span class="size-1.5 rounded-full bg-red-500"></span>error</span>
                       {:else}
                         <span
                           class="inline-flex items-center gap-1.5 rounded-full font-semibold bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5 text-[10px]"
                           title={status?.state === 'success' ? 'last probe passed' : undefined}
                         >
-                          <span class="size-1.5 rounded-full bg-green-500"></span>
-                          active
-                        </span>
+                          <span class="size-1.5 rounded-full bg-green-500"></span>{t('active')}</span>
                       {/if}
                       <!-- Cooldown & Exhausted Quota badge with live timer -->
                       {#if cooldownInfo}
@@ -4007,24 +3956,20 @@
                         {:else if fbSess?.status === 'queued'}
                           <span
                             class="inline-flex items-center gap-1 rounded-full font-semibold px-2 py-0.5 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                            title="Waiting in queue"
+                            title={t('Waiting in queue')}
                           >
-                            <span class="material-symbols-outlined text-[12px]">schedule</span> queued
-                          </span>
+                            <span class="material-symbols-outlined text-[12px]">schedule</span>{t('queued')}</span>
                         {:else if fbSess?.status === 'banned'}
                           <span
                             class="inline-flex items-center gap-1 rounded-full font-semibold px-2 py-0.5 text-[10px] bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
-                            title="Account banned"
+                            title={t('Account banned')}
                           >
-                            <span class="material-symbols-outlined text-[12px]">block</span> banned
-                          </span>
+                            <span class="material-symbols-outlined text-[12px]">block</span>{t('banned')}</span>
                         {:else if fbSess}
                           <span
                             class="inline-flex items-center gap-1 rounded-full font-normal px-2 py-0.5 text-[10px] bg-surface-2 text-text-muted border border-border/50"
-                            title="No active session held"
-                          >
-                            no session
-                          </span>
+                            title={t('No active session held')}
+                          >{t('no session')}</span>
                         {/if}
                       {/if}
                       <!-- Proxy badge (upstream: green when the bound pool is active,
@@ -4036,9 +3981,7 @@
                             : 'bg-red-500/10 text-red-600 dark:text-red-400'}"
                           title={proxyBadge.displayText}
                         >
-                          <span class="size-1.5 rounded-full {proxyBadge.variant === 'success' ? 'bg-green-500' : 'bg-red-500'}"></span>
-                          Proxy
-                        </span>
+                          <span class="size-1.5 rounded-full {proxyBadge.variant === 'success' ? 'bg-green-500' : 'bg-red-500'}"></span>{t('Proxy')}</span>
                       {/if}
                       <!-- Last error tooltip -->
                       {#if lastErr && lastErr !== 'Provider test not supported'}
@@ -4132,7 +4075,7 @@
                         <span class="material-symbols-outlined text-[18px] {updatingProxyConnId === conn.id ? 'animate-spin' : ''}">
                           {updatingProxyConnId === conn.id ? 'progress_activity' : 'lan'}
                         </span>
-                        <span class="text-[10px] leading-tight">Proxy</span>
+                        <span class="text-[10px] leading-tight">{t('Proxy')}</span>
                       </button>
 
                       {#if activeProxyDropdownId === conn.id}
@@ -4148,23 +4091,19 @@
                         >
                           {#if proxyPools.length === 0}
                             <div class="px-3 py-2 text-xs text-text-muted">
-                              <p>No proxy pools available.</p>
+                              <p>{t('No proxy pools available.')}</p>
                               <a
                                 href="/dashboard/proxypools"
                                 class="mt-1.5 inline-flex items-center gap-1 font-medium text-primary hover:underline"
                               >
-                                <span class="material-symbols-outlined text-sm">add</span>
-                                Create proxy pool
-                              </a>
+                                <span class="material-symbols-outlined text-sm">add</span>{t('Create proxy pool')}</a>
                             </div>
                           {:else}
                             <button
                               type="button"
                               onclick={() => assignProxyPool(conn, null)}
                               class="flex w-full items-center px-3 py-1.5 text-xs hover:bg-surface-2 transition-colors cursor-pointer {!assignedPoolId ? 'text-primary font-medium' : 'text-text-main'}"
-                            >
-                              None
-                            </button>
+                            >{t('None')}</button>
                             {#each proxyPools as pool}
                               <button
                                 type="button"
@@ -4173,7 +4112,7 @@
                               >
                                 <span class="truncate">{pool.name}</span>
                                 {#if !pool.isActive}
-                                  <span class="text-[10px] text-text-muted shrink-0">(inactive)</span>
+                                  <span class="text-[10px] text-text-muted shrink-0">{t('(inactive)')}</span>
                                 {/if}
                               </button>
                             {/each}
@@ -4182,14 +4121,14 @@
                       {/if}
                     </div>
                     <Menu
-                      label="Actions for this connection"
+                      label={t('Actions for this connection')}
                       triggerIcon="more_horiz"
                       hideLabel
                       minWidth="13rem"
                     >
                       {#if isFreebuff}
                         <MenuItem
-                          label="Manage session"
+                          label={t('Manage session')}
                           icon="lock_clock"
                           onSelect={() => selectFreebuffAccount(conn.id)}
                         />
@@ -4197,24 +4136,24 @@
                       {/if}
 
                       <MenuItem
-                        label="Refresh"
+                        label={t('Refresh')}
                         icon="sync"
                         disabled={isTestingOneByOne || status?.state === 'testing'}
                         onSelect={() => refreshOneConnection(conn)}
                       />
                       {#if isDeepSeekWeb}
                         <MenuItem
-                          label="Renew credential"
+                          label={t('Renew credential')}
                           icon="lock_reset"
                           disabled={renewingConnId === conn.id}
                           onSelect={() => renewDeepSeekCredential(conn)}
                         />
                       {/if}
-                      <MenuItem label="Edit" icon="edit" onSelect={() => openEditConnection(conn)} />
+                      <MenuItem label={t('Edit')} icon="edit" onSelect={() => openEditConnection(conn)} />
 
                       <div class="my-1 border-t border-border-subtle" role="separator"></div>
 
-                      <MenuItem label="Delete" icon="delete" danger onSelect={() => handleDeleteConnection(conn)} />
+                      <MenuItem label={t('Delete')} icon="delete" danger onSelect={() => handleDeleteConnection(conn)} />
                     </Menu>
                   </div>
 
@@ -4223,7 +4162,7 @@
                     <button
                       type="button"
                       role="switch"
-                      aria-label="Toggle connection active"
+                      aria-label={t('Toggle connection active')}
                       aria-checked={isConnActive}
                       onclick={() => toggleConnectionActive(conn)}
                       class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500/30 {isConnActive ? 'bg-brand-500' : 'bg-surface-3'} w-8 h-4"
@@ -4260,9 +4199,7 @@
           onclick={handleAddConnectionClick}
           class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
         >
-          <span class="material-symbols-outlined text-[18px]">login</span>
-          Connect Kiro
-        </button>
+          <span class="material-symbols-outlined text-[18px]">login</span>{t('Connect Kiro')}</button>
       {:else if hasDualAuthModes}
         <button
           type="button"
@@ -4286,9 +4223,7 @@
           onclick={handleAddConnectionClick}
           class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-brand-500 hover:bg-brand-600 text-white shadow-sm h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
         >
-          <span class="material-symbols-outlined text-[18px]">add</span>
-          Add
-        </button>
+          <span class="material-symbols-outlined text-[18px]">add</span>{t('Add')}</button>
       {/if}
       {#if providerConnections.length > 0}
         <button
@@ -4296,17 +4231,13 @@
           onclick={() => (showExportKeysModal = true)}
           class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
         >
-          <span class="material-symbols-outlined text-[18px]">download</span>
-          Export Keys
-        </button>
+          <span class="material-symbols-outlined text-[18px]">download</span>{t('Export Keys')}</button>
         <button
           type="button"
           onclick={() => (showShareProviderModal = true)}
           class="inline-flex items-center justify-center gap-2 font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out cursor-pointer active:scale-[0.97] bg-surface-2 hover:bg-surface-3 text-text-main border border-border h-7 px-3 text-xs rounded-[8px] w-full sm:w-auto"
         >
-          <span class="material-symbols-outlined text-[18px]">link</span>
-          Share
-        </button>
+          <span class="material-symbols-outlined text-[18px]">link</span>{t('Share')}</button>
       {/if}
     </div>
     {/if}
@@ -4330,7 +4261,7 @@
       <div class="flex flex-col gap-2 rounded-lg border border-border-subtle bg-surface-2/40 p-2.5">
         <div class="flex flex-wrap items-end gap-2">
           <div class="min-w-[200px] flex-1">
-            <label for="new-compatible-model-input" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">Model ID</label>
+            <label for="new-compatible-model-input" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-text-muted/70">{t('Model ID')}</label>
             <input
               id="new-compatible-model-input"
               type="text"
@@ -4366,7 +4297,7 @@
             type="button"
             onclick={() => handleImportCompatibleModels(false)}
             disabled={!canImportCompatible || isImportingCompatibleModels}
-            title="Fetch this endpoint's /models and add everything it lists"
+            title={t('Fetch this endpoint\'s /models and add everything it lists')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-border bg-surface-2 px-3 text-xs font-medium text-text-main transition-colors hover:bg-surface-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             <span class="material-symbols-outlined text-[16px]">download</span>
@@ -4376,17 +4307,15 @@
             type="button"
             onclick={() => handleImportCompatibleModels(true)}
             disabled={!canImportCompatible || isImportingCompatibleModels}
-            title="Same as import, but skip anything that is not on the provider's free tier"
+            title={t('Same as import, but skip anything that is not on the provider\'s free tier')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-border bg-surface-2 px-3 text-xs font-medium text-text-main transition-colors hover:bg-surface-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
-            <span class="material-symbols-outlined text-[16px]">savings</span>
-            Import free only
-          </button>
+            <span class="material-symbols-outlined text-[16px]">savings</span>{t('Import free only')}</button>
           <button
             type="button"
             onclick={handleTestAllCompatibleModels}
             disabled={compatibleRows.length === 0 || compatibleTestAllRunning}
-            title="Test all sends a real completion per model and consumes account quota"
+            title={t('Test all sends a real completion per model and consumes account quota')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-border bg-surface-2 px-3 text-xs font-medium text-text-main transition-colors hover:bg-surface-3 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             <span class="material-symbols-outlined text-[16px]">{compatibleTestAllRunning ? 'progress_activity' : 'science'}</span>
@@ -4396,7 +4325,7 @@
             type="button"
             onclick={handleRemoveAllCompatibleModels}
             disabled={compatibleRows.length === 0 || isRemovingCompatibleModels || compatibleTestAllRunning}
-            title="Remove all deletes this node's imported models and the aliases pointing at them; models that ship with the build stay"
+            title={t('Remove all deletes this node\'s imported models and the aliases pointing at them; models that ship with the build stay')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-border bg-surface-2 px-3 text-xs font-medium text-text-main transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             <span class="material-symbols-outlined text-[16px]">{isRemovingCompatibleModels ? 'progress_activity' : 'delete_sweep'}</span>
@@ -4406,17 +4335,15 @@
             type="button"
             onclick={handleAutoDisableDeadModels}
             disabled={compatibleRows.length === 0}
-            title="Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in."
+            title={t('Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-amber-500/40 bg-amber-500/10 px-3 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-500/20 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed dark:text-amber-400"
           >
-            <span class="material-symbols-outlined text-[16px]">heart_broken</span>
-            Disable dead models
-          </button>
+            <span class="material-symbols-outlined text-[16px]">heart_broken</span>{t('Disable dead models')}</button>
         </div>
-        <p class="text-xs text-text-muted">Test all sends a real completion per model and consumes account quota.</p>
-        <p class="text-xs text-text-muted">Remove all deletes this node's imported models and the aliases pointing at them; models that ship with the build stay.</p>
+        <p class="text-xs text-text-muted">{t('Test all sends a real completion per model and consumes account quota.')}</p>
+        <p class="text-xs text-text-muted">{t('Remove all deletes this node\'s imported models and the aliases pointing at them; models that ship with the build stay.')}</p>
         {#if !canImportCompatible}
-          <p class="text-xs text-text-muted">Add a connection to enable importing models.</p>
+          <p class="text-xs text-text-muted">{t('Add a connection to enable importing models.')}</p>
         {/if}
       </div>
       <!-- Toolbar: search / filter / batch selection over the rows below.
@@ -4443,7 +4370,7 @@
         />
       </div>
       {#if filteredRows.length === 0 && compatibleRows.length > 0}
-        <p class="text-xs text-text-muted">No models match the current search and filters.</p>
+        <p class="text-xs text-text-muted">{t('No models match the current search and filters.')}</p>
       {/if}
       {#if compatibleRows.length > 0}
         <div class="flex flex-col gap-3">
@@ -4476,32 +4403,26 @@
                   {#if row.caps.vision}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-text-muted/70" style="font-size: 12px;">visibility</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Vision — Supports image input
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Vision — Supports image input')}</div>
                     </div>
                   {/if}
                   {#if row.caps.reasoning}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-text-muted/70" style="font-size: 12px;">neurology</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Reasoning — Supports reasoning / thinking
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Reasoning — Supports reasoning / thinking')}</div>
                     </div>
                   {/if}
                   {#if row.caps.jailbreak}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-red-500/80" style="font-size: 12px;">local_fire_department</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Jailbreak — Uncensored / unrestricted
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Jailbreak — Uncensored / unrestricted')}</div>
                     </div>
                   {/if}
                   <div class="relative group/btn">
                     <button
                       type="button"
                       onclick={() => copyCompatibleModel(row.id)}
-                      aria-label="Copy model id"
+                      aria-label={t('Copy model id')}
                       class="p-0.5 hover:bg-sidebar rounded text-text-muted hover:text-primary cursor-pointer"
                     >
                       <span class="material-symbols-outlined text-sm">{copiedModelId === row.id ? 'check' : 'content_copy'}</span>
@@ -4516,7 +4437,7 @@
                         type="button"
                         onclick={() => handleTestCompatibleModel(row.id)}
                         disabled={isTestingRow}
-                        aria-label="Test compatible model"
+                        aria-label={t('Test compatible model')}
                         class="p-0.5 hover:bg-sidebar rounded text-text-muted hover:text-primary transition-colors cursor-pointer"
                       >
                         <span class="material-symbols-outlined text-sm" style={isTestingRow ? 'animation: spin 1s linear infinite' : undefined}>
@@ -4553,7 +4474,7 @@
                 {#if row.disabled}
                   <div class="mt-2 flex items-start gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1.5 rounded-md border border-amber-500/20">
                     <span class="material-symbols-outlined text-sm shrink-0 mt-0.5">visibility_off</span>
-                    <span class="font-medium leading-relaxed">Disabled — hidden from <code class="font-mono">/v1/models</code> and every model picker. The row stays here so you can enable it again.</span>
+                    <span class="font-medium leading-relaxed">{t('Disabled — hidden from')} <code class="font-mono">{t('/v1/models')}</code> {t('and every model picker. The row stays here so you can enable it again.')}</span>
                   </div>
                 {/if}
                 {#if tError}
@@ -4567,7 +4488,7 @@
                 type="button"
                 onclick={() => handleDeleteCompatibleModel(row)}
                 class="p-1 hover:bg-red-50 rounded text-red-500 cursor-pointer"
-                title="Remove model"
+                title={t('Remove model')}
               >
                 <span class="material-symbols-outlined text-sm">delete</span>
               </button>
@@ -4582,11 +4503,11 @@
     <!-- Header -->
     <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-3">
-        <h2 class="text-lg font-semibold">Available Models</h2>
+        <h2 class="text-lg font-semibold">{t('Available Models')}</h2>
         {#if modelDeprecationCount > 0}
           <span
             class="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-medium text-warning border border-warning/25"
-            title="These models were retired by the provider and cannot serve a request"
+            title={t('These models were retired by the provider and cannot serve a request')}
           >
             <span class="material-symbols-outlined text-[13px] leading-none" aria-hidden="true">error</span>
             {modelDeprecationCount} deprecated
@@ -4594,7 +4515,7 @@
         {/if}
         {#if providerThinkingLevels}
         <select
-          title="Appends (level) suffix to copied model names"
+          title={t('Appends (level) suffix to copied model names')}
           value={thinkingLevel}
           onchange={handleThinkingChange}
           class="rounded-md border border-border bg-background px-2 py-1 text-xs focus:border-primary focus:outline-none cursor-pointer"
@@ -4640,7 +4561,7 @@
           type="button"
           onclick={() => { activeModelTestError = null; checkAllSummary = null; }}
           class="hover:opacity-75 cursor-pointer shrink-0"
-          title="Dismiss"
+          title={t('Dismiss')}
         >
           <span class="material-symbols-outlined text-sm">close</span>
         </button>
@@ -4691,7 +4612,7 @@
       />
     </div>
     {#if gridModels.length === 0 && allAvailableModels.length > 0}
-      <p class="mb-3 text-xs text-text-muted">No models match the current search and filters.</p>
+      <p class="mb-3 text-xs text-text-muted">{t('No models match the current search and filters.')}</p>
     {/if}
     <!-- Models flex-wrap list matching upstream -->
     <div class="flex flex-wrap gap-3">
@@ -4720,15 +4641,11 @@
                   {fullModelId}
                 </code>
                 {#if rowCaps?.free}
-                  <span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                    FREE
-                  </span>
+                  <span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">{t('FREE')}</span>
                 {/if}
                 {#if isSessionActive}
                   <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Active Session
-                  </span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>{t('Active Session')}</span>
                 {/if}
                 <DeprecatedBadge provider={providerId} model={model.id} />
               </div>
@@ -4738,25 +4655,19 @@
                   {#if rowCaps?.vision}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-text-muted/70" style="font-size: 12px;">visibility</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Vision — Supports image input
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Vision — Supports image input')}</div>
                     </div>
                   {/if}
                   {#if rowCaps?.reasoning}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-text-muted/70" style="font-size: 12px;">neurology</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Reasoning — Supports reasoning / thinking
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Reasoning — Supports reasoning / thinking')}</div>
                     </div>
                   {/if}
                   {#if rowCaps?.jailbreak}
                     <div class="relative inline-flex group/tt">
                       <span class="material-symbols-outlined leading-none cursor-help text-red-500/80" style="font-size: 12px;">local_fire_department</span>
-                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">
-                        Jailbreak — Uncensored / unrestricted
-                      </div>
+                      <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 w-max max-w-56 rounded px-2 py-1 text-[11px] leading-snug bg-gray-900 text-white opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 whitespace-normal shadow-lg">{t('Jailbreak — Uncensored / unrestricted')}</div>
                     </div>
                   {/if}
                 </span>
@@ -4816,9 +4727,7 @@
                   <span class="material-symbols-outlined text-sm">content_copy</span>
                 {/if}
               </button>
-              <span class="pointer-events-none absolute mt-1 top-5 left-1/2 -translate-x-1/2 text-[10px] text-text-muted whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity">
-                Copy
-              </span>
+              <span class="pointer-events-none absolute mt-1 top-5 left-1/2 -translate-x-1/2 text-[10px] text-text-muted whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity">{t('Copy')}</span>
             </div>
 
             <!-- Disable button -->
@@ -4826,7 +4735,7 @@
               type="button"
               onclick={() => handleDisableModel(model.id)}
               class="ml-auto rounded p-0.5 text-text-muted opacity-100 transition-opacity hover:bg-red-500/10 hover:text-red-500 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
-              title="Disable this model"
+              title={t('Disable this model')}
             >
               <span class="material-symbols-outlined text-sm">close</span>
             </button>
@@ -4853,9 +4762,7 @@
         onclick={() => (showAddCustomModelModal = true)}
         class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-primary/40 px-3 py-2 text-xs text-primary transition-colors hover:border-primary hover:bg-primary/5 sm:w-auto cursor-pointer"
       >
-        <span class="material-symbols-outlined text-sm">add</span>
-        Add Model
-      </button>
+        <span class="material-symbols-outlined text-sm">add</span>{t('Add Model')}</button>
 
       {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter' || providerId === 'devin-desktop' || providerId === 'ghe-copilot') && providerConnections.some((c) => c.isActive !== 0)}
         <button
@@ -4881,7 +4788,7 @@
           onclick={handleCheckAllModels}
           disabled={isCheckingAll}
           class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-3 px-3 py-2 text-xs text-text-main transition-colors sm:w-auto cursor-pointer disabled:opacity-50"
-          title="Send a minimal request to every model and mark the ones that fail"
+          title={t('Send a minimal request to every model and mark the ones that fail')}
         >
           <span class="material-symbols-outlined text-sm">{isCheckingAll ? 'progress_activity' : 'troubleshoot'}</span>
           {isCheckingAll
@@ -4893,11 +4800,9 @@
           onclick={handleAutoDisableDeadModels}
           disabled={isCheckingAll}
           class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-2 text-xs text-amber-600 transition-colors sm:w-auto cursor-pointer disabled:opacity-50 dark:text-amber-400"
-          title="Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in."
+          title={t('Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
         >
-          <span class="material-symbols-outlined text-sm">heart_broken</span>
-          Disable dead models
-        </button>
+          <span class="material-symbols-outlined text-sm">heart_broken</span>{t('Disable dead models')}</button>
       {/if}
 
       {#if canListLiveModels && providerConnections.some((c) => c.isActive !== 0)}
@@ -4906,7 +4811,7 @@
           onclick={handleCheckLatestModels}
           disabled={isCheckingLatest}
           class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-3 px-3 py-2 text-xs text-text-main transition-colors sm:w-auto cursor-pointer disabled:opacity-50"
-          title="Fetch the provider's live catalog and list models you have not added yet"
+          title={t('Fetch the provider\'s live catalog and list models you have not added yet')}
         >
           <span class="material-symbols-outlined text-sm">{isCheckingLatest ? 'progress_activity' : 'cached'}</span>
           {isCheckingLatest ? 'Checking...' : 'Check Latest Models'}
@@ -4919,7 +4824,7 @@
           onclick={handleSyncModelDeprecations}
           disabled={isSyncingModels}
           class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-3 px-3 py-2 text-xs text-text-main transition-colors sm:w-auto cursor-pointer disabled:opacity-50"
-          title="Re-read the provider's live catalog and clear the Deprecated badge from any model it still serves"
+          title={t('Re-read the provider\'s live catalog and clear the Deprecated badge from any model it still serves')}
         >
           <span class="material-symbols-outlined text-sm {isSyncingModels ? 'animate-spin' : ''}">
             {isSyncingModels ? 'progress_activity' : 'sync'}
@@ -4942,9 +4847,7 @@
                   onclick={() => handleAddLatestModel(m.id, m.name)}
                   class="shrink-0 inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-primary hover:bg-primary/10 border border-primary/40 cursor-pointer"
                 >
-                  <span class="material-symbols-outlined text-[13px]">add</span>
-                  Add
-                </button>
+                  <span class="material-symbols-outlined text-[13px]">add</span>{t('Add')}</button>
               </div>
             {/each}
           </div>
@@ -4956,7 +4859,7 @@
     <!-- Suggested models from provider API — show only models not yet added -->
     {#if suggestedNotAdded.length > 0}
       <div class="w-full mt-2">
-        <p class="text-xs text-text-muted mb-2">Suggested free models (≥200k context):</p>
+        <p class="text-xs text-text-muted mb-2">{t('Suggested free models (≥200k context):')}</p>
         <div class="flex flex-wrap gap-2">
           {#each suggestedNotAdded as m (m.id)}
             <button
@@ -5007,7 +4910,7 @@
     ></div>
     <div class="relative w-full bg-surface border border-border-subtle rounded-[14px] shadow-[var(--shadow-elev)] fade-in max-w-md p-6">
       <div class="flex items-center justify-between pb-3 border-b border-border-subtle mb-4">
-        <h2 class="text-lg font-semibold text-text-main">Risk Notice</h2>
+        <h2 class="text-lg font-semibold text-text-main">{t('Risk Notice')}</h2>
         <button
           type="button"
           onclick={() => (showRiskNoticeModal = false)}
@@ -5016,24 +4919,18 @@
           <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
-      <p class="text-xs text-red-600 dark:text-yellow-400 leading-relaxed mb-6">
-        This provider uses a subscription/OAuth session not officially licensed for proxy/router use. Account may be restricted or banned. Use at your own risk.
-      </p>
+      <p class="text-xs text-red-600 dark:text-yellow-400 leading-relaxed mb-6">{t('This provider uses a subscription/OAuth session not officially licensed for proxy/router use. Account may be restricted or banned. Use at your own risk.')}</p>
       <div class="flex gap-2 justify-end">
         <button
           type="button"
           onclick={() => (showRiskNoticeModal = false)}
           class="px-3 py-1.5 text-xs font-semibold rounded-[8px] bg-surface-2 hover:bg-surface-3 text-text-main border border-border cursor-pointer"
-        >
-          Cancel
-        </button>
+        >{t('Cancel')}</button>
         <button
           type="button"
           onclick={confirmRiskAndProceed}
           class="px-3 py-1.5 text-xs font-semibold rounded-[8px] bg-red-600 hover:bg-red-700 text-white shadow-sm cursor-pointer"
-        >
-          I Understand, Continue
-        </button>
+        >{t('I Understand, Continue')}</button>
       </div>
     </div>
   </div>
@@ -5074,48 +4971,48 @@
         </form>
       {/if}
       {#if providerId === 'kiro' && !kiroMethod && !deviceUserCode}
-        <p class="text-sm text-text-muted mb-3">Choose your authentication method:</p>
+        <p class="text-sm text-text-muted mb-3">{t('Choose your authentication method:')}</p>
         <div class="space-y-2 mb-4">
           <button type="button" onclick={() => { kiroMethod = 'builder-id'; startKiroDeviceFlow('builder-id') }} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">shield</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">AWS Builder ID</h3><p class="text-xs text-text-muted">Recommended. Free AWS account, device-code flow.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('AWS Builder ID')}</h3><p class="text-xs text-text-muted">{t('Recommended. Free AWS account, device-code flow.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'idc' }} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">business</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">AWS IAM Identity Center</h3><p class="text-xs text-text-muted">Enterprise with your organization start URL.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('AWS IAM Identity Center')}</h3><p class="text-xs text-text-muted">{t('Enterprise with your organization start URL.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'api-key' }} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">key</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">API Key</h3><p class="text-xs text-text-muted">Long-lived headless Kiro/CodeWhisperer key.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('API Key')}</h3><p class="text-xs text-text-muted">{t('Long-lived headless Kiro/CodeWhisperer key.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'social-google'; startKiroSocial('google') }} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">account_circle</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">Google Account</h3><p class="text-xs text-text-muted">Log in with Google, paste callback manually.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('Google Account')}</h3><p class="text-xs text-text-muted">{t('Log in with Google, paste callback manually.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'social-github'; startKiroSocial('github') }} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">code</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">GitHub Account</h3><p class="text-xs text-text-muted">Log in with GitHub, paste callback manually.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('GitHub Account')}</h3><p class="text-xs text-text-muted">{t('Log in with GitHub, paste callback manually.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'import' }} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">file_upload</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">Import Token</h3><p class="text-xs text-text-muted">Paste refresh token from Kiro IDE.</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('Import Token')}</h3><p class="text-xs text-text-muted">{t('Paste refresh token from Kiro IDE.')}</p></div>
             </div>
           </button>
           <button type="button" onclick={() => { kiroMethod = 'import-cli-proxy' }} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors cursor-pointer">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary mt-0.5">data_object</span>
-              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">Import CLIProxyAPI JSON</h3><p class="text-xs text-text-muted">external_idp auth JSON (Microsoft login).</p></div>
+              <div class="flex-1"><h3 class="font-semibold text-sm mb-0.5">{t('Import CLIProxyAPI JSON')}</h3><p class="text-xs text-text-muted">{t('external_idp auth JSON (Microsoft login).')}</p></div>
             </div>
           </button>
         </div>
@@ -5123,25 +5020,25 @@
       {#if providerId === 'kiro' && kiroMethod === 'idc' && !deviceUserCode}
         <div class="space-y-3 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
           <div>
-            <p class="text-xs font-medium mb-1">IDC Start URL <span class="text-red-500">*</span></p>
-            <input bind:value={kiroIdcStartUrl} placeholder="https://your-org.awsapps.com/start" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+            <p class="text-xs font-medium mb-1">{t('IDC Start URL')} <span class="text-red-500">*</span></p>
+            <input bind:value={kiroIdcStartUrl} placeholder={t('https://your-org.awsapps.com/start')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
           </div>
           <div>
-            <p class="text-xs font-medium mb-1">AWS Region</p>
-            <input bind:value={kiroIdcRegion} placeholder="us-east-1" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+            <p class="text-xs font-medium mb-1">{t('AWS Region')}</p>
+            <input bind:value={kiroIdcRegion} placeholder={t('us-east-1')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
           </div>
           <div class="flex gap-2">
-            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Back</button>
+            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Back')}</button>
             <button type="button" onclick={() => startKiroDeviceFlow('idc')} disabled={isConnecting || !kiroIdcStartUrl.trim()} class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-white disabled:opacity-50 cursor-pointer">{isConnecting ? 'Connecting…' : 'Continue'}</button>
           </div>
         </div>
       {/if}
       {#if providerId === 'kiro' && kiroMethod === 'api-key'}
         <div class="space-y-3 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
-          <input bind:value={kiroApiKey} type="password" placeholder="Kiro / CodeWhisperer API key" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
-          <input bind:value={kiroApiKeyRegion} placeholder="Region (default us-east-1)" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+          <input bind:value={kiroApiKey} type="password" placeholder={t('Kiro / CodeWhisperer API key')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+          <input bind:value={kiroApiKeyRegion} placeholder={t('Region (default us-east-1)')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
           <div class="flex gap-2">
-            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Back</button>
+            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Back')}</button>
             <button type="button" onclick={submitKiroApiKey} disabled={isConnecting} class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-white disabled:opacity-50 cursor-pointer">{isConnecting ? 'Saving…' : 'Save'}</button>
           </div>
         </div>
@@ -5149,18 +5046,18 @@
       {#if providerId === 'kiro' && kiroMethod === 'import'}
         <div class="space-y-3 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
           <button type="button" onclick={startKiroAutoImport} disabled={isConnecting} class="w-full py-1.5 text-xs font-semibold rounded-[8px] bg-surface-2 hover:bg-surface-3 border border-border disabled:opacity-50 cursor-pointer">{isConnecting ? 'Reading…' : 'Auto-detect from this host'}</button>
-          <input bind:value={kiroRefreshToken} placeholder="Refresh token (aorAAAAAG…)" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+          <input bind:value={kiroRefreshToken} placeholder={t('Refresh token (aorAAAAAG…)')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
           <div class="flex gap-2">
-            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Back</button>
+            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Back')}</button>
             <button type="button" onclick={submitKiroImport} disabled={isConnecting} class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-white disabled:opacity-50 cursor-pointer">{isConnecting ? 'Importing…' : 'Import'}</button>
           </div>
         </div>
       {/if}
       {#if providerId === 'kiro' && kiroMethod === 'import-cli-proxy'}
         <div class="space-y-3 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
-          <textarea bind:value={kiroCliProxyJson} rows={4} placeholder="Paste CLIProxyAPI auth JSON (external_idp)" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"></textarea>
+          <textarea bind:value={kiroCliProxyJson} rows={4} placeholder={t('Paste CLIProxyAPI auth JSON (external_idp)')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"></textarea>
           <div class="flex gap-2">
-            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Back</button>
+            <button type="button" onclick={() => { kiroMethod = null }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Back')}</button>
             <button type="button" onclick={submitKiroCliProxyImport} disabled={isConnecting} class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-white disabled:opacity-50 cursor-pointer">{isConnecting ? 'Importing…' : 'Import'}</button>
           </div>
         </div>
@@ -5168,15 +5065,15 @@
       {#if providerId === 'kiro' && (kiroMethod === 'social-google' || kiroMethod === 'social-github')}
         <div class="space-y-3 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
           {#if kiroSocialAuthUrl}
-            <p class="text-xs text-text-muted">Open this URL, log in, then paste the callback URL (kiro://…) below:</p>
+            <p class="text-xs text-text-muted">{t('Open this URL, log in, then paste the callback URL (kiro://…) below:')}</p>
             <div class="flex gap-2">
               <input readonly value={kiroSocialAuthUrl} class="flex-1 px-2.5 py-1.5 text-xs border border-border rounded-md bg-background text-text-muted select-all font-mono" />
-              <button type="button" onclick={() => window.open(kiroSocialAuthUrl, '_blank')} class="px-3 py-1.5 text-xs font-semibold rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Open</button>
+              <button type="button" onclick={() => window.open(kiroSocialAuthUrl, '_blank')} class="px-3 py-1.5 text-xs font-semibold rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Open')}</button>
             </div>
           {/if}
-          <input bind:value={kiroSocialCallback} placeholder="kiro://kiro.kiroAgent/authenticate-success?code=…" class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
+          <input bind:value={kiroSocialCallback} placeholder={t('kiro://kiro.kiroAgent/authenticate-success?code=…')} class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono" />
           <div class="flex gap-2">
-            <button type="button" onclick={() => { kiroMethod = null; kiroSocialAuthUrl = '' }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">Back</button>
+            <button type="button" onclick={() => { kiroMethod = null; kiroSocialAuthUrl = '' }} class="px-3 py-1.5 text-xs rounded-md border border-border bg-surface-2 hover:bg-surface-3 cursor-pointer">{t('Back')}</button>
             <button type="button" onclick={submitKiroSocialCallback} disabled={isConnecting} class="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-white disabled:opacity-50 cursor-pointer">{isConnecting ? 'Exchanging…' : 'Exchange code'}</button>
           </div>
         </div>
@@ -5210,15 +5107,15 @@
       <div class="space-y-4">
         {#if providerId === 'cursor'}
           <div class="space-y-2 p-3 border border-border rounded-md bg-sidebar/50">
-            <p class="text-[11px] text-text-muted">Get it from Cursor IDE's <span class="font-mono">state.vscdb</span> (<span class="font-mono">cursorAuth/accessToken</span> + <span class="font-mono">storage.serviceMachineId</span>):</p>
+            <p class="text-[11px] text-text-muted">{t('Get it from Cursor IDE\'s')} <span class="font-mono">{t('state.vscdb')}</span> (<span class="font-mono">{t('cursorAuth/accessToken')}</span> + <span class="font-mono">{t('storage.serviceMachineId')}</span>):</p>
             <input
               bind:value={specialToken}
-              placeholder="Access token (cursorAuth/accessToken)"
+              placeholder={t('Access token (cursorAuth/accessToken)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
             <input
               bind:value={specialExtra}
-              placeholder="Machine ID (storage.serviceMachineId)"
+              placeholder={t('Machine ID (storage.serviceMachineId)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
             <button
@@ -5233,39 +5130,39 @@
         {/if}
         {#if providerId === 'gitlab'}
           <div class="space-y-2 p-3 border border-border rounded-md bg-sidebar/50">
-            <p class="text-[11px] text-text-muted">Or use a Personal Access Token (in addition to the OAuth login above):</p>
+            <p class="text-[11px] text-text-muted">{t('Or use a Personal Access Token (in addition to the OAuth login above):')}</p>
             <input
               bind:value={specialToken}
               type="password"
-              placeholder="GitLab PAT (scope api, read_user)"
+              placeholder={t('GitLab PAT (scope api, read_user)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
             <input
               bind:value={specialBaseUrl}
-              placeholder="Base URL (default https://gitlab.com)"
+              placeholder={t('Base URL (default https://gitlab.com)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
           </div>
         {/if}
         {#if providerId === 'iflow'}
           <div class="space-y-2 p-3 border border-border rounded-md bg-sidebar/50">
-            <p class="text-[11px] text-text-muted">Or use a platform.iflow.cn cookie (in addition to the OAuth login above):</p>
+            <p class="text-[11px] text-text-muted">{t('Or use a platform.iflow.cn cookie (in addition to the OAuth login above):')}</p>
             <input
               bind:value={specialToken}
-              placeholder="Cookie (must contain BXAuth=...)"
+              placeholder={t('Cookie (must contain BXAuth=...)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
           </div>
         {/if}
         {#if deviceUserCode}
           <div class="p-3 border border-border rounded-md bg-sidebar/50 text-center">
-            <p class="text-[11px] text-text-muted mb-1">Enter this code on the login page that opened:</p>
+            <p class="text-[11px] text-text-muted mb-1">{t('Enter this code on the login page that opened:')}</p>
             <p class="text-2xl font-mono font-bold tracking-[0.3em] text-text-main select-all">{deviceUserCode}</p>
           </div>
         {/if}
         {#if oauthAuthUrl}
           <div>
-            <p class="text-sm font-medium mb-1">Step 1: Open this URL in your browser</p>
+            <p class="text-sm font-medium mb-1">{t('Step 1: Open this URL in your browser')}</p>
           <div class="flex gap-2">
             <input
               readonly
@@ -5277,9 +5174,7 @@
               onclick={() => window.open(oauthAuthUrl, '_blank')}
               class="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-text-main cursor-pointer"
             >
-              <span class="material-symbols-outlined text-sm">open_in_new</span>
-              Open
-            </button>
+              <span class="material-symbols-outlined text-sm">open_in_new</span>{t('Open')}</button>
             <button
               type="button"
               onclick={copyAuthUrl}
@@ -5294,22 +5189,22 @@
 
         {#if providerId === 'gitlab'}
           <div class="grid grid-cols-1 gap-2 p-3 border border-border rounded-md bg-sidebar/50 mb-1">
-            <p class="text-[11px] text-text-muted">Self-hosted GitLab / own OAuth app (optional — defaults to gitlab.com without a client):</p>
+            <p class="text-[11px] text-text-muted">{t('Self-hosted GitLab / own OAuth app (optional — defaults to gitlab.com without a client):')}</p>
             <input
               bind:value={gitlabBaseUrl}
-              placeholder="Base URL (default https://gitlab.com)"
+              placeholder={t('Base URL (default https://gitlab.com)')}
               class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
             />
             <div class="grid grid-cols-2 gap-2">
               <input
                 bind:value={gitlabClientId}
-                placeholder="OAuth Client ID"
+                placeholder={t('OAuth Client ID')}
                 class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
               />
               <input
                 bind:value={gitlabClientSecret}
                 type="password"
-                placeholder="OAuth Client Secret"
+                placeholder={t('OAuth Client Secret')}
                 class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background focus:outline-none focus:border-primary font-mono"
               />
             </div>
@@ -5376,9 +5271,7 @@
               isAuthorizingFreebuff = false
             }}
             class="flex-1 py-1.5 text-xs font-semibold rounded-[8px] bg-surface-2 hover:bg-surface-3 text-text-main border border-border cursor-pointer"
-          >
-            Cancel
-          </button>
+          >{t('Cancel')}</button>
         </div>
       </div>
       {/if}
@@ -5403,7 +5296,7 @@
           type="button"
           onclick={cancelApplyProxy}
           disabled={isApplyingProxy}
-          aria-label="Close"
+          aria-label={t('Close')}
           class="p-1 rounded text-text-muted hover:text-text-main disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <span class="material-symbols-outlined text-lg">close</span>
@@ -5422,8 +5315,8 @@
         >
           <span class="material-symbols-outlined text-primary text-lg">sync_alt</span>
           <div>
-            <div class="text-xs font-medium text-text-main">One-to-one (rotate)</div>
-            <div class="text-[11px] text-text-muted">Distribute active proxy pools round-robin</div>
+            <div class="text-xs font-medium text-text-main">{t('One-to-one (rotate)')}</div>
+            <div class="text-[11px] text-text-muted">{t('Distribute active proxy pools round-robin')}</div>
           </div>
         </button>
 
@@ -5435,8 +5328,8 @@
         >
           <span class="material-symbols-outlined text-red-500 text-lg">link_off</span>
           <div>
-            <div class="text-xs font-medium text-text-main">None (unbind all)</div>
-            <div class="text-[11px] text-text-muted">Remove proxy pool from connections</div>
+            <div class="text-xs font-medium text-text-main">{t('None (unbind all)')}</div>
+            <div class="text-[11px] text-text-muted">{t('Remove proxy pool from connections')}</div>
           </div>
         </button>
 
@@ -5460,7 +5353,7 @@
               <div class="flex items-center gap-2">
                 <div class="text-xs font-medium text-text-main truncate">{pool.name}</div>
                 {#if !pool.isActive}
-                  <span class="text-[10px] text-text-muted">(inactive)</span>
+                  <span class="text-[10px] text-text-muted">{t('(inactive)')}</span>
                 {/if}
               </div>
               <div class="text-[11px] text-text-muted truncate">{pool.proxyUrl}</div>
