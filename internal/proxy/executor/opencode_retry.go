@@ -111,7 +111,7 @@ func refusedResponseToError(resp *http.Response) *proxy.UpstreamError {
 }
 
 func overloadResponseToError(resp *http.Response) *proxy.UpstreamError {
-	if resp == nil || !((resp.StatusCode >= 500 && resp.StatusCode <= 599) || resp.StatusCode == http.StatusTooManyRequests) {
+	if resp == nil || (resp.StatusCode < 500 || resp.StatusCode > 599) && resp.StatusCode != http.StatusTooManyRequests {
 		return nil
 	}
 	body, _ := io.ReadAll(io.LimitReader(resp.Body, constants.UpstreamErrLimit))
