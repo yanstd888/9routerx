@@ -349,6 +349,8 @@ var ProviderModels = map[string][]string{
 	"ntw":                 {"notrack-c"},
 	"uncloseai":           {"turboderp/Qwen3.8-27B-exl3"},
 	"unc":                 {"turboderp/Qwen3.8-27B-exl3"},
+	"friendliai":          {"meta-llama-3.1-70b-instruct", "meta-llama-3.1-8b-instruct"},
+	"friendli":            {"meta-llama-3.1-70b-instruct", "meta-llama-3.1-8b-instruct"},
 	"notrack-web":         {"notrack-c"},
 	"keenable":            {},
 	"1min":                {"gpt-4o-mini"},

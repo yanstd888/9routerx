@@ -38,6 +38,7 @@ var RegistryAliases = map[string]string{
 	"keenable":              "keenable",
 	"oneminai":              "1min",
 	"uncloseai":             "unc",
+	"friendliai":            "friendli",
 	"tencent-aistudio-web": "tasw",
 	"haiper":            "hp",
 	"clova-studio":      "clova",

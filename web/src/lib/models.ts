@@ -283,6 +283,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "chatplayground": "cpl",
   "notrack-web": "ntw",
   "uncloseai": "unc",
+  "friendliai": "friendli",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10094,6 +10095,20 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "turboderp/Qwen3.8-27B-exl3",
       "name": "Qwen3.8 27B exl3 (Free)",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
+  "friendli": [
+    {
+      "id": "meta-llama-3.1-70b-instruct",
+      "name": "Meta Llama 3.1 70B Instruct",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "meta-llama-3.1-8b-instruct",
+      "name": "Meta Llama 3.1 8B Instruct",
       "supportedFormats": ["openai"],
       "capabilities": []
     }

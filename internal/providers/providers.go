@@ -1986,6 +1986,14 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme:   "bearer",
 		AuthOptional: true,
 	},
+	// FriendliAI: serverless passthrough (OmniRoute pin 632d84f5); see the
+	// registry comment for the flp_* /dedicated 403 that keeps this lane on
+	// the serverless base URL.
+	"friendliai": {
+		BaseURL:    "https://api.friendli.ai/serverless/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,

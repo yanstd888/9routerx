@@ -53,6 +53,7 @@ var ProviderAliasMap = map[string]string{
 	"cpl":            "chatplayground",
 	"ntw":            "notrack-web",
 	"unc":            "uncloseai",
+	"friendli":       "friendliai",
 	"hp":             "haiper",
 	"nlpc":           "nlpcloud",
 	"cmc-goat":       "commandcode-goat",

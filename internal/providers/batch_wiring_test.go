@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -313,6 +313,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("unc"); got != "uncloseai" {
 		t.Errorf("unc resolved to %q", got)
+	}
+	friendliMeta := ProviderRegistry["friendliai"]
+	if friendliMeta.Name != "FriendliAI" || friendliMeta.Alias != "friendli" || friendliMeta.Icon != "handshake" || friendliMeta.Color != "#EC4899" || friendliMeta.Website != "https://friendli.ai" {
+		t.Errorf("friendliai metadata = %+v", friendliMeta)
+	}
+	friendliCfg := KnownProviders["friendliai"]
+	if friendliCfg.BaseURL != "https://api.friendli.ai/serverless/v1/chat/completions" || friendliCfg.AuthHeader != "Authorization" || friendliCfg.AuthScheme != "bearer" {
+		t.Errorf("friendliai config = %+v", friendliCfg)
+	}
+	if len(ProviderModels["friendliai"]) != 2 || len(ProviderModels["friendli"]) != 2 {
+		t.Errorf("friendliai catalog = %d/%d models, want 2/2", len(ProviderModels["friendliai"]), len(ProviderModels["friendli"]))
+	}
+	if got := ResolveAlias("friendli"); got != "friendliai" {
+		t.Errorf("friendli resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

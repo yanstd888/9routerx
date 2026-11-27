@@ -2258,6 +2258,29 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Notice:       &Notice{Text: "UncloseAI is a free anonymous lane on hermes.ai.unturf.com. The roster rotates every few weeks: if the pinned id 404s, refresh models from /v1/models or Auto-Sync. Verified live 2026-11-27: the public beta is currently closed and key registration is shut, so a 401 public_beta_closed answer means wait for the reopen; existing keys keep working. Tool calling is emulated.", APIKeyURL: "https://uncloseai.com"},
 		ModelsFetcher: &Fetcher{URL: "https://hermes.ai.unturf.com/v1/models", Type: "openai"},
 	},
+	"friendliai": {
+		// FriendliAI serverless lane (OmniRoute apikey metadata, pinned
+		// 632d84f5): OpenAI-compatible chat over api.friendli.ai/serverless.
+		// Upstream #5430 (verified live there): an flp_* serverless token
+		// gets 403 Forbidden on the /dedicated path — serverless accepts it
+		// and serves the public models, so the serverless base URL is the
+		// pinned contract, not a preference. The pinned snapshot lists the
+		// llama-3.1 pair; the live /v1/models endpoint serves the public
+		// serverless catalog and feeds refreshes. Verified live 2026-11-27:
+		// GET /serverless/v1/models answers with the public catalog.
+		ID:           "friendliai",
+		Name:         "FriendliAI",
+		Alias:        "friendli",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#EC4899",
+		Icon:         "handshake",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://friendli.ai",
+		AuthHint:     "Paste your FriendliAI serverless token (flp_...) from friendli.ai. Free tier for serverless inference — no credit card required.",
+		Notice:       &Notice{Text: "FriendliAI runs through the serverless endpoint (api.friendli.ai/serverless). An flp_* serverless token is rejected with 403 on the /dedicated path — keep the pinned serverless base URL. The public serverless catalog feeds the model list.", APIKeyURL: "https://friendli.ai"},
+		ModelsFetcher: &Fetcher{URL: "https://api.friendli.ai/serverless/v1/models", Type: "openai"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",
