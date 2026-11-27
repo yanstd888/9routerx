@@ -47,6 +47,7 @@ var ProviderAliasMap = map[string]string{
 	"clova":          "clova-studio",
 	"1min":           "oneminai",
 	"tasw":           "tencent-aistudio-web",
+	"cnl":            "conol-web",
 	"adp-web":        "adapta-web",
 	"stx":            "syntx",
 	"cpl":            "chatplayground",

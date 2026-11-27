@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -285,6 +285,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("adp-web"); got != "adapta-web" {
 		t.Errorf("adp-web resolved to %q", got)
+	}
+	conolMeta := ProviderRegistry["conol-web"]
+	if conolMeta.Name != "Conol (Unofficial/Experimental)" || conolMeta.Alias != "cnl" || conolMeta.Icon != "auto_awesome" || conolMeta.Color != "#F6C945" || conolMeta.Website != "https://conol.ai" {
+		t.Errorf("conol-web metadata = %+v", conolMeta)
+	}
+	conolCfg := KnownProviders["conol-web"]
+	if conolCfg.BaseURL != "https://conol.ai/api/sessions" || conolCfg.AuthHeader != "Cookie" || conolCfg.AuthScheme != "raw" {
+		t.Errorf("conol-web config = %+v", conolCfg)
+	}
+	if len(ProviderModels["conol-web"]) != len(conolModels) || len(ProviderModels["cnl"]) != len(conolModels) {
+		t.Errorf("conol catalog = %d/%d models", len(ProviderModels["conol-web"]), len(ProviderModels["cnl"]))
+	}
+	if got := ResolveAlias("cnl"); got != "conol-web" {
+		t.Errorf("cnl resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

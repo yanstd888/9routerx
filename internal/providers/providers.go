@@ -519,6 +519,12 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"conol-web": {
+		BaseURL:    "https://conol.ai/api/sessions",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
 	"adapta-web": {
 		BaseURL:    "https://agent.adapta.one",
 		AuthHeader: "Authorization",

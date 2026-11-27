@@ -30,6 +30,7 @@ var RegistryAliases = map[string]string{
 	"codebuddy-intl":    "cbai",
 	"codex":             "cx",
 	"command-code":      "cmd",
+	"conol-web":             "cnl",
 	"adapta-web":            "adp-web",
 	"syntx":                 "stx",
 	"chatplayground":        "cpl",

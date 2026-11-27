@@ -24,6 +24,7 @@ func RegisterAll() {
 	Register("sumopod", func() Executor { return ForwardOpenAI })
 	Register("groq", func() Executor { return ForwardOpenAI })
 	Register("nvidia", func() Executor { return ForwardNvidia })
+	Register("conol-web", func() Executor { return ForwardConolWeb })
 	Register("adapta-web", func() Executor { return ForwardAdaptaWeb })
 	Register("syntx", func() Executor { return ForwardSyntx })
 	Register("chatplayground", func() Executor { return ForwardChatplayground })

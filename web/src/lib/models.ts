@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "conol-web": "cnl",
   "adapta-web": "adp-web",
   "syntx": "stx",
   "chatplayground": "cpl",
@@ -9471,6 +9472,170 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "cnl": [
+  {
+    "id": "claude-opus-5",
+    "name": "claude-opus-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-opus-4-8",
+    "name": "claude-opus-4-8",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-fable-5",
+    "name": "claude-fable-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-sonnet-5",
+    "name": "claude-sonnet-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-sonnet-4-6",
+    "name": "claude-sonnet-4-6",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-haiku-4-5",
+    "name": "claude-haiku-4-5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.5",
+    "name": "gpt-5.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.5-pro",
+    "name": "gpt-5.5-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-sol",
+    "name": "gpt-5.6-sol",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-terra",
+    "name": "gpt-5.6-terra",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-5.6-luna",
+    "name": "gpt-5.6-luna",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek/deepseek-v4-pro",
+    "name": "deepseek/deepseek-v4-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "z-ai/glm-5.2",
+    "name": "z-ai/glm-5.2",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "tencent/hy3",
+    "name": "tencent/hy3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "moonshotai/kimi-k3",
+    "name": "moonshotai/kimi-k3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "moonshotai/kimi-k2.7-code",
+    "name": "moonshotai/kimi-k2.7-code",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen/qwen3.7-plus",
+    "name": "qwen/qwen3.7-plus",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen/qwen3.7-max",
+    "name": "qwen/qwen3.7-max",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "minimax/minimax-m3",
+    "name": "minimax/minimax-m3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "stepfun/step-3.7-flash",
+    "name": "stepfun/step-3.7-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "google/gemini-3.7-flash",
+    "name": "google/gemini-3.7-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "google/gemini-3.1-pro-preview",
+    "name": "google/gemini-3.1-pro-preview",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "google/gemini-3.1-flash-lite",
+    "name": "google/gemini-3.1-flash-lite",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "x-ai/grok-4.3",
+    "name": "x-ai/grok-4.3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash",
+    "name": "deepseek/deepseek-v4-flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "xiaomi/mimo-v2.5",
+    "name": "xiaomi/mimo-v2.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "xiaomi/mimo-v2.5-pro",
+    "name": "xiaomi/mimo-v2.5-pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
   ],
   "adp-web": [
   {
