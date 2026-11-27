@@ -51,14 +51,23 @@ func opencodeStableSessionKey(req *Request, free bool) string {
 // attempted. The expiry is conditional on failed so a rotation that loses a
 // race against an already-rotated request keeps the newer session instead of
 // discarding its fresh budget.
-func rotateOpencodeStableSession(stableKey, failed string, install func(session string)) func() {
+func rotateOpencodeStableSession(stableKey, failed string, install func(session string)) *openCodeRotation {
 	if stableKey == "" {
 		return nil
 	}
-	return func() {
-		proxy.ExpireStableOpenCodeSession(stableKey, failed)
-		if fresh := proxy.StableOpenCodeSessionID(stableKey); fresh != failed {
-			install(fresh)
-		}
+	var rotatedID string
+	return &openCodeRotation{
+		rotate: func() {
+			proxy.ExpireStableOpenCodeSession(stableKey, failed)
+			if fresh := proxy.StableOpenCodeSessionID(stableKey); fresh != failed {
+				rotatedID = fresh
+				install(fresh)
+			}
+		},
+		expire: func() {
+			if rotatedID != "" {
+				proxy.ExpireStableOpenCodeSession(stableKey, rotatedID)
+			}
+		},
 	}
 }

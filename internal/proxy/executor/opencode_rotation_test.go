@@ -131,9 +131,10 @@ func TestRotateOpencodeStableSession(t *testing.T) {
 
 	id := proxy.StableOpenCodeSessionID("rotate-test")
 	var installed []string
-	rotate := rotateOpencodeStableSession("rotate-test", id, func(session string) {
+	rotation := rotateOpencodeStableSession("rotate-test", id, func(session string) {
 		installed = append(installed, session)
 	})
+	rotate := rotation.rotate
 	if rotate == nil {
 		t.Fatal("expected a rotation hook for a stable-session request")
 	}
@@ -151,7 +152,7 @@ func TestRotateOpencodeStableSession(t *testing.T) {
 	rotate2 := rotateOpencodeStableSession("rotate-test", id, func(session string) {
 		installed = append(installed, session)
 	})
-	rotate2()
+	rotate2.rotate()
 	current := proxy.StableOpenCodeSessionID("rotate-test")
 	if current != installed[0] {
 		t.Errorf("a lost rotation race must keep the newer session: map=%q installed=%v", current, installed)
@@ -165,6 +166,30 @@ func TestRotateOpencodeStableSession(t *testing.T) {
 // refusal in the response position must still be lifted into the error
 // position, or the 403 direct replay and the 429 session rotation never see
 // it. Regression for the live run where every 429 sailed past the rotation.
+func TestForwardOpenCodeRotating_ExpiresSecondRejectedStableSession(t *testing.T) {
+	stableKey := "test-opencode-rotate-twice"
+	first := proxy.StableOpenCodeSessionID(stableKey)
+	var second string
+	attempts := 0
+	_, err := forwardOpenCodeRotatingWithExpiry(context.Background(), func() (*http.Response, error) {
+		attempts++
+		if attempts == 1 {
+			return nil, usageLimitErr()
+		}
+		second = proxy.StableOpenCodeSessionID(stableKey)
+		return nil, usageLimitErr()
+	}, func() (*http.Response, error) { return nil, context.Canceled }, rotateOpencodeStableSession(stableKey, first, func(string) {}))
+	if err == nil {
+		t.Fatal("second usage limit must be returned")
+	}
+	if attempts != 2 || second == "" || second == first {
+		t.Fatalf("attempts=%d first=%q second=%q", attempts, first, second)
+	}
+	if got := proxy.StableOpenCodeSessionID(stableKey); got == second {
+		t.Fatalf("second rejected session remains cached: %q", got)
+	}
+}
+
 func TestForwardOpenCodeRotating_ResponsePositionUsageLimit(t *testing.T) {
 	attempts := 0
 	rotations := 0
