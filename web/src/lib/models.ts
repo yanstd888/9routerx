@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "chatplayground": "cpl",
   "notrack-web": "ntw",
   "keenable": "keenable",
   "oneminai": "1min",
@@ -9468,6 +9469,206 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "name": "Jev 1.13 Free",
       "kind": "systemone"
     }
+  ],
+  "cpl": [
+  {
+    "id": "gpt-6.1-sol",
+    "name": "ChatGPT-6.1 Sol",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gpt-6-luna",
+    "name": "ChatGPT-6 Luna",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gemini-3.8-flash-l",
+    "name": "Gemini (Latest Model)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gemini-3.8-flash",
+    "name": "Gemini 3.8 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "gemini-3.1-pro",
+    "name": "Gemini 3.1 Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-opus-5-5",
+    "name": "Claude Opus 5.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-haiku-5-5",
+    "name": "Claude (Latest Model)",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-sonnet-5-5",
+    "name": "Claude Sonnet 5.5",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "claude-fable-5-1",
+    "name": "Claude Fable 5.1",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "kimi-k2.6",
+    "name": "Kimi K",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek-v4-pro",
+    "name": "DeepSeek V4 Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek-v4-flash",
+    "name": "DeepSeek V4 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "grok-4.6",
+    "name": "Grok 4.6",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "mistral-large-3",
+    "name": "Mistral Large 3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "kimi-k3",
+    "name": "Kimi K3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "deepseek-r1",
+    "name": "DeepSeek R1",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "llama-4-maverick",
+    "name": "Llama 4 Maverick",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "llama-4-scout",
+    "name": "Llama 4 Scout",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "command-a",
+    "name": "Command A",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "command-r-plus",
+    "name": "Command R Plus",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "minimax-m3",
+    "name": "MiniMax M3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.8-max",
+    "name": "Qwen 3.8 Max",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.7-plus",
+    "name": "Qwen 3.7 Plus",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "qwen3.6-flash",
+    "name": "Qwen 3.6 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "nova-2-lite-v1",
+    "name": "Nova 2 Lite",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "mimo-v2.6-pro",
+    "name": "MiMo V2.6 Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "hy3",
+    "name": "HY3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "grok-4.7",
+    "name": "Grok 4.7",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "glm-5.3",
+    "name": "GLM 5.3",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "glm-5.3-flash",
+    "name": "GLM 5.3 Flash",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar-reasoning-pro",
+    "name": "Sonar Reasoning Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar-pro",
+    "name": "Sonar Pro",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
+  {
+    "id": "perplexity-sonar",
+    "name": "Sonar",
+    "supportedFormats": ["openai"],
+    "capabilities": []
+  },
   ],
   "ntw": [
     {

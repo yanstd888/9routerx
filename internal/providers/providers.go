@@ -519,6 +519,13 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"chatplayground": {
+		BaseURL:    "https://app.chatplayground.ai/api/chat",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		CatalogURL: "https://app.chatplayground.ai/api/models",
+		Format:     FormatOpenAI,
+	},
 	"notrack-web": {
 		BaseURL:    "https://notrack.ai",
 		AuthHeader: "Cookie",

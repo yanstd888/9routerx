@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -243,6 +243,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("ntw"); got != "notrack-web" {
 		t.Errorf("ntw resolved to %q", got)
+	}
+	cplMeta := ProviderRegistry["chatplayground"]
+	if cplMeta.Name != "ChatPlayground" || cplMeta.Alias != "cpl" || cplMeta.Icon != "auto_awesome" || cplMeta.Color != "#7C3AED" || cplMeta.Website != "https://web.chatplayground.ai" {
+		t.Errorf("chatplayground metadata = %+v", cplMeta)
+	}
+	cplCfg := KnownProviders["chatplayground"]
+	if cplCfg.BaseURL != "https://app.chatplayground.ai/api/chat" || cplCfg.AuthHeader != "Authorization" || cplCfg.CatalogURL != "https://app.chatplayground.ai/api/models" {
+		t.Errorf("chatplayground config = %+v", cplCfg)
+	}
+	if len(ProviderModels["chatplayground"]) != 33 || len(ProviderModels["cpl"]) != 33 {
+		t.Errorf("chatplayground catalog = %d/%d models", len(ProviderModels["chatplayground"]), len(ProviderModels["cpl"]))
+	}
+	if got := ResolveAlias("cpl"); got != "chatplayground" {
+		t.Errorf("cpl resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
