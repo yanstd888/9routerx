@@ -285,6 +285,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "uncloseai": "unc",
   "friendliai": "friendli",
   "databricks": "databricks",
+  "snowflake": "snowflake",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -10136,6 +10137,32 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
     {
       "id": "databricks-gemini-2-5-pro",
       "name": "Databricks Gemini 2.5 Pro",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    }
+  ],
+  "snowflake": [
+    {
+      "id": "llama3.1-70b",
+      "name": "Llama 3.1 70B",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "llama3.3-70b",
+      "name": "Llama 3.3 70B",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "deepseek-r1",
+      "name": "DeepSeek R1",
+      "supportedFormats": ["openai"],
+      "capabilities": []
+    },
+    {
+      "id": "claude-3-5-sonnet",
+      "name": "Claude 3.5 Sonnet",
       "supportedFormats": ["openai"],
       "capabilities": []
     }

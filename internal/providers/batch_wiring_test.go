@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web", "chatplayground", "syntx", "adapta-web", "conol-web", "uncloseai", "friendliai", "databricks", "snowflake"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -338,6 +338,17 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if len(ProviderModels["databricks"]) != 4 {
 		t.Errorf("databricks catalog = %d models, want 4", len(ProviderModels["databricks"]))
+	}
+	snflMeta := ProviderRegistry["snowflake"]
+	if snflMeta.Name != "Snowflake Cortex" || snflMeta.Alias != "snowflake" || snflMeta.Icon != "ac_unit" || snflMeta.Color != "#29B5E8" || snflMeta.Website != "https://www.snowflake.com" {
+		t.Errorf("snowflake metadata = %+v", snflMeta)
+	}
+	snflCfg := KnownProviders["snowflake"]
+	if snflCfg.BaseURL != "https://{account}.snowflakecomputing.com/api/v2/cortex/inference:complete" || snflCfg.AuthHeader != "Authorization" || snflCfg.AuthScheme != "bearer" {
+		t.Errorf("snowflake config = %+v", snflCfg)
+	}
+	if len(ProviderModels["snowflake"]) != 4 {
+		t.Errorf("snowflake catalog = %d models, want 4", len(ProviderModels["snowflake"]))
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)

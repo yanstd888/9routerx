@@ -2304,6 +2304,29 @@ var ProviderRegistry = map[string]ProviderMeta{
 		AuthHint:     "Paste a Databricks workspace token and set the connection Base URL to your workspace serving-endpoints host, e.g. https://adb-1234567890123456.7.azuredatabricks.net/serving-endpoints.",
 		Notice:       &Notice{Text: "Databricks Model Serving is per-workspace: requests go to <workspace>/serving-endpoints/chat/completions. The pinned default is a placeholder that no workspace answers, so the executor refuses it until the connection Base URL points at your own workspace. Model availability follows the serving endpoints created in that workspace.", APIKeyURL: "https://www.databricks.com"},
 	},
+	"snowflake": {
+		// Snowflake Cortex (OmniRoute apikey metadata, pinned 632d84f5):
+		// OpenAI-compatible chat over the Cortex inference:complete route.
+		// The pinned baseUrl is an {account} placeholder; upstream's
+		// executor-default unit test pins the URL normalization (account
+		// host -> /api/v2/cortex/inference:complete) and the PAT/keypair
+		// credential classification (pat/ prefix strips to the raw token
+		// and sets X-Snowflake-Authorization-Token-Type:
+		// PROGRAMMATIC_ACCESS_TOKEN; anything else is a KEYPAIR_JWT). The
+		// connection carries the account host and the executor refuses the
+		// placeholder with an actionable 400.
+		ID:           "snowflake",
+		Name:         "Snowflake Cortex",
+		Alias:        "snowflake",
+		Category:     CategoryAPIKey,
+		AuthType:     "apikey",
+		Color:        "#29B5E8",
+		Icon:         "ac_unit",
+		ServiceKinds: []string{"llm"},
+		Website:      "https://www.snowflake.com",
+		AuthHint:     "Paste a Snowflake programmatic access token (pat/...) or a keypair JWT, and set the connection Base URL to your account host, e.g. https://acme-org.snowflakecomputing.com.",
+		Notice:       &Notice{Text: "Snowflake Cortex routes to <account>/api/v2/cortex/inference:complete. A pat/ prefixed token is sent as a PROGRAMMATIC ACCESS TOKEN; any other credential is sent as a KEYPAIR_JWT. Model availability follows the Cortex models enabled for the account.", APIKeyURL: "https://www.snowflake.com"},
+	},
 	"zcode": {
 		ID:           "zcode",
 		Name:         "ZCode (Z.ai)",

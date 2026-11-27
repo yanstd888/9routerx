@@ -2003,6 +2003,15 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	// Snowflake Cortex: account-local inference route (OmniRoute pin
+	// 632d84f5). The default carries the pinned {account} placeholder; the
+	// executor replaces it with the connection Base URL and refuses the
+	// placeholder outright, so this default never reaches the wire.
+	"snowflake": {
+		BaseURL:    "https://{account}.snowflakecomputing.com/api/v2/cortex/inference:complete",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,
