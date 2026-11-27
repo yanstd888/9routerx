@@ -277,6 +277,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "opencode-go": "ocg",
   "opencode-zen": "ocz",
   "openadapter": "oad",
+  "notrack-web": "ntw",
   "keenable": "keenable",
   "oneminai": "1min",
   "tencent-aistudio-web": "tasw",
@@ -9466,6 +9467,14 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "id": "jev-1.13-free",
       "name": "Jev 1.13 Free",
       "kind": "systemone"
+    }
+  ],
+  "ntw": [
+    {
+      "id": "notrack-c",
+      "name": "NoTrack C",
+      "supportedFormats": ["openai"],
+      "capabilities": ["tools"]
     }
   ],
   "keenable": [],

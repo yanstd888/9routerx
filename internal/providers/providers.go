@@ -519,6 +519,11 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"notrack-web": {
+		BaseURL:    "https://notrack.ai",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
 	"keenable": {
 		BaseURL:       "https://api.keenable.ai",
 		AuthHeader:    "X-API-Key",

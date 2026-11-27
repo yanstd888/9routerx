@@ -47,6 +47,7 @@ var ProviderAliasMap = map[string]string{
 	"clova":          "clova-studio",
 	"1min":           "oneminai",
 	"tasw":           "tencent-aistudio-web",
+	"ntw":            "notrack-web",
 	"hp":             "haiper",
 	"nlpc":           "nlpcloud",
 	"cmc-goat":       "commandcode-goat",

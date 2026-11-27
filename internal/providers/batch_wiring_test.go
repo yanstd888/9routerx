@@ -7,7 +7,7 @@ import (
 )
 
 func TestProviderBatchAliasesRoundTrip(t *testing.T) {
-	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable"} {
+	for _, id := range []string{"alibaba", "featherless-ai", "ovhcloud", "aihorde", "uc-direct", "synthetic", "river", "nace", "alibaba-cn", "agnes-cn", "volcengine-coding-plan", "volcengine-agent-plan", "leonardo", "opencode-server", "command-code", "commandcode-goat", "poe", "nlpcloud", "cerebrium", "clova-studio", "gigachat", "udio", "haiper", "huggingchat", "tencent-aistudio-web", "oneminai", "keenable", "notrack-web"} {
 		meta := ProviderRegistry[id]
 		if got := ResolveAlias(meta.Alias); got != id {
 			t.Errorf("%s publishes alias %q resolving to %q", id, meta.Alias, got)
@@ -229,6 +229,20 @@ func TestProviderBatchAliasesRoundTrip(t *testing.T) {
 	}
 	if got := ResolveAlias("keenable"); got != "keenable" {
 		t.Errorf("keenable resolved to %q", got)
+	}
+	ntwMeta := ProviderRegistry["notrack-web"]
+	if ntwMeta.Name != "NoTrack Web (Free)" || ntwMeta.Alias != "ntw" || ntwMeta.Icon != "auto_awesome" || ntwMeta.Color != "#0EA5E9" || ntwMeta.Website != "https://notrack.ai" {
+		t.Errorf("notrack-web metadata = %+v", ntwMeta)
+	}
+	ntwCfg := KnownProviders["notrack-web"]
+	if ntwCfg.BaseURL != "https://notrack.ai" || ntwCfg.AuthHeader != "Cookie" || ntwCfg.AuthScheme != "raw" {
+		t.Errorf("notrack-web config = %+v", ntwCfg)
+	}
+	if len(ProviderModels["notrack-web"]) != 1 || len(ProviderModels["ntw"]) != 1 {
+		t.Errorf("notrack catalog = %d/%d models", len(ProviderModels["notrack-web"]), len(ProviderModels["ntw"]))
+	}
+	if got := ResolveAlias("ntw"); got != "notrack-web" {
+		t.Errorf("ntw resolved to %q", got)
 	}
 	if got := ResolveAlias("ocs"); got != "opencode-server" {
 		t.Errorf("ocs resolved to %q", got)
