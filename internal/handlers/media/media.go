@@ -920,6 +920,14 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 			}
+			if keenableEndpoint(endpoint) && isKeenableProvider(subInfo.Provider) {
+				if err := h.handleKeenable(w, r, body, endpoint, subInfo); err == nil {
+					return
+				} else {
+					lastErr, lastStatus = searchErrorParts(err)
+					continue
+				}
+			}
 			if (endpoint == "/v1/images/generations" || endpoint == "/images/generations" ||
 				endpoint == "/v1/images/edits" || endpoint == "/images/edits") && (subInfo.Provider == "antigravity" || subInfo.Provider == "ag") {
 				if err := h.handleAntigravityImage(w, r, body, subInfo); err == nil {
@@ -1116,6 +1124,14 @@ func (h *MediaHandler) forwardMediaRequest(w http.ResponseWriter, r *http.Reques
 	// and fetch lanes are adapted rather than forwarded verbatim.
 	if aimlapiToolEndpoint(endpoint) && isAimlapiProvider(modelInfo.Provider) {
 		if err := h.handleAimlapiTool(w, r, body, endpoint, modelInfo); err != nil {
+			writeSearchError(w, err)
+		}
+		return
+	}
+	// Keenable answers its own JSON shape and also serves callers that have no
+	// key (a /public path), so its lanes are adapted rather than forwarded.
+	if keenableEndpoint(endpoint) && isKeenableProvider(modelInfo.Provider) {
+		if err := h.handleKeenable(w, r, body, endpoint, modelInfo); err != nil {
 			writeSearchError(w, err)
 		}
 		return

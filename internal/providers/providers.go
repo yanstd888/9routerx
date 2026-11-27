@@ -1134,6 +1134,19 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	// Keenable — web search and page fetch on one host. Both lanes also answer
+	// without a key on a /public path, so the provider works before a
+	// connection is added; the request and the answer are adapted in
+	// internal/handlers/media/keenable_search.go.
+	"keenable": {
+		BaseURL:      "https://api.keenable.ai",
+		AuthHeader:   "X-API-Key",
+		AuthScheme:   "raw",
+		SearchURL:    "https://api.keenable.ai/v1/search",
+		SearchMethod: "POST",
+		FetchURL:     "https://api.keenable.ai/v1/fetch",
+		FetchMethod:  "POST",
+	},
 	"linkup": {
 		BaseURL:      "https://api.linkup.so/v1/search",
 		AuthHeader:   "Authorization",
