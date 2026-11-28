@@ -102,6 +102,8 @@ func (h *MediaHandler) probeModel(r *http.Request, model, kind string) testModel
 	ctx, cancel := context.WithTimeout(r.Context(), testModelTimeout)
 	defer cancel()
 	ctx = handlerutil.WithProbeContext(ctx)
+	connectionRecorder := &handlerutil.ProbeConnectionRecorder{}
+	ctx = handlerutil.WithProbeConnectionRecorder(ctx, connectionRecorder)
 
 	probe, err := http.NewRequestWithContext(ctx, http.MethodPost, probePath(kind), payload.body)
 	if err != nil {
@@ -116,6 +118,7 @@ func (h *MediaHandler) probeModel(r *http.Request, model, kind string) testModel
 
 	result := readProbeResult(rec, kind)
 	result.LatencyMs = time.Since(start).Milliseconds()
+	result.ConnectionID = connectionRecorder.ID()
 	return result
 }
 
@@ -269,6 +272,9 @@ type testModelResult struct {
 	Error     string `json:"error,omitempty"`
 	Blocked   bool   `json:"blocked,omitempty"`
 	ResetAt   string `json:"resetAt,omitempty"`
+	// ConnectionID names the account the resolver actually used for this probe.
+	// A cooldown on one account is not proof the model is dead.
+	ConnectionID string `json:"connectionId,omitempty"`
 }
 
 // readProbeResult decides pass or fail from the probe response.

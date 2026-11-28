@@ -11,6 +11,7 @@ export function isDeadProbeStatus(status: ModelTestStatus | undefined): boolean 
 export interface ModelTestVerdict {
   status: 'ok' | 'error' | 'blocked'
   error: string | null
+  connectionId?: string
 }
 
 export function parseModelTestVerdict(res: {
@@ -19,11 +20,15 @@ export function parseModelTestVerdict(res: {
   error?: string
   blocked?: boolean
   resetAt?: string
+  connectionId?: string
 }): ModelTestVerdict {
   if (res.ok) {
-    return { status: 'ok', error: null }
+    return { status: 'ok', error: null, connectionId: res.connectionId }
   }
   const err = res.error || 'Model test failed'
+  // The probe resolver may choose any healthy connection. Naming it lets an
+  // operator tell a dead model from one account in cooldown.
+  const via = res.connectionId ? ` (via ${res.connectionId})` : ''
 
   // The backend owns this verdict. It knows whether the account was parked
   // (temporary, resolves on its own) or whether the model was actually asked
@@ -32,10 +37,14 @@ export function parseModelTestVerdict(res: {
   // and a model-scoped quota refusal never clears by waiting.
   if (res.blocked) {
     const reset = formatResetAt(res.resetAt)
-    return { status: 'blocked', error: reset ? `Blocked (cooldown until ${reset})` : err }
+    return {
+      status: 'blocked',
+      error: (reset ? `Blocked (cooldown until ${reset})` : err) + via,
+      connectionId: res.connectionId,
+    }
   }
 
-  return { status: 'error', error: err }
+  return { status: 'error', error: err + via, connectionId: res.connectionId }
 }
 
 // The gateway speaks RFC3339; operators read local time. Every other reset in

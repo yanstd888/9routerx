@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
-	"strconv"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -319,6 +319,7 @@ func (h *ChatHandler) getBestConnectionWithContext(ctx context.Context, provider
 					Name:     &publicName,
 					IsActive: 1,
 				}
+				handlerutil.ProbeConnectionRecorderFrom(ctx).Set(conn.ID)
 				return conn, connData, nil
 			}
 			return nil, nil, fmt.Errorf("no active connections for provider: %s", provider)
@@ -511,6 +512,7 @@ func (h *ChatHandler) getBestConnectionWithContext(ctx context.Context, provider
 	// directly — the assignment the dashboard shows was never dialled.
 	h.applyProviderProxyPool(&connData, provider, excludePools...)
 
+	handlerutil.ProbeConnectionRecorderFrom(ctx).Set(conn.ID)
 	return conn, &connData, nil
 }
 

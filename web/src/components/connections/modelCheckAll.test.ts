@@ -82,6 +82,27 @@ describe('parseModelTestVerdict', () => {
     expect(res.status).toBe('error')
     expect(res.error).toBe('HTTP 404 Model not found')
   })
+
+  test('names the connection that was actually probed', () => {
+    const failure = parseModelTestVerdict({
+      ok: false,
+      status: 429,
+      error: 'HTTP 429 rate limited',
+      connectionId: 'acct-7',
+    })
+    expect(failure.status).toBe('error')
+    expect(failure.error).toBe('HTTP 429 rate limited (via acct-7)')
+    expect(failure.connectionId).toBe('acct-7')
+
+    const cooldown = parseModelTestVerdict({
+      ok: false,
+      blocked: true,
+      resetAt: '2026-10-09T02:00:00Z',
+      connectionId: 'acct-7',
+    })
+    expect(cooldown.status).toBe('blocked')
+    expect(cooldown.error?.includes('via acct-7')).toBe(true)
+  })
 })
 
 describe('formatCheckAllSummary', () => {
