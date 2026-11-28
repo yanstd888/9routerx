@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -800,9 +801,15 @@ func (r *Repo) GetRequestDetailsPaged(ctx context.Context, limit, offset int, si
 		where = "WHERE timestamp >= ?"
 		args = append(args, since)
 	}
-	var total int
-	if err := r.db.QueryRowContext(ctx, fmt.Sprintf(requestDetailCount, where), args...).Scan(&total); err != nil {
-		return nil, 0, fmt.Errorf("count requestDetails: %w", err)
+	// R10: the COUNT runs over the whole filtered range per page change — on
+	// 'all' that is a full-table count per click. The count is cached behind a
+	// table-watermark signature (the newest and oldest timestamps, both index
+	// seeks): page navigations within one watermark serve the cached count,
+	// and any insert or boundary delete recounts. A watermark read failure
+	// falls through to the uncached count rather than blocking the page.
+	total, countErr := r.cachedRequestDetailCount(ctx, since, where, args)
+	if countErr != nil {
+		return nil, 0, fmt.Errorf("count requestDetails: %w", countErr)
 	}
 
 	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(requestDetailListSelect, where), append(args, limit, offset)...)
@@ -837,6 +844,74 @@ func (r *Repo) GetRequestDetailsPaged(ctx context.Context, limit, offset int, si
 	}
 	return res, total, nil
 }
+
+// requestDetailCountEntry is one cached page count.
+type requestDetailCountEntry struct {
+	total     int
+	watermark string
+	fetchedAt time.Time
+}
+
+// requestDetailCounts caches the Details-tab page count per since-filter,
+// keyed behind a table-watermark signature: the newest and oldest timestamps,
+// both index seeks on idx_rd_ts. Page navigations within one watermark serve
+// the cached count; any insert or boundary delete recounts. Entries expire on
+// the same TTL the other usage caches use — a quiet table cannot pin a stale
+// count past it.
+var requestDetailCounts = struct {
+	mu      sync.Mutex
+	entries map[string]*requestDetailCountEntry
+}{entries: make(map[string]*requestDetailCountEntry)}
+
+// cachedRequestDetailCount serves the filtered row count from the cache,
+// recounting when the watermark signature moved or the entry expired. A
+// watermark read failure counts uncached: the page must not block on the
+// cache's own plumbing.
+func (r *Repo) cachedRequestDetailCount(ctx context.Context, since, where string, args []any) (int, error) {
+	signature, sigErr := func() (string, error) {
+		var sig struct {
+			newest string
+			oldest string
+		}
+		if err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), ''), COALESCE(MIN(timestamp), '') FROM requestDetails`).Scan(&sig.newest, &sig.oldest); err != nil {
+			return "", err
+		}
+		return sig.newest + "|" + sig.oldest, nil
+	}()
+
+	requestDetailCounts.mu.Lock()
+	if sigErr == nil {
+		if entry, ok := requestDetailCounts.entries[since]; ok && entry.watermark == signature && time.Since(entry.fetchedAt) <= usageDetailCountTTL {
+			entry.fetchedAt = time.Now()
+			total := entry.total
+			requestDetailCounts.mu.Unlock()
+			return total, nil
+		}
+	}
+	requestDetailCounts.mu.Unlock()
+
+	var total int
+	if err := r.db.QueryRowContext(ctx, fmt.Sprintf(requestDetailCount, where), args...).Scan(&total); err != nil {
+		return 0, err
+	}
+	if sigErr == nil {
+		requestDetailCounts.mu.Lock()
+		if len(requestDetailCounts.entries) >= requestDetailCountMaxEntries {
+			requestDetailCounts.entries = make(map[string]*requestDetailCountEntry, requestDetailCountMaxEntries)
+		}
+		requestDetailCounts.entries[since] = &requestDetailCountEntry{total: total, watermark: signature, fetchedAt: time.Now()}
+		requestDetailCounts.mu.Unlock()
+	}
+	return total, nil
+}
+
+const (
+	// usageDetailCountTTL bounds how long one watermark's count is served,
+	// matching the other usage caches.
+	usageDetailCountTTL = 5 * time.Minute
+	// requestDetailCountMaxEntries bounds the per-filter cache.
+	requestDetailCountMaxEntries = 16
+)
 
 // GetRequestDetailByID returns the full stored payload for one request, which
 // is what the inspector shows. It is a primary-key lookup, so opening a row
