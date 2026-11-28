@@ -1388,13 +1388,6 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
-	// Naga AI: mechanical passthrough from the OmniRoute open-sse registry
-	// (pinned 632d84f5).
-	"naga-ai": {
-		BaseURL:    "https://api.naga.ac/v1/chat/completions",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
 	// AgentRouter: mechanical passthrough from the OmniRoute open-sse registry
 	// (pinned 632d84f5).
 	"agentrouter": {

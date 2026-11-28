@@ -203,6 +203,7 @@ var ProviderAliasMap = map[string]string{
 	"paralon":            "paraloncloud",
 	"ofa":                "openference-api",
 	"naga":               "naga-ac",
+	"naga-ai":            "naga-ac",
 	"llmkiwi":            "llm-kiwi",
 	"glb":                "gitlawb",
 	"g4fpol":             "g4f-pollinations",

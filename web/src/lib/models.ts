@@ -169,7 +169,7 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "ainative": "ainative",
   "anyapi": "anyapi",
   "agentrouter": "agentrouter",
-  "naga-ai": "naga-ai",
+  "naga-ai": "naga-ac",
   "speka": "speka",
   "tabitoken": "tabitoken",
   "seekai": "ska",

@@ -151,7 +151,6 @@ func RegisterAll() {
 	Register("ainative", func() Executor { return ForwardOpenAI })
 	Register("anyapi", func() Executor { return ForwardOpenAI })
 	Register("agentrouter", func() Executor { return ForwardOpenAI })
-	Register("naga-ai", func() Executor { return ForwardOpenAI })
 	Register("speka", func() Executor { return ForwardOpenAI })
 	Register("tabitoken", func() Executor { return ForwardOpenAI })
 	Register("seekai", func() Executor { return ForwardOpenAI })
