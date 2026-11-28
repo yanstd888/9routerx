@@ -6,8 +6,8 @@ section: Using the Gateway
 
 # Providers
 
-9RouterX has 154 built-in provider entries: 91 in the API-key category, 28 in
-OAuth, 29 in the free categories, and 6 in web-cookie. These are catalog groups,
+9RouterX has <!-- GEN:PROVIDERCOUNT total -->344<!-- /GEN --> built-in provider entries: <!-- GEN:PROVIDERCOUNT apikey -->265<!-- /GEN --> in the API-key category, <!-- GEN:PROVIDERCOUNT oauth -->34<!-- /GEN --> in
+OAuth, <!-- GEN:PROVIDERCOUNT freeAll -->34<!-- /GEN --> in the free categories, and <!-- GEN:PROVIDERCOUNT webCookie -->11<!-- /GEN --> in web-cookie. These are catalog groups,
 not counts of guaranteed authentication flows; for example, `muse` is grouped
 under OAuth but uses API-key authentication. The grouped catalog also includes
 two custom endpoint templates, which are not built-in providers.

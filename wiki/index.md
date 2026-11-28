@@ -66,7 +66,7 @@ branch rather than in a release you can download.
 | Token savers | RTK and compression/output styles; opt-in [tool-loop watch](token-saver.md#tool-loop-watch) with protocol-dependent coverage |
 | Governance | Per-key rate limits, budgets, plans, allowlists, and a [fair-share scheduling hint](governance.md#fair-share-scheduling), not a reserved quota |
 | Security | Credential vault, key hashing, dashboard-token scopes, reversible PII placeholders, guardrails, and audit records with documented limits |
-| Providers | 154 built-in entries (91 API category, 28 OAuth category, 29 free, 6 web-cookie); auth modes vary. 248 static free models across 36 providers, including 24 keyless; custom endpoint templates are separate |
+| Providers | <!-- GEN:PROVIDERCOUNT total -->344<!-- /GEN --> built-in entries (<!-- GEN:PROVIDERCOUNT apikey -->265<!-- /GEN --> API category, <!-- GEN:PROVIDERCOUNT oauth -->34<!-- /GEN --> OAuth category, <!-- GEN:PROVIDERCOUNT freeAll -->34<!-- /GEN --> free, <!-- GEN:PROVIDERCOUNT webCookie -->11<!-- /GEN --> web-cookie); auth modes vary. 248 static free models across 36 providers, including 24 keyless; custom endpoint templates are separate |
 | Agents | MCP server endpoint, A2A endpoints, multi-target webhooks, team cost centers |
 | Operations | Docker, tunnels, updates, automatic snapshots, sensitive remote JSON backups, supplied proxy harvest, and local doctor/onboarding status |
 
