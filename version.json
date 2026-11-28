@@ -9,13 +9,13 @@
     "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-windows-amd64.exe"
   },
   "sha256s": {
-    "darwin_amd64": "59ef891dbce1d9dbf4c5f29f59fd0bcecf15528b745f785aa4ff1c494a08829c",
-    "darwin_arm64": "bc950bb38735d5b6ff7ad369a5d7ebc86735e02ce09bea208baf1082c402bb2d",
-    "linux_amd64": "58d2a1044b6bec6c485d252317c3ca5f05dd48c4e380410a69ec8732d9488d99",
-    "linux_arm64": "e8a9e64b6ffd374ef651e64b1449bb6136baead724204e1fcaacd7e6dbf52374",
-    "windows_amd64": "ed55833c2a96a02bc2de87c823209070e79fc3c9b4d12eb32ed66277788a9828"
+    "darwin_amd64": "a37ed92fd95f80f6aca29e876c748a9973be1d97f78039d221370188f13d5b5c",
+    "darwin_arm64": "d057578294c466fcc7e40c843b75d845bb355c3d5360d8ba821a577133330138",
+    "linux_amd64": "0396682a6deb4132e84e3544b30a9184bb2277531d2415198d68acd2b2575cb0",
+    "linux_arm64": "40824aa340d613ce25f7ee8f7d2ae69de716904b55b403a4150c5e3378ed3e89",
+    "windows_amd64": "ef0d12c3ff2354230e06111c6e2ea05c0785035e89c2dcb5b3dc59e1aabd156e"
   },
-  "releaseNotes": "\n\n### Added\n- **16 new providers** — web-chat lanes (NoTrack Web, ChatPlayground, SYNTX.ai, Adapta One, Conol) and API-key gateways (UncloseAI free anonymous access, FriendliAI, Databricks Model Serving, Snowflake Cortex, Charm Hyper, Token Kiosk, Token Market, TokenReply, Unifically, Gitlawb Opengateway GMI Cloud, and Cheaper Inference with a dual chat/Responses surface and the CI payload transport).\n\n### Fixed\n- **Gitlawb MiMo lane route** — chat now posts to /v1/xiaomi-mimo/chat/completions; the bare lane prefix the config used to carry is answered with 404 by the gateway.\n- **Model lookup tests** — catalog probes percent-encode ids, so display names containing spaces no longer randomly break the request line.\n- **Lint debt** — 143 golangci-lint findings across the provider batches paid down (unchecked closes, capitalized error strings, misformatted files, dead code).\n",
+  "releaseNotes": "\n\n### Added\n- **NoTrack Web, ChatPlayground, SYNTX.ai, Adapta One and Conol web-chat providers** — native executors ported from the pinned registry, with per-provider catalog metadata, artwork and frontend tests.\n- **Eleven API-key providers** — UncloseAI (free anonymous gateway), FriendliAI, Databricks Model Serving, Snowflake Cortex, Charm Hyper, Token Kiosk, Token Market, TokenReply, Unifically, Gitlawb Opengateway (GMI Cloud) and Cheaper Inference. Cheaper Inference carries the 39-model catalog, the dual chat/Responses surface with a hard `store:false`, the CI payload transport (gzip tier, chunked reservation above 4MiB, 20MiB ceiling) and the fail-closed media guard.\n\n### Fixed\n- **Gitlawb MiMo lane chat route** — the config posted to the bare `/v1/xiaomi-mimo` prefix, which the gateway answers with 404 `Not found. Use POST /v1/chat/completions.`; the suffixed `/chat/completions` route is verified live and now registered.\n- **Model lookup test flake** — catalog probe ids are percent-encoded, so display names containing spaces (baseten's \"Kimi K2.7 Code\") can no longer randomly break the synthesized request line.\n- **golangci-lint debt** — 143 findings across the never-CI-linted provider batches resolved: unchecked closes, capitalized error strings, misformatted files, dead code, bodyclose and errorlint wrap-style fixes.\n",
   "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.64",
-  "publishedAt": "2026-11-27T15:22:06Z"
+  "publishedAt": "2026-11-28T00:29:09Z"
 }
