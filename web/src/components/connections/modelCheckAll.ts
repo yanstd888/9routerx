@@ -1,9 +1,17 @@
 // 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id
 export type ModelTestStatus = 'ok' | 'error' | 'blocked' | 'testing'
 
+// Only a hard failure proves a model is dead. "blocked" is an account cooldown
+// that resolves on its own; disabling on it removes the model from /v1/models
+// and every combo permanently for a temporary condition.
+export function isDeadProbeStatus(status: ModelTestStatus | undefined): boolean {
+  return status === 'error'
+}
+
 export interface ModelTestVerdict {
   status: 'ok' | 'error' | 'blocked'
   error: string | null
+  connectionId?: string
 }
 
 export function parseModelTestVerdict(res: {
@@ -12,11 +20,15 @@ export function parseModelTestVerdict(res: {
   error?: string
   blocked?: boolean
   resetAt?: string
+  connectionId?: string
 }): ModelTestVerdict {
   if (res.ok) {
-    return { status: 'ok', error: null }
+    return { status: 'ok', error: null, connectionId: res.connectionId }
   }
   const err = res.error || 'Model test failed'
+  // The probe resolver may choose any healthy connection. Naming it lets an
+  // operator tell a dead model from one account in cooldown.
+  const via = res.connectionId ? ` (via ${res.connectionId})` : ''
 
   // The backend owns this verdict. It knows whether the account was parked
   // (temporary, resolves on its own) or whether the model was actually asked
@@ -25,10 +37,14 @@ export function parseModelTestVerdict(res: {
   // and a model-scoped quota refusal never clears by waiting.
   if (res.blocked) {
     const reset = formatResetAt(res.resetAt)
-    return { status: 'blocked', error: reset ? `Blocked (cooldown until ${reset})` : err }
+    return {
+      status: 'blocked',
+      error: (reset ? `Blocked (cooldown until ${reset})` : err) + via,
+      connectionId: res.connectionId,
+    }
   }
 
-  return { status: 'error', error: err }
+  return { status: 'error', error: err + via, connectionId: res.connectionId }
 }
 
 // The gateway speaks RFC3339; operators read local time. Every other reset in
@@ -81,4 +97,19 @@ export function getBlockedModelIds(statuses: Record<string, ModelTestStatus>): s
   return Object.entries(statuses)
     .filter(([, s]) => s === 'blocked')
     .map(([id]) => id)
+}
+
+// A sweep must end with a terminal status for every id it started. A probe
+// whose fetch neither resolves nor rejects, or a worker that exits early,
+// otherwise leaves 'testing' rows that formatCheckAllSummary filters out —
+// the summary total no longer matches the visible table.
+export function finalizeSweepStatuses(
+  statuses: Record<string, ModelTestStatus>,
+  ids: string[],
+): Record<string, ModelTestStatus> {
+  const finalized = { ...statuses }
+  for (const id of ids) {
+    if (finalized[id] === 'testing') finalized[id] = 'error'
+  }
+  return finalized
 }

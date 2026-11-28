@@ -102,6 +102,8 @@ func (h *MediaHandler) probeModel(r *http.Request, model, kind string) testModel
 	ctx, cancel := context.WithTimeout(r.Context(), testModelTimeout)
 	defer cancel()
 	ctx = handlerutil.WithProbeContext(ctx)
+	connectionRecorder := &handlerutil.ProbeConnectionRecorder{}
+	ctx = handlerutil.WithProbeConnectionRecorder(ctx, connectionRecorder)
 
 	probe, err := http.NewRequestWithContext(ctx, http.MethodPost, probePath(kind), payload.body)
 	if err != nil {
@@ -116,6 +118,7 @@ func (h *MediaHandler) probeModel(r *http.Request, model, kind string) testModel
 
 	result := readProbeResult(rec, kind)
 	result.LatencyMs = time.Since(start).Milliseconds()
+	result.ConnectionID = connectionRecorder.ID()
 	return result
 }
 
@@ -269,6 +272,9 @@ type testModelResult struct {
 	Error     string `json:"error,omitempty"`
 	Blocked   bool   `json:"blocked,omitempty"`
 	ResetAt   string `json:"resetAt,omitempty"`
+	// ConnectionID names the account the resolver actually used for this probe.
+	// A cooldown on one account is not proof the model is dead.
+	ConnectionID string `json:"connectionId,omitempty"`
 }
 
 // readProbeResult decides pass or fail from the probe response.
@@ -459,6 +465,26 @@ func parseProbeBody(raw []byte) probeBody {
 	body := probeBody{raw: raw}
 	if json.Unmarshal(raw, &body.object) != nil {
 		body.object = nil
+		return body
+	}
+
+	// One more envelope level is common among OpenAI-compatible gateways:
+	// {"data":{...}}. Unwrap only when there is exactly one object field and it
+	// carries a completion shape, and only once — deeper nesting is a different
+	// protocol, not an envelope we should guess at.
+	if len(body.object) == 1 {
+		for _, value := range body.object {
+			var inner map[string]jsontext.Value
+			if json.Unmarshal(value, &inner) != nil {
+				break
+			}
+			_, hasChoices := inner["choices"]
+			_, hasContent := inner["content"]
+			if hasChoices || hasContent {
+				body.raw = []byte(value)
+				body.object = inner
+			}
+		}
 	}
 	return body
 }

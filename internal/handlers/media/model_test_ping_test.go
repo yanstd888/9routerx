@@ -23,6 +23,23 @@ func TestProbeContextFlag(t *testing.T) {
 	}
 }
 
+func TestParseProbeBody_UnwrapsSingleObjectEnvelope(t *testing.T) {
+	parsed := parseProbeBody([]byte(`{"data":{"choices":[{"message":{"content":"hi"}}]}}`))
+	if _, ok := parsed.object["choices"]; !ok {
+		t.Fatalf("generic envelope was not unwrapped: %v", parsed.object)
+	}
+	if _, ok := parsed.object["data"]; ok {
+		t.Error("outer envelope field still present after unwrap")
+	}
+}
+
+func TestParseProbeBody_LeavesMultiFieldObjectAlone(t *testing.T) {
+	parsed := parseProbeBody([]byte(`{"data":{"choices":[]},"meta":{"ok":true}}`))
+	if _, ok := parsed.object["data"]; !ok {
+		t.Error("ambiguous envelope must not be unwrapped")
+	}
+}
+
 func TestReadProbeResult_BlockedCooldownResponse(t *testing.T) {
 	rec := httptest.NewRecorder()
 	rec.WriteHeader(http.StatusBadGateway)

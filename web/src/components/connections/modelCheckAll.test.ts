@@ -2,9 +2,21 @@
 import { describe, expect, test } from 'bun:test'
 import {
   formatCheckAllSummary,
+  finalizeSweepStatuses,
   getBlockedModelIds,
+  isDeadProbeStatus,
   parseModelTestVerdict,
 } from './modelCheckAll'
+
+describe('isDeadProbeStatus', () => {
+  test('only a hard error disables a model', () => {
+    expect(isDeadProbeStatus('error')).toBe(true)
+    expect(isDeadProbeStatus('blocked')).toBe(false)
+    expect(isDeadProbeStatus('testing')).toBe(false)
+    expect(isDeadProbeStatus('ok')).toBe(false)
+    expect(isDeadProbeStatus(undefined)).toBe(false)
+  })
+})
 
 describe('parseModelTestVerdict', () => {
   test('returns ok when res.ok is true', () => {
@@ -71,6 +83,27 @@ describe('parseModelTestVerdict', () => {
     expect(res.status).toBe('error')
     expect(res.error).toBe('HTTP 404 Model not found')
   })
+
+  test('names the connection that was actually probed', () => {
+    const failure = parseModelTestVerdict({
+      ok: false,
+      status: 429,
+      error: 'HTTP 429 rate limited',
+      connectionId: 'acct-7',
+    })
+    expect(failure.status).toBe('error')
+    expect(failure.error).toBe('HTTP 429 rate limited (via acct-7)')
+    expect(failure.connectionId).toBe('acct-7')
+
+    const cooldown = parseModelTestVerdict({
+      ok: false,
+      blocked: true,
+      resetAt: '2026-10-09T02:00:00Z',
+      connectionId: 'acct-7',
+    })
+    expect(cooldown.status).toBe('blocked')
+    expect(cooldown.error?.includes('via acct-7')).toBe(true)
+  })
 })
 
 describe('formatCheckAllSummary', () => {
@@ -123,6 +156,26 @@ describe('formatCheckAllSummary', () => {
     expect(summary.blocked).toBe(1)
     expect(summary.severity).toBe('error')
     expect(summary.message).toBe('1 passed · 1 failed · 1 blocked — see per-row status.')
+  })
+})
+
+describe('finalizeSweepStatuses', () => {
+  test('a stuck probe becomes an error so the summary counts every visible row', () => {
+    const statuses = finalizeSweepStatuses(
+      { m1: 'ok', m2: 'testing', m3: 'blocked' },
+      ['m1', 'm2', 'm3'],
+    )
+    expect(statuses.m2).toBe('error')
+    const summary = formatCheckAllSummary(statuses)
+    expect(summary.total).toBe(3)
+    expect(summary.failed).toBe(1)
+    expect(summary.blocked).toBe(1)
+  })
+
+  test('leaves statuses outside the sweep untouched', () => {
+    const statuses = finalizeSweepStatuses({ other: 'testing', m1: 'testing' }, ['m1'])
+    expect(statuses.m1).toBe('error')
+    expect(statuses.other).toBe('testing')
   })
 })
 
