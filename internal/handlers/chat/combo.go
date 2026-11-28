@@ -709,6 +709,35 @@ func (h *ChatHandler) handleComboFallback(ctx context.Context, w http.ResponseWr
 	h.handleComboFallbackWithVisited(ctx, cw, body, comboModels, strategy, isStream, translateResponse, comboName, stickyLimit, nil, true, adapterModels...)
 }
 
+// routeComboModels is the single strategy dispatcher for both the chat and
+// messages/responses lanes. The messages lane used to honour only smart and
+// tokenmaxxing, so cache-optimized, auto, quota-weighted, reset-aware and lkgp
+// silently fell back to stored order even though the UI offered them.
+func (h *ChatHandler) routeComboModels(ctx context.Context, body []byte, comboModels []string, strategy, comboName string, stickyLimit int) (context.Context, []string) {
+	var ordered []string
+	switch strategy {
+	case "smart":
+		return h.applySmartRouting(ctx, body, comboModels, comboName)
+	case "tokenmaxxing":
+		return ctx, h.applyTokenmaxxingRouting(ctx, comboModels)
+	case "cache-optimized":
+		return ctx, h.applyCacheOptimizedRouting(body, comboModels)
+	case "auto":
+		return ctx, h.applyAutoRouting(ctx, body, comboModels)
+	case "quota-weighted":
+		return ctx, h.applyQuotaWeightedRouting(ctx, comboModels)
+	case "reset-aware":
+		return ctx, h.applyResetAwareRouting(ctx, comboModels)
+	case "lkgp":
+		return ctx, h.applyLKGPRouting(ctx, comboModels)
+	}
+	if h.comboRespectsStoredOrder(comboName) {
+		return ctx, slices.Clone(comboModels)
+	}
+	ordered = h.applyComboStrategy(strategy, comboModels, comboName, stickyLimit, detectNewTurn(body))
+	return ctx, ordered
+}
+
 func (h *ChatHandler) handleComboFallbackWithVisited(ctx context.Context, cw *committedResponseWriter, body []byte, comboModels []string, strategy string, isStream bool, translateResponse bool, comboName string, stickyLimit int, visited map[string]bool, isRoot bool, adapterModels ...string) {
 	var lastErr *upstreamError
 	var retry passRetry
@@ -729,26 +758,7 @@ func (h *ChatHandler) handleComboFallbackWithVisited(ctx context.Context, cw *co
 	// The smart and tokenmaxxing strategies are exempt: they compute dynamic
 	// ranking (by task suitability and quota allowance respectively), so honoring
 	// stored order would defeat the evaluation they exist to perform.
-	var models []string
-	if strategy == "smart" {
-		ctx, models = h.applySmartRouting(ctx, body, comboModels, comboName)
-	} else if strategy == "tokenmaxxing" {
-		models = h.applyTokenmaxxingRouting(ctx, comboModels)
-	} else if strategy == "cache-optimized" {
-		models = h.applyCacheOptimizedRouting(body, comboModels)
-	} else if strategy == "auto" {
-		models = h.applyAutoRouting(ctx, body, comboModels)
-	} else if strategy == "quota-weighted" {
-		models = h.applyQuotaWeightedRouting(ctx, comboModels)
-	} else if strategy == "reset-aware" {
-		models = h.applyResetAwareRouting(ctx, comboModels)
-	} else if strategy == "lkgp" {
-		models = h.applyLKGPRouting(ctx, comboModels)
-	} else if h.comboRespectsStoredOrder(comboName) {
-		models = slices.Clone(comboModels)
-	} else {
-		models = h.applyComboStrategy(strategy, comboModels, comboName, stickyLimit, detectNewTurn(body))
-	}
+	ctx, models := h.routeComboModels(ctx, body, comboModels, strategy, comboName, stickyLimit)
 
 	// 2. Auto-capability-switch: float models that satisfy the request's required capabilities to the front.
 	// This ensures that if the rotated model lacks required capabilities (e.g., vision), a capable model overrides it.
@@ -1212,16 +1222,7 @@ func (h *ChatHandler) handleMessagesComboFallbackWithVisited(ctx context.Context
 	// combo models must not re-select them (same account = same 429 quota).
 	var excludeIDs []string
 	var models []string
-	// smart and tokenmaxxing compute dynamic rankings and override stored order.
-	if strategy == "smart" {
-		ctx, models = h.applySmartRouting(ctx, bodyJSON, comboModels, comboName)
-	} else if strategy == "tokenmaxxing" {
-		models = h.applyTokenmaxxingRouting(ctx, comboModels)
-	} else if h.comboRespectsStoredOrder(comboName) {
-		models = slices.Clone(comboModels)
-	} else {
-		models = h.applyComboStrategy(strategy, comboModels, comboName, stickyLimit, detectNewTurn(bodyJSON))
-	}
+	ctx, models = h.routeComboModels(ctx, bodyJSON, comboModels, strategy, comboName, stickyLimit)
 	if required := DetectRequiredCapabilities(bodyJSON); len(required) > 0 {
 		reordered := ReorderByCapabilities(models, required)
 		models = reordered
