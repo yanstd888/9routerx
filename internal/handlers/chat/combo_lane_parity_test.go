@@ -51,10 +51,10 @@ func TestRouteComboModelsParity(t *testing.T) {
 				t.Fatalf("unhandled strategy %q", strategy)
 			}
 
-			// reset-aware scores against the current clock, so two calls a few
-			// milliseconds apart may rank equal candidates differently. The
-			// dispatcher parity is still pinned by the member set.
-			if strategy == "reset-aware" {
+			// smart and reset-aware score against the clock, so two calls a few
+			// milliseconds apart may rank equal candidates differently. Dispatcher
+			// parity is still pinned by the member set for those two.
+			if strategy == "smart" || strategy == "reset-aware" {
 				sort.Strings(got)
 				sort.Strings(wantModels)
 			}
