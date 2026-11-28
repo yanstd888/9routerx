@@ -836,10 +836,7 @@ func SetupServerRouter(r chi.Router, repo *db.Repo, ts *TokenSaverConfig) *chat.
 		// cap must not consume a queue slot or a rate-limit stamp on its way
 		// to the refusal.
 		r.Use(middleware.RequireKeyPolicies(repo))
-		// The lifetime quota read is a whole-lifetime ledger SUM per request for
-		// an armed key; the wrapper serves it from a short-TTL cache so the hot
-		// path stops rescanning the ledger every request (R8).
-		r.Use(middleware.RequireRateLimit(rateLimiter, defaults, middleware.NewCachedTokenUsage(repo)))
+		r.Use(middleware.RequireRateLimit(rateLimiter, defaults, repo))
 		r.Use(guardrails.Inbound(guardrailStore, guardrailAudit(repo), guardrailSwitch))
 		engineChatH = SetupRoutes(r, repo, ts)
 
