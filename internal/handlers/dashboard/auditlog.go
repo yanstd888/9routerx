@@ -74,7 +74,10 @@ func (h *DashboardHandler) recordAudit(r *http.Request, action, target string, b
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), auditWriteTimeout)
 		defer cancel()
-		_ = h.Repo.InsertAuditLog(ctx, entry)
+		// The chained insert reads the previous entry's hash, so every audit
+		// write is bound to its predecessor. The goroutine still drops errors:
+		// an audit gap must never fail the mutation it trails.
+		_ = h.Repo.RecordAuditChainEntry(ctx, entry)
 	}()
 }
 
@@ -128,6 +131,18 @@ func (h *DashboardHandler) HandleListAuditLogs(w http.ResponseWriter, r *http.Re
 		"entries": entries,
 		"total":   len(entries),
 	})
+}
+
+// HandleVerifyAuditChain handles GET /api/audit/verify. The admin-only route
+// reports whether the hash chain built by recordAudit is intact, and the first
+// row that broke it when it is not.
+func (h *DashboardHandler) HandleVerifyAuditChain(w http.ResponseWriter, r *http.Request) {
+	status, err := h.Repo.VerifyAuditChain(r.Context())
+	if err != nil {
+		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	handlerutil.WriteJSON(w, http.StatusOK, status)
 }
 
 // writeAuditCSV streams the audit trail as CSV. The header row is written first
