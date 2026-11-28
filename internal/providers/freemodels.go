@@ -177,31 +177,6 @@ var freeModelCatalog = []freeBudget{
 	{"nous", "poolside/laguna-s-2.1:free", regimeRecurringDaily, ""},
 	{"nous", "poolside/laguna-xs-2.1:free", regimeRecurringDaily, ""},
 
-	// Vertex AI ("$300 free credits").
-	{"vertex", "gemini-3.1-pro-preview", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-3.1-flash-lite", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-3-flash-preview", regimeOneTimeInitial, ""},
-	{"vertex", "gemma-4-31b-it", regimeOneTimeInitial, ""},
-	{"vertex", "DeepSeek-V4-Flash", regimeOneTimeInitial, ""},
-	{"vertex", "DeepSeek-V4-Pro", regimeOneTimeInitial, ""},
-	{"vertex", "Qwen3.6-35B-A3B", regimeOneTimeInitial, ""},
-	{"vertex", "GLM-5.1-FP8", regimeOneTimeInitial, ""},
-	{"vertex", "claude-opus-4-7", regimeOneTimeInitial, ""},
-	{"vertex", "claude-sonnet-4-6", regimeOneTimeInitial, ""},
-	// Missing from the earlier sync (omni 2026-10-30): the flash generations
-	// below 3.1 and the MaaS lanes.
-	{"vertex", "gemini-3.7-flash", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-3.6-flash", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-3.5-flash", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-3.5-flash-lite", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-2.5-pro", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-2.5-flash", regimeOneTimeInitial, ""},
-	{"vertex", "gemini-2.5-flash-lite", regimeOneTimeInitial, ""},
-	{"vertex", "deepseek-ai/deepseek-v3.2-maas", regimeOneTimeInitial, ""},
-	{"vertex", "deepseek-ai/deepseek-v3.1-maas", regimeOneTimeInitial, ""},
-	{"vertex", "qwen/qwen3-next-80b-a3b-instruct-maas", regimeOneTimeInitial, ""},
-	{"vertex", "zai-org/glm-5-maas", regimeOneTimeInitial, ""},
-
 	// Qoder (free plan models).
 	{"qoder", "qwen3.8-max-preview", regimeRecurringDaily, ""},
 	{"qoder", "qwen3.7-max", regimeRecurringDaily, ""},

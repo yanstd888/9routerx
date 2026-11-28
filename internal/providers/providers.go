@@ -800,14 +800,6 @@ var KnownProviders = map[string]ProviderConfig{
 		NoAuth:        true,
 		Hidden:        true,
 	},
-	"mimocode": {
-		BaseURL:       "https://api.xiaomimimimo.com/api/free-ai/openai/chat",
-		AuthHeader:    "Authorization",
-		AuthScheme:    "bearer",
-		DefaultAPIKey: "mimo-dynamic",
-		NoAuth:        true,
-		Hidden:        true,
-	},
 	"blackbox": {
 		BaseURL:        "https://api.blackbox.ai/v1/chat/completions",
 		AuthHeader:     "Authorization",
@@ -1385,13 +1377,6 @@ var KnownProviders = map[string]ProviderConfig{
 	// (pinned 632d84f5).
 	"speka": {
 		BaseURL:    "https://speka.me/v1/chat/completions",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
-	// Naga AI: mechanical passthrough from the OmniRoute open-sse registry
-	// (pinned 632d84f5).
-	"naga-ai": {
-		BaseURL:    "https://api.naga.ac/v1/chat/completions",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
@@ -2524,16 +2509,6 @@ var KnownProviders = map[string]ProviderConfig{
 		SearchURL:    "https://api.z.ai/api/mcp/web_search",
 		SearchMethod: "POST",
 	},
-	"vertex": {
-		BaseURL:    "https://aiplatform.googleapis.com/v1",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
-	"vertex-partner": {
-		BaseURL:    "https://aiplatform.googleapis.com/v1",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
 	"voyage-ai": {
 		BaseURL:    "https://api.voyageai.com/v1/embeddings",
 		AuthHeader: "Authorization",
@@ -2698,6 +2673,7 @@ var KnownProviders = map[string]ProviderConfig{
 		BaseURL:    "https://daily-cloudcode-pa.googleapis.com/v1internal",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
+		Format:     "gemini-native",
 	},
 	"google-pse": {
 		BaseURL:      "https://www.googleapis.com/customsearch/v1",

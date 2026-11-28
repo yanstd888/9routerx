@@ -14,18 +14,21 @@ func TestMimocodeProviderCatalogAndAliases(t *testing.T) {
 		}
 	}
 
-	// 2. Registry alias mapping
-	if alias := RegistryAliases["mimocode"]; alias != "mmf" {
-		t.Errorf("RegistryAliases['mimocode'] = %q, want 'mmf'", alias)
+	// 2. The shadowed registry row is gone; the compatibility alias remains.
+	if alias, ok := RegistryAliases["mimocode"]; ok {
+		t.Errorf("RegistryAliases['mimocode'] = %q, want no entry", alias)
 	}
 
-	// 3. Provider catalog definition
-	cfg, ok := KnownProviders["mimocode"]
+	// 3. Wire configuration lives only on the canonical provider.
+	if _, ok := KnownProviders["mimocode"]; ok {
+		t.Error("KnownProviders still holds the shadowed mimocode row")
+	}
+	cfg, ok := KnownProviders["mimo-free"]
 	if !ok {
-		t.Fatal("KnownProviders missing 'mimocode'")
+		t.Fatal("KnownProviders missing 'mimo-free'")
 	}
 	if cfg.BaseURL == "" || !cfg.NoAuth {
-		t.Errorf("unexpected mimocode config: %+v", cfg)
+		t.Errorf("unexpected mimo-free config: %+v", cfg)
 	}
 
 	// 4. Provider models

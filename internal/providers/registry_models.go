@@ -157,7 +157,7 @@ var ProviderModels = map[string][]string{
 	"el":         {"eleven_multilingual_v2", "eleven_turbo_v2_5", "scribe_v1", "scribe_v2"},
 	"gc":         {"gemini-4-argon", "gemini-3.1-pro-preview", "gemini-3-pro-preview", "gemini-3-flash-preview", "gemini-3.1-flash-lite-preview", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"},
 	"gcli":       {"grok-build", "grok-4.5", "grok-4.5-high", "grok-4.5-medium", "grok-4.5-low"},
-	"gemini":     {"gemini-4-argon", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite-preview", "gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemma-4-31b-it", "gemini-embedding-2-preview", "gemini-embedding-001", "text-embedding-005", "text-embedding-004", "gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.5-flash-native-audio-preview-09-17", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts", "embedding-001"},
+	"gemini":     {"gemini-4-argon", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite-preview", "gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemma-4-31b-it", "gemini-embedding-2-preview", "gemini-embedding-001", "text-embedding-005", "text-embedding-004", "gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image", "gemini-2.0-flash", "gemini-2.5-flash-native-audio-preview-09-17", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts", "embedding-001"},
 	"gemini-cli": {"gemini-4-argon", "gemini-3.1-pro-preview", "gemini-3-pro-preview", "gemini-3-flash-preview", "gemini-3.1-flash-lite-preview", "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"},
 	// gemini-web lists both naming forms the site's own registry produces, so a
 	// request written either way resolves. The registry names a model after its
@@ -413,14 +413,10 @@ var ProviderModels = map[string][]string{
 	"together":             {"meta-llama/Llama-3.3-70B-Instruct-Turbo", "deepseek-ai/DeepSeek-R1", "Qwen/Qwen3-235B-A22B", "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8", "BAAI/bge-large-en-v1.5", "togethercomputer/m2-bert-80M-8k-retrieval"},
 	"tokenrouter":          {"anthropic/claude-haiku-4.5", "anthropic/claude-sonnet-4.6", "anthropic/claude-opus-4.8", "anthropic/claude-opus-4.8-fast", "openai/gpt-5.4", "openai/gpt-5.4-mini", "openai/gpt-5.4-pro", "openai/gpt-5.5", "openai/gpt-5.6-sol", "google/gemini-3.5-flash", "google/gemini-3.6-flash", "deepseek/deepseek-v4-flash", "deepseek/deepseek-v4-pro", "qwen/qwen3-coder-next", "qwen/qwen3.7-max", "qwen/qwen3.8-max", "moonshotai/kimi-k2.7-code", "moonshotai/kimi-k3-free", "z-ai/glm-5.3-free", "z-ai/glm-5.2", "z-ai/glm-5-turbo", "x-ai/grok-4.5"},
 	"venice":               {"venice-uncensored-1-2", "zai-org-glm-5", "qwen3-235b-a22b-instruct-2507", "qwen3-coder-480b-a35b-instruct-turbo", "qwen3-vl-235b-a22b", "deepseek-v4-pro", "llama-3.3-70b", "hermes-3-llama-3.1-405b", "mistral-small-3-2-24b-instruct", "text-embedding-3-large", "text-embedding-bge-m3", "text-embedding-qwen3-8b", "venice-sd35", "flux-2-pro", "gpt-image-2"},
-	"vertex":               {"gemini-4-argon", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite-preview", "gemini-3-flash-preview", "gemini-2.5-flash", "veo-3.1-generate-preview", "veo-3.1-fast-generate-preview", "veo-3.0-generate-001", "veo-2.0-generate-001"},
-	"vertex-partner":       {"deepseek-ai/deepseek-v3.2-maas", "qwen/qwen3-next-80b-a3b-thinking-maas", "qwen/qwen3-next-80b-a3b-instruct-maas", "zai-org/glm-5-maas"},
 	"volcengine-ark":       {"Doubao-Seed-2.0-Code", "Doubao-Seed-2.0-pro", "Doubao-Seed-2.0-lite", "Doubao-Seed-Code", "DeepSeek-V4-Flash", "DeepSeek-V4-Pro", "GLM-5.1", "MiniMax-M2.7", "Kimi-K2.6"},
 	"v1m":                  {"rev-latest", "v1m-decision-engine"},
 	"voyage":               {"voyage-3-large", "voyage-3.5", "voyage-3.5-lite", "voyage-code-3", "voyage-finance-2", "voyage-law-2", "voyage-multilingual-2"},
 	"voyage-ai":            {"voyage-3-large", "voyage-3.5", "voyage-3.5-lite", "voyage-code-3", "voyage-finance-2", "voyage-law-2", "voyage-multilingual-2"},
-	"vx":                   {"gemini-3.1-pro-preview", "gemini-3.1-flash-lite-preview", "gemini-3-flash-preview", "gemini-2.5-flash", "veo-3.1-generate-preview", "veo-3.1-fast-generate-preview", "veo-3.0-generate-001", "veo-2.0-generate-001"},
-	"vxp":                  {"deepseek-ai/deepseek-v3.2-maas", "qwen/qwen3-next-80b-a3b-thinking-maas", "qwen/qwen3-next-80b-a3b-instruct-maas", "zai-org/glm-5-maas"},
 	"xai":                  {"grok-4.7", "grok-4.6", "grok-4.5", "grok-4", "grok-4-fast-reasoning", "grok-code-fast-1", "grok-3", "grok-2-image-1212", "grok-imagine-video"},
 	"xiaomi-mimo":          {"mimo-x-pro-preview", "mimo-x-flash-preview", "mimo-v2.5-pro", "mimo-v2.5", "mimo-v2-omni", "mimo-v2-flash", "mimo-v2.5-tts"},
 	"xiaomi-tokenplan":     {"mimo-v2.5-pro", "mimo-v2.5-pro-claude", "mimo-v2.5", "mimo-v2-pro", "mimo-v2-omni", "mimo-v2-tts", "mimo-v2.5-tts", "mimo-v2.5-tts-voiceclone", "mimo-v2.5-tts-voicedesign"},
@@ -879,12 +875,6 @@ var ProviderModelKinds = map[string]map[string]string{
 	"v1m": {
 		"rev-latest":          "systemone",
 		"v1m-decision-engine": "systemone",
-	},
-	"vertex": {
-		"veo-2.0-generate-001":          "video",
-		"veo-3.0-generate-001":          "video",
-		"veo-3.1-fast-generate-preview": "video",
-		"veo-3.1-generate-preview":      "video",
 	},
 	"voyage": {
 		"voyage-3-large":        "embedding",

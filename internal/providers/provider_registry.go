@@ -330,6 +330,10 @@ var ProviderRegistry = map[string]ProviderMeta{
 		ServiceKinds: []string{"llm"},
 		Website:      "https://cursor.com",
 		Notice:       &Notice{SignupURL: "https://cursor.com"},
+		// TODO_OWNER: Cursor needs a wire executor (checksum + machineId) before
+		// it can be offered again; hidden until then so Check All cannot report
+		// every model as dead on a bare api2.cursor.sh POST.
+		Hidden: true,
 	},
 	"ghe-copilot": {
 		ID: "ghe-copilot", Name: "GHE Copilot", Alias: "ghe-copilot",
@@ -1212,19 +1216,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:           "https://speka.me",
 		PassthroughModels: true,
 		ModelsFetcher:     &Fetcher{URL: "https://speka.me/v1/models", Type: "openai"},
-	},
-	"naga-ai": {
-		ID:                "naga-ai",
-		Name:              "Naga AI",
-		Alias:             "naga-ai",
-		Category:          CategoryAPIKey,
-		AuthType:          "apikey",
-		Color:             "#059669",
-		Icon:              "router",
-		ServiceKinds:      []string{"llm"},
-		Website:           "https://naga.ac",
-		PassthroughModels: true,
-		ModelsFetcher:     &Fetcher{URL: "https://api.naga.ac/v1/models", Type: "openai"},
 	},
 	"agentrouter": {
 		ID:                "agentrouter",
@@ -2662,18 +2653,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		ServiceKinds:  []string{"llm"},
 		ModelsFetcher: &Fetcher{URL: "https://models.dev/api.json", Type: "mimo-free"},
 	},
-	"mimocode": {
-		ID:            "mimocode",
-		Name:          "MiMoCode Free",
-		Alias:         "mmf",
-		Category:      CategoryFree,
-		Color:         "#FF6900",
-		Icon:          "smart_toy",
-		NoAuth:        true,
-		Hidden:        true,
-		ServiceKinds:  []string{"llm"},
-		ModelsFetcher: &Fetcher{URL: "https://models.dev/api.json", Type: "mimo-free"},
-	},
 	"opencode": {
 		ID:            "opencode",
 		Name:          "OpenCode Free",
@@ -3174,17 +3153,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Hidden:       true,
 		ServiceKinds: []string{"tts"},
 		Website:      "https://github.com/neonbjb/tortoise-tts",
-	},
-	"vertex": {
-		ID:           "vertex",
-		Name:         "Vertex AI",
-		Alias:        "vx",
-		Category:     CategoryFreeTier,
-		Color:        "#4285F4",
-		Icon:         "cloud",
-		ServiceKinds: []string{"llm"},
-		Website:      "https://cloud.google.com/vertex-ai",
-		Notice:       &Notice{Text: "New Google Cloud accounts get $300 free credits. Requires GCP project + Service Account with Vertex AI API enabled.", APIKeyURL: "https://console.cloud.google.com/iam-admin/serviceaccounts"},
 	},
 	"alicode": {
 		ID:           "alicode",
@@ -4181,17 +4149,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		Website:       "https://vercel.com/ai-gateway",
 		Notice:        &Notice{Text: "Unified OpenAI-compatible endpoint from Vercel. Use your AI Gateway API key, then pick models with provider/model IDs like anthropic/claude-sonnet-4.6 or openai/gpt-5.4.", APIKeyURL: "https://vercel.com/dashboard/~/ai-gateway"},
 		ModelsFetcher: &Fetcher{URL: "https://ai-gateway.vercel.sh/v1/models", Type: "vercel-free"},
-	},
-	"vertex-partner": {
-		ID:           "vertex-partner",
-		Name:         "Vertex Partner",
-		Alias:        "vxp",
-		Category:     CategoryAPIKey,
-		Color:        "#34A853",
-		Icon:         "cloud",
-		ServiceKinds: []string{"llm", "video"},
-		Website:      "https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models",
-		Notice:       &Notice{APIKeyURL: "https://console.cloud.google.com/iam-admin/serviceaccounts"},
 	},
 	"volcengine-ark": {
 		ID:           "volcengine-ark",
