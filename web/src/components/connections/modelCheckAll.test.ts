@@ -2,6 +2,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   formatCheckAllSummary,
+  finalizeSweepStatuses,
   getBlockedModelIds,
   isDeadProbeStatus,
   parseModelTestVerdict,
@@ -155,6 +156,26 @@ describe('formatCheckAllSummary', () => {
     expect(summary.blocked).toBe(1)
     expect(summary.severity).toBe('error')
     expect(summary.message).toBe('1 passed · 1 failed · 1 blocked — see per-row status.')
+  })
+})
+
+describe('finalizeSweepStatuses', () => {
+  test('a stuck probe becomes an error so the summary counts every visible row', () => {
+    const statuses = finalizeSweepStatuses(
+      { m1: 'ok', m2: 'testing', m3: 'blocked' },
+      ['m1', 'm2', 'm3'],
+    )
+    expect(statuses.m2).toBe('error')
+    const summary = formatCheckAllSummary(statuses)
+    expect(summary.total).toBe(3)
+    expect(summary.failed).toBe(1)
+    expect(summary.blocked).toBe(1)
+  })
+
+  test('leaves statuses outside the sweep untouched', () => {
+    const statuses = finalizeSweepStatuses({ other: 'testing', m1: 'testing' }, ['m1'])
+    expect(statuses.m1).toBe('error')
+    expect(statuses.other).toBe('testing')
   })
 })
 

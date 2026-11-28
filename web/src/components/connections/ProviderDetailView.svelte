@@ -57,6 +57,7 @@
   import { proxyBadgeInfo } from './proxyBadge'
   import {
     formatCheckAllSummary,
+    finalizeSweepStatuses,
     getBlockedModelIds,
     isDeadProbeStatus,
     parseModelTestVerdict,
@@ -3094,6 +3095,8 @@
       })
       await Promise.allSettled(workers)
       if (pid !== providerId) return
+      modelTestStatuses = finalizeSweepStatuses(modelTestStatuses, ids)
+      checkAllProgress = { done: ids.length, total: ids.length }
       const summary = formatCheckAllSummary(modelTestStatuses)
       checkAllSummary = summary
       activeModelTestError = summary.message

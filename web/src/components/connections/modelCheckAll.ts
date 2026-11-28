@@ -98,3 +98,18 @@ export function getBlockedModelIds(statuses: Record<string, ModelTestStatus>): s
     .filter(([, s]) => s === 'blocked')
     .map(([id]) => id)
 }
+
+// A sweep must end with a terminal status for every id it started. A probe
+// whose fetch neither resolves nor rejects, or a worker that exits early,
+// otherwise leaves 'testing' rows that formatCheckAllSummary filters out —
+// the summary total no longer matches the visible table.
+export function finalizeSweepStatuses(
+  statuses: Record<string, ModelTestStatus>,
+  ids: string[],
+): Record<string, ModelTestStatus> {
+  const finalized = { ...statuses }
+  for (const id of ids) {
+    if (finalized[id] === 'testing') finalized[id] = 'error'
+  }
+  return finalized
+}
