@@ -36,6 +36,7 @@ const (
 
 // providerSpecificSecretFields lists secret fields stored inside the `providerSpecificData` JSON object.
 var providerSpecificSecretFields = []string{
+	"copilotToken",
 	"consoleApiKey",
 	"alibabaConsoleCookie",
 	"alibabaConsoleSecToken",

@@ -64,14 +64,18 @@ func (h *MediaHandler) HandleAudioMusic(w http.ResponseWriter, r *http.Request) 
 	}
 
 	apiKey := chat.ExtractAPIKey(connData)
-	if apiKey == "" {
+	if apiKey == "" && provider != "udio" {
 		handlerutil.WriteJSONError(w, http.StatusUnauthorized, "no API key found for elevenlabs connection")
 		return
 	}
 
-	providerCfg, err := h.ChatH.GetProviderConfig("elevenlabs", connData)
+	providerCfg, err := h.ChatH.GetProviderConfig(provider, connData)
 	if err != nil {
-		handlerutil.WriteJSONError(w, http.StatusInternalServerError, "get elevenlabs config: "+err.Error())
+		handlerutil.WriteJSONError(w, http.StatusInternalServerError, "get "+provider+" config: "+err.Error())
+		return
+	}
+	if provider == "udio" {
+		h.handleUdioMusic(w, r, req, udioCookie(connData), connData.BaseURL, connData)
 		return
 	}
 

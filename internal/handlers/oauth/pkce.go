@@ -97,14 +97,48 @@ var pkceProviders = map[string]*pkceConfig{
 		providers:    []string{"gitlab"},
 		authorizeURL: "https://gitlab.com/oauth/authorize",
 		tokenURL:     "https://gitlab.com/oauth/token",
-		scope:        "api read_user",
+		scope:        "api read_user ai_features",
 		userInfoPath: "/api/v4/user",
 		connPrefix:   "gl-",
-		display:      "GitLab",
+		display:      "GitLab Duo",
+	},
+	// gitlab-duo is the same GitLab PKCE flow with the ai_features scope the
+	// Duo Workflow models need (OmniRoute gitlab-duo.ts, pinned 632d84f5) —
+	// the api scope rides along so existing GitLab connections keep working.
+	// The registry surfaces this lane as the "gitlab" provider.
+	"gitlab-duo": {
+		providers:    []string{"gitlab-duo"},
+		authorizeURL: "https://gitlab.com/oauth/authorize",
+		tokenURL:     "https://gitlab.com/oauth/token",
+		scope:        "api read_user ai_features",
+		userInfoPath: "/api/v4/user",
+		connPrefix:   "gld-",
+		display:      "GitLab Duo",
+	},
+	// openference: public PKCE client (clientId "omniroute", no secret —
+	// OmniRoute OPENFERENCE_CONFIG + resolvePublicCred("openference_id"),
+	// pinned 632d84f5). Identity comes from the id_token claims. OmniRoute
+	// pins its loopback callback to 127.0.0.1:56123/callback; the dashboard
+	// flow hands the operator the callback URL to paste, matching the
+	// authorize step verified live (200).
+	"openference": {
+		providers:        []string{"openference"},
+		clientID:         "omniroute",
+		authorizeURL:     "https://openference.com/app/oauth/authorize",
+		tokenURL:         "https://openference.com/oauth/token",
+		scope:            "openid profile email model:invoke offline_access",
+		connPrefix:       "of-",
+		display:          "Openference",
+		emailFromIDTok:   true,
+		fixedRedirectURI: openferenceRedirectURI,
+		fixedPort:        openferenceLoopbackPort,
 	},
 }
 
 func pkceLookup(provider string) *pkceConfig {
+	if provider == "gitlab-duo" {
+		provider = "gitlab"
+	}
 	if cfg, ok := pkceProviders[provider]; ok {
 		return cfg
 	}
@@ -137,9 +171,9 @@ func (h *OAuthHandler) HandlePKCEAuthorize(w http.ResponseWriter, r *http.Reques
 		"code_challenge_method": {"S256"},
 		"state":                 {state},
 	}
-	// GitLab: allow self-hosted base + user OAuth app credentials.
+	// GitLab (incl. gitlab-duo): allow self-hosted base + user OAuth app credentials.
 	authorizeURL, tokenURL := cfg.authorizeURL, cfg.tokenURL
-	if provider == "gitlab" {
+	if provider == "gitlab" || provider == "gitlab-duo" {
 		base := strings.TrimSuffix(r.URL.Query().Get("baseUrl"), "/")
 		if base == "" {
 			base = "https://gitlab.com"
@@ -268,7 +302,8 @@ func resolvePKCEExchange(body pkceExchangeBody, r *http.Request) (*pkceExchange,
 		clientSecret: body.ClientSecret,
 		tokenURL:     cfg.tokenURL,
 	}
-	if body.Provider == "gitlab" {
+	if body.Provider == "gitlab" || body.Provider == "gitlab-duo" {
+		ex.provider = "gitlab"
 		ex.base = strings.TrimSuffix(body.BaseURL, "/")
 		if ex.base == "" {
 			ex.base = "https://gitlab.com"
@@ -384,6 +419,14 @@ func (ex *pkceExchange) buildConnectionData(ctx context.Context, tokens *pkceTok
 			}
 			extra["providerSpecificData"] = psd
 		}
+	}
+	if ex.provider == "gitlab" {
+		psd := map[string]any{"baseUrl": ex.base, "clientId": ex.clientID}
+		if ex.clientSecret != "" {
+			psd["clientSecret"] = ex.clientSecret
+		}
+		extra["providerSpecificData"] = psd
+		extra["gitlabBaseUrl"] = ex.base
 	}
 	if ex.cfg.userInfoPath != "" && ex.base != "" { // GitLab: fetch user profile
 		if u, err := fetchOAuthUserInfo(ctx, ex.base+ex.cfg.userInfoPath, tokens.AccessToken); err == nil {

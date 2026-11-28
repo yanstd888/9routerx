@@ -57,6 +57,9 @@ func UpstreamSpeaksResponses(provider, model string, cfg *providers.ProviderConf
 		// family fallback the executor applies.
 		formats, declared := providers.GetModelFormats(provider, cleanResponsesModel(model))
 		return declared && formats.TargetFormat == providers.FormatOpenAIResponses
+	case "ghe-copilot":
+		formats, declared := providers.GetModelFormats(provider, model)
+		return declared && formats.TargetFormat == providers.FormatOpenAIResponses
 	case "muse":
 		// Meta's Model API serves both lanes on one key, and every Muse Spark
 		// model pins the Responses one, so a /v1/responses client is relayed

@@ -306,7 +306,7 @@ func (h *ChatHandler) getBestConnectionWithContext(ctx context.Context, provider
 			}
 		}
 		if len(connections) == 0 {
-			if cfg, ok := providers.KnownProviders[provider]; ok && cfg.NoAuth {
+			if cfg, ok := providers.KnownProviders[provider]; ok && (cfg.NoAuth || cfg.AuthOptional) {
 				// Inject virtual connection for no-auth provider with optional proxy pool strategy from settings
 				connData := &ConnectionData{
 					AccessToken: "public",
@@ -693,6 +693,12 @@ func (h *ChatHandler) getProviderConfig(provider string, connData *ConnectionDat
 		// A custom node's baseUrl is a PREFIX rather than an endpoint the
 		// operator named, so it is completed by a different rule (#768).
 		baseURL := compatibleNodeLaneURL(provider, connectionAPIType(connData), connData.BaseURL)
+		if provider == "devin-desktop" || provider == "opencode-server" {
+			// Native service roots are not OpenAI API roots: OpenCode CLI
+			// Server owns /session, /event and /config/providers under the
+			// bare host, so appending /chat/completions would break every lane.
+			baseURL = strings.TrimRight(strings.TrimSpace(connData.BaseURL), "/")
+		}
 		if cfg, ok := providers.KnownProviders[provider]; ok {
 			cloned := cfg
 			cloned.BaseURL = baseURL

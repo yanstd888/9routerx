@@ -55,7 +55,7 @@ func filterMessages(msgs []any, opts FilterOptions) ([]any, bool) {
 		}
 		out = append(out, msg)
 	}
-	pruned, prunedChanged := pruneEmptyMessages(out)
+	pruned, prunedChanged := pruneEmptyMessages(out, opts)
 	if prunedChanged {
 		changed = true
 	}
@@ -83,7 +83,7 @@ func filterContentBlocks(parts []any, opts FilterOptions) ([]any, bool) {
 		case typ == claudeBlockThinking || typ == claudeBlockRedactedThinking:
 			changed = true
 			continue
-		case validOpenAIContentTypes[typ]:
+		case validOpenAIContentTypes[typ] || opts.PreserveVideoURL && typ == "video_url":
 			stripped, strippedChanged := stripBlock(block, opts)
 			if strippedChanged {
 				changed = true
@@ -118,7 +118,7 @@ func filterContentBlocks(parts []any, opts FilterOptions) ([]any, bool) {
 // the JSON entry point reports that as ErrNoMessages, so the gateway can
 // answer the client itself instead of forwarding an empty messages array the
 // upstream answers with a 400.
-func pruneEmptyMessages(msgs []any) ([]any, bool) {
+func pruneEmptyMessages(msgs []any, opts FilterOptions) ([]any, bool) {
 	kept := msgs[:0]
 	changed := false
 	for _, m := range msgs {
@@ -128,6 +128,10 @@ func pruneEmptyMessages(msgs []any) ([]any, bool) {
 			continue
 		}
 		role, _ := msg["role"].(string)
+		if opts.PreservePartialAssistant && role == "assistant" && msg["partial"] == true {
+			kept = append(kept, m)
+			continue
+		}
 		if role == "tool" {
 			kept = append(kept, m)
 			continue

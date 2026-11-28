@@ -638,7 +638,7 @@ func (t *comboLastTried) lastSendableComboIndex(excludeIDs []string) int {
 // on every exclusion change, and re-querying a provider's rows each time would
 // put the database back in the hot loop this tracker exists to keep it out of.
 func (h *ChatHandler) comboEntrySendable(modelInfo *ModelInfo, excludeIDs []string, cache map[string][]*models.ProviderConnection) bool {
-	if cfg, ok := providers.KnownProviders[modelInfo.Provider]; ok && (cfg.NoAuth || cfg.DefaultAPIKey != "") {
+	if cfg, ok := providers.KnownProviders[modelInfo.Provider]; ok && (cfg.NoAuth || cfg.AuthOptional || cfg.DefaultAPIKey != "") {
 		return true
 	}
 	if h.Repo == nil {

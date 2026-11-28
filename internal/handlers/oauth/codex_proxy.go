@@ -48,6 +48,7 @@ const codexSessionTTL = 30 * time.Minute
 // step minted. It carries the PKCE verifier across the round trip so the
 // loopback server can finish the exchange without the browser.
 type codexSession struct {
+	state        string
 	codeVerifier string
 	redirectURI  string
 	name         string
@@ -88,6 +89,7 @@ func (p *codexProxy) register(state, codeVerifier, redirectURI, name string) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.sessions[state] = &codexSession{
+		state:        state,
 		codeVerifier: codeVerifier,
 		redirectURI:  redirectURI,
 		name:         name,
@@ -203,7 +205,7 @@ func (p *codexProxy) stop() {
 	srv, idle := p.srv, p.idle
 	p.srv, p.listener, p.idle = nil, nil, nil
 	for _, sess := range p.sessions {
-		if sess.status == "pending" {
+		if sess.status == "pending" || sess.status == "exchanging" {
 			sess.status = "error"
 			sess.errMsg = "The local login listener stopped before the login completed. Close this window and click Login again."
 		}
@@ -241,7 +243,7 @@ func (p *codexProxy) stopIfIdle() {
 	p.mu.Lock()
 	pending := false
 	for _, sess := range p.sessions {
-		if sess.status == "pending" {
+		if sess.status == "pending" || sess.status == "exchanging" {
 			pending = true
 			break
 		}
@@ -272,6 +274,15 @@ func (p *codexProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		p.stopIfIdle()
 		return
 	}
+	p.mu.Lock()
+	pending, exists := p.sessions[state]
+	if !exists || pending.status != "pending" {
+		p.mu.Unlock()
+		http.Error(w, "authorization callback already used", http.StatusConflict)
+		return
+	}
+	pending.status = "exchanging"
+	p.mu.Unlock()
 	p.handleSessionCallback(w, r, state, sess)
 }
 

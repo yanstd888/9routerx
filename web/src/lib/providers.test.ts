@@ -227,7 +227,7 @@ describe('providers & media separation', () => {
     // without an asset under web/public/providers is a 404 on every surface
     // that draws it. Only the alias table may point at another provider's file.
     const assets = new Set(readdirSync(join(import.meta.dir, '../../public/providers')))
-    const shared = new Set(['zai-search', 'zcode'])
+    const shared = new Set(['zai-search', 'zcode', 'ghe-copilot', 'moonshot'])
     const missing = PROVIDER_CATALOG.filter(
       (p) => !shared.has(p.id) && !assets.has(`${p.id}.png`) && !assets.has(`${p.id}.svg`)
     ).map((p) => p.id)

@@ -371,7 +371,7 @@ func sanitizeProviderConnection(c *models.ProviderConnection) map[string]any {
 			"baseUrl", "azureEndpoint", "deployment", "apiVersion", "accountId",
 			"region", "projectId", "resourceUrl", "proxyPoolId",
 			"connectionProxyEnabled", "connectionProxyUrl", "connectionNoProxy",
-			"githubLogin", "githubName", "githubEmail", "githubUserId",
+			"githubLogin", "githubName", "githubEmail", "githubUserId", "gheUrl",
 			"username", "firstName", "lastName", "authMethod", "authKind",
 			"profileArn", "accessKeyId", "profile",
 		} {
@@ -1087,6 +1087,10 @@ func (h *DashboardHandler) writeConnectionModels(w http.ResponseWriter, r *http.
 		handlerutil.WriteJSONError(w, http.StatusNotFound, "connection not found")
 		return
 	}
+	if conn.Provider == "devin-desktop" {
+		h.writeDevinConnectionModels(w, r, conn)
+		return
+	}
 	var connData struct {
 		APIKey               string         `json:"apiKey"`
 		AccessToken          string         `json:"accessToken"`
@@ -1335,6 +1339,10 @@ func (h *DashboardHandler) writeConnectionModels(w http.ResponseWriter, r *http.
 	// expressed through them rather than through the id. Filtering on the id
 	// alone advertises models the account is not entitled to, which then fail
 	// upstream with 400.
+	if conn.Provider == "ghe-copilot" {
+		h.handleGHEModels(w, r, conn.ID, conn.Data)
+		return
+	}
 	if isGitHubProvider(conn.Provider) {
 		copilotModels, err := fetchCopilotCatalogModels(r.Context(), conn.Data)
 		if err != nil {

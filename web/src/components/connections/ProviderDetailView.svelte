@@ -140,7 +140,7 @@
   let providerNoticeApiKeyUrl = $derived(selectedCatalogItem?.notice?.apiKeyUrl || '')
   let isOAuth = $derived(selectedCatalogItem?.category === 'oauth')
   let isClineOAuth = $derived(providerId === 'cline' || providerId === 'clinepass')
-  let isPKCEOAuth = $derived(providerId === 'claude' || providerId === 'codex' || providerId === 'xai' || providerId === 'gitlab')
+  let isPKCEOAuth = $derived(providerId === 'claude' || providerId === 'codex' || providerId === 'xai' || providerId === 'gitlab' || providerId === 'openference')
   let isAuthCodeOAuth = $derived(providerId === 'gemini-cli' || providerId === 'iflow')
   let isCustomOAuth = $derived(providerId === 'trae' || providerId === 'windsurf' || providerId === 'zed')
   // Upstream parity: providers with authModes ["apikey","oauth"] offer both an
@@ -165,10 +165,11 @@
   )
   let isDeviceOAuth = $derived(
     providerId === 'qoder' || providerId === 'kilocode' || providerId === 'grok-cli' ||
-    providerId === 'github' || providerId === 'kiro' || providerId === 'kimi' ||
+    providerId === 'github' || providerId === 'ghe-copilot' || providerId === 'kiro' || providerId === 'kimi' ||
     providerId === 'kimi-coding' || providerId === 'codebuddy-cn' || providerId === 'codebuddy-intl' ||
     providerId === 'minimax-code' || providerId === 'minimax-code-global' || providerId === 'muse' ||
     providerId === 'nous' || providerId === 'glm' ||
+    providerId === 'megabrain' || providerId === 'workbuddy' || providerId === 'amazon-q' ||
     providerId === 'zcode'
   )
   // Upstream parity: only the explicit noAuth flag hides the Connections card
@@ -1498,6 +1499,12 @@
       }
     } else if (providerId === 'freebuff') {
       startFreebuffFlow()
+    } else if (providerId === 'devin-desktop') {
+      oauthError = null
+      callbackInput = ''
+      oauthAuthUrl = ''
+      pkceState = ''
+      showOAuthModal = true
     } else if (isClineOAuth) {
       openClineOAuth()
     } else if (isPKCEOAuth) {
@@ -1508,6 +1515,12 @@
       openCustomOAuth()
     } else if (providerId === 'kiro') {
       openKiroOAuth()
+    } else if (providerId === 'ghe-copilot') {
+      stopDevicePoll()
+      oauthError = null
+      oauthAuthUrl = ''
+      gheInstanceUrl = ''
+      showOAuthModal = true
     } else if (isDeviceOAuth) {
       // Device-code providers (qoder, grok-cli, github, kilocode, kimi,
       // codebuddy-*) have no authorize endpoint to redirect to: the backend
@@ -1564,7 +1577,7 @@
     try {
       // Codex cannot use the dashboard callback: OpenAI only accepts the
       // redirect URI registered for the Codex CLI client.
-      const cb = providerId === 'codex' ? CODEX_REDIRECT_URI : dashboardCallback()
+      const cb = providerId === 'codex' ? CODEX_REDIRECT_URI : providerId === 'openference' ? 'http://127.0.0.1:56123/callback' : dashboardCallback()
       const res = await api.pkceAuthorize(
         providerId,
         providerId === 'gitlab'
@@ -1581,6 +1594,14 @@
       pkceRedirectUri = res.redirectUri || cb
       if (providerId === 'codex') {
         await startCodexLoopback()
+      } else if (providerId === 'openference') {
+        const proxy = await api.openferenceStartProxy({ appPort: window.location.port || (window.location.protocol === 'https:' ? '443' : '80'), state: pkceState, codeVerifier: pkceCodeVerifier, redirectUri: pkceRedirectUri })
+        if (proxy.success) {
+          stopCodexPoll()
+          codexPollTimer = setInterval(pollOpenferenceStatus, 1500)
+        } else {
+          oauthError = 'The local login listener could not start. After signing in, paste the callback URL here to complete authorization.'
+        }
       }
       rememberPending({
         state: pkceState,
@@ -1646,6 +1667,50 @@
     }
   }
 
+  async function pollOpenferenceStatus() {
+    try {
+      const res = await api.openferencePollStatus(pkceState)
+      if (res.status === 'done') {
+        stopCodexPoll()
+        showOAuthModal = false
+        onRefresh()
+      } else if (res.status === 'error' || res.status === 'unknown') {
+        stopCodexPoll()
+        oauthError = res.error || 'The local listener is unavailable. Paste the callback URL to complete authorization.'
+      }
+    } catch {
+      // A transient network failure leaves manual callback exchange available.
+    }
+  }
+
+  async function startDevinBrowserLogin() {
+    oauthError = null
+    try {
+      const res = await api.devinAuthorize()
+      oauthAuthUrl = res.url
+      pkceState = res.state
+      pkceCodeVerifier = res.codeVerifier
+      pkceRedirectUri = res.redirectUri
+      rememberPending({ state: pkceState, verifier: pkceCodeVerifier, redirectUri: pkceRedirectUri, extra: { state: pkceState } })
+      const listener = await api.devinStartProxy({ appPort: window.location.port || (window.location.protocol === 'https:' ? '443' : '80'), state: pkceState, codeVerifier: pkceCodeVerifier, redirectUri: pkceRedirectUri })
+      if (listener.success) {
+        stopCodexPoll()
+        codexPollTimer = setInterval(pollDevinStatus, 1500)
+      } else {
+        oauthError = 'Port 59653 is unavailable. After signing in, paste the full callback URL here.'
+      }
+      window.open(oauthAuthUrl, '_blank', 'width=600,height=700')
+    } catch (err) { oauthError = err instanceof Error ? err.message : String(err) }
+  }
+
+  async function pollDevinStatus() {
+    try {
+      const res = await api.devinPollStatus(pkceState)
+      if (res.status === 'done') { stopCodexPoll(); showOAuthModal = false; onRefresh() }
+      else if (res.status === 'error' || res.status === 'unknown') { stopCodexPoll(); oauthError = res.error || 'The local login listener is unavailable. Retry or paste the callback URL.' }
+    } catch { /* Manual exchange remains available if a polling request fails. */ }
+  }
+
   function stopCodexPoll() {
     if (codexPollTimer) {
       clearInterval(codexPollTimer)
@@ -1661,6 +1726,10 @@
     stopCodexPoll()
     if (providerId === 'codex') {
       void api.codexStopProxy().catch(() => {})
+    } else if (providerId === 'openference') {
+      void api.openferenceStopProxy().catch(() => {})
+    } else if (providerId === 'devin-desktop') {
+      void api.devinStopProxy(pkceState).catch(() => {})
     }
   }
 
@@ -1891,14 +1960,31 @@
 
 
   let isPollingDevice = $state(false)
+  let gheInstanceUrl = $state('')
 
-  async function openDeviceOAuth() {
+  async function startGHEDeviceOAuth() {
+    oauthError = null
+    try {
+      const instance = new URL(gheInstanceUrl.trim())
+      if (instance.protocol !== 'https:' || instance.username || instance.password || instance.search || instance.hash || instance.pathname.replace(/\/+$/, '')) {
+        throw new Error('Enter an HTTPS instance origin without a path, credentials, query, or fragment.')
+      }
+      isConnecting = true
+      await openDeviceOAuth(instance.origin)
+    } catch (err) {
+      oauthError = err instanceof Error ? err.message : String(err)
+    } finally {
+      isConnecting = false
+    }
+  }
+
+  async function openDeviceOAuth(gheUrl?: string) {
     oauthError = null
     callbackInput = ''
     copiedAuthUrl = false
     stopDevicePoll()
     try {
-      const res = await api.deviceStart(providerId)
+      const res = await api.deviceStart(providerId, gheUrl ? { gheUrl } : undefined)
       oauthAuthUrl = res.verification_uri_complete || res.verification_uri || ''
       deviceUserCode = res.user_code || ''
       deviceCode = res.device_code || ''
@@ -2107,6 +2193,16 @@
         return
       }
 
+      if (providerId === 'devin-desktop') {
+        try {
+          if (pkceState) await api.devinExchange(raw, pkceState, pkceCodeVerifier)
+          else await api.devinImport(raw.trim())
+          stopCodexPoll()
+          showOAuthModal = false
+          onRefresh()
+        } catch (err) { oauthError = err instanceof Error ? err.message : String(err) }
+        return
+      }
       if (!raw) return
       let code = raw.trim()
       let redirectUri: string | undefined
@@ -2889,6 +2985,8 @@
     // included — on the standard OpenAI /v1/models shape. Its registry
     // catalog is a 22-model snapshot, so this is the only path that surfaces
     // models added after it (reflection/beam:free, minimax/minimax-m3.1-flash).
+    'command-code',
+    'commandcode-goat',
     'commandcode',
     // Five more keyless catalogues, each probed live at 200 with no
     // Authorization header. vercel-ai-gateway and chutes ship no static
@@ -4666,7 +4764,7 @@
       >
         <span class="material-symbols-outlined text-sm">add</span>{t('Add Model')}</button>
 
-      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter') && providerConnections.some((c) => c.isActive !== 0)}
+      {#if (providerId === 'cline' || providerId === 'clinepass' || providerId === 'qoder' || providerId === 'qoder-cn' || providerId === 'commandcode' || providerId === 'vercel-ai-gateway' || providerId === 'chutes' || providerId === 'nvidia' || providerId === 'ollama' || providerId === 'openrouter' || providerId === 'devin-desktop' || providerId === 'ghe-copilot') && providerConnections.some((c) => c.isActive !== 0)}
         <button
           type="button"
           onclick={handleImportLiveCatalogModels}
@@ -4857,6 +4955,21 @@
           <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
+      {#if providerId === 'devin-desktop'}
+        <div class="space-y-2 p-3 border border-border rounded-md bg-sidebar/50 mb-4">
+          <p class="text-xs text-text-muted">Paste a Devin Desktop credential to import it unchanged, or start browser sign-in. Browser callbacks use port 59653; for a remote gateway, paste the complete callback URL manually.</p>
+          <button type="button" onclick={startDevinBrowserLogin} disabled={isConnecting} class="w-full p-3 text-left border border-border rounded-lg hover:bg-sidebar transition-colors disabled:opacity-50 cursor-pointer">Sign in with Devin in the browser</button>
+        </div>
+      {/if}
+      {#if providerId === 'ghe-copilot' && !deviceCode}
+        <form class="space-y-3 mb-4" onsubmit={(event) => { event.preventDefault(); startGHEDeviceOAuth() }}>
+          <label for="ghe-instance-url" class="block text-sm font-medium text-text-main">GitHub Enterprise instance URL</label>
+          <input id="ghe-instance-url" type="url" required bind:value={gheInstanceUrl} placeholder="https://ghe.company.com" disabled={isConnecting} aria-describedby="ghe-instance-help" class="w-full min-h-[44px] px-3 border border-border rounded-md bg-surface text-text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50" />
+          <p id="ghe-instance-help" class="text-sm text-text-main">Use your organization's HTTPS instance origin. Sign-in and token renewal use this instance, not github.com.</p>
+          {#if oauthError}<p role="alert" class="text-sm text-red-700 dark:text-red-400">{oauthError}</p>{/if}
+          <button type="submit" disabled={isConnecting || !gheInstanceUrl.trim()} class="min-h-[44px] px-4 rounded-md border border-border bg-surface-2 text-text-main hover:bg-surface-3 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">{isConnecting ? 'Requesting device code...' : 'Request device code'}</button>
+        </form>
+      {/if}
       {#if providerId === 'kiro' && !kiroMethod && !deviceUserCode}
         <p class="text-sm text-text-muted mb-3">{t('Choose your authentication method:')}</p>
         <div class="space-y-2 mb-4">
@@ -4965,7 +5078,7 @@
           </div>
         </div>
       {/if}
-      {#if providerId !== 'kiro' || kiroMethod || deviceUserCode}
+      {#if (providerId !== 'kiro' || kiroMethod || deviceUserCode) && (providerId !== 'ghe-copilot' || deviceCode)}
       <div class="flex items-center gap-2 px-3 py-2 border border-border rounded-lg bg-sidebar/50 mb-4">
         <span class="material-symbols-outlined text-base text-primary animate-spin">progress_activity</span>
         <span class="text-sm">

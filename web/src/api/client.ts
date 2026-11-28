@@ -2380,6 +2380,22 @@ export const api = {
       `/api/oauth/codex/poll-status?state=${encodeURIComponent(state)}`
     ),
   codexStopProxy: () => request<{ success: boolean }>('/api/oauth/codex/stop-proxy'),
+  openferenceStartProxy: (params: { appPort: string; state: string; codeVerifier: string; redirectUri: string }) => {
+    const q = new URLSearchParams({ app_port: params.appPort, state: params.state, code_verifier: params.codeVerifier, redirect_uri: params.redirectUri })
+    return request<{ success: boolean; reason?: string }>(`/api/oauth/openference/start-proxy?${q.toString()}`)
+  },
+  openferencePollStatus: (state: string) =>
+    request<{ status: string; connectionId?: string; error?: string }>(`/api/oauth/openference/poll-status?state=${encodeURIComponent(state)}`),
+  openferenceStopProxy: () => request<{ success: boolean }>('/api/oauth/openference/stop-proxy'),
+  devinAuthorize: () => request<{ url: string; state: string; codeVerifier: string; redirectUri: string }>('/api/oauth/devin-desktop/authorize'),
+  devinImport: (token: string, name?: string) => request<{ status: string; connectionId: string }>('/api/oauth/devin-desktop/import', { method: 'POST', body: JSON.stringify({ token, name }) }),
+  devinExchange: (code: string, state: string, codeVerifier: string) => request<{ status: string; connectionId: string }>('/api/oauth/devin-desktop/exchange', { method: 'POST', body: JSON.stringify({ code, state, codeVerifier }) }),
+  devinStartProxy: (params: { appPort: string; state: string; codeVerifier: string; redirectUri: string }) => {
+    const q = new URLSearchParams({ app_port: params.appPort, state: params.state, code_verifier: params.codeVerifier, redirect_uri: params.redirectUri })
+    return request<{ success: boolean; reason?: string }>(`/api/oauth/devin-desktop/start-proxy?${q.toString()}`)
+  },
+  devinPollStatus: (state: string) => request<{ status: string; error?: string }>(`/api/oauth/devin-desktop/poll-status?state=${encodeURIComponent(state)}`),
+  devinStopProxy: (state: string) => request<{ success: boolean }>(`/api/oauth/devin-desktop/stop-proxy?state=${encodeURIComponent(state)}`),
   authcodeAuthorize: (provider: string, redirectUri?: string) => {
     const q = new URLSearchParams({ provider })
     if (redirectUri) q.set('redirect_uri', redirectUri)
@@ -2401,7 +2417,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
-  deviceStart: (provider: string, opts?: { region?: string; startUrl?: string; authMethod?: string }) =>
+  deviceStart: (provider: string, opts?: { region?: string; startUrl?: string; authMethod?: string; gheUrl?: string }) =>
     request<{ device_code: string; user_code: string; verification_uri: string; verification_uri_complete: string; expires_in: number; interval: number; session: Record<string, unknown> }>(
       '/api/oauth/device/start',
       { method: 'POST', body: JSON.stringify({ provider, ...opts }) }

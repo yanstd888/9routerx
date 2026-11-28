@@ -15,6 +15,7 @@ import (
 	"9routerx/proxy/internal/handlerutil"
 	"9routerx/proxy/internal/log"
 	"9routerx/proxy/internal/middleware"
+	"9routerx/proxy/internal/providers"
 	internalproxy "9routerx/proxy/internal/proxy"
 	"9routerx/proxy/internal/proxy/executor"
 	"9routerx/proxy/internal/thinking"
@@ -178,7 +179,7 @@ func (h *ChatHandler) HandleResponses(w http.ResponseWriter, r *http.Request) {
 // nothing is touched at all: upstream makes the same call by skipping
 // translation when the source format already equals the target format.
 func (h *ChatHandler) newResponsesContext(r *http.Request, requestedModel string, modelInfo *ModelInfo, body *[]byte) context.Context {
-	ctx := handlerutil.WithSessionID(r.Context(), handlerutil.ExtractSessionID(r))
+	ctx := withMoonshotOriginal(handlerutil.WithSessionID(r.Context(), handlerutil.ExtractSessionID(r)), *body, false)
 	// Provider-scope limit state, installed where the request's context is built
 	// so every candidate this request tries shares one memory of which providers
 	// were full (docs/provider-limits-plan.md D7).
@@ -189,7 +190,8 @@ func (h *ChatHandler) newResponsesContext(r *http.Request, requestedModel string
 	ctx = withGuardrailKey(ctx, requestKeyID(r))
 
 	providerCfg, err := h.getProviderConfig(modelInfo.Provider, nil)
-	if err == nil && executor.UpstreamSpeaksResponses(modelInfo.Provider, modelInfo.Model, providerCfg) {
+	if (modelInfo.Provider == "ghe-copilot" && h.gheTargetFormat(modelInfo.Model, modelInfo.ConnectionID) == providers.FormatOpenAIResponses) ||
+		(err == nil && executor.UpstreamSpeaksResponses(modelInfo.Provider, modelInfo.Model, providerCfg)) {
 		log.Debug("chat", "responses passthrough", "provider", modelInfo.Provider, "model", modelInfo.Model)
 		return ctx
 	}

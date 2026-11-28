@@ -439,7 +439,8 @@ var qoderCapabilities = map[string]Capabilities{
 }
 
 var providerCapabilities = map[string]map[string]Capabilities{
-	"qoder": qoderCapabilities,
+	"moonshot": moonshotCapabilities,
+	"qoder":    qoderCapabilities,
 	// Qoder CN serves the identical model catalog from the CN gateway, so it
 	// shares the intl Qoder capability table verbatim.
 	"qoder-cn": qoderCapabilities,
@@ -456,6 +457,219 @@ var providerCapabilities = map[string]map[string]Capabilities{
 		// (upstream #5097); pin the published window so clients compact instead
 		// of hard-failing mid-session.
 		"deepseek-v4.1-flash-free": {Vision: true, Reasoning: true, ThinkingFormat: "deepseek", ContextWindow: 330000, MaxOutput: 128000},
+	},
+	// The local CLI Server serves the same bare ids as the free lane, so it
+	// inherits those verified wire quirks instead of the generic *mimo*v2.6*
+	// pattern, which describes a different, always-on thinking dialect.
+	"opencode-server": {
+		"big-pickle":                      {Reasoning: true, ThinkingFormat: "openai", ContextWindow: 200000, MaxOutput: 32000},
+		"space-bunny-free":                {Vision: true, VideoInput: true, Reasoning: true, ThinkingFormat: "openai", ContextWindow: 1048576, MaxOutput: 524288},
+		"muse-spark-1.3-contributor-free": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
+		"nemotron-3-ultra-free":           {Reasoning: true, Tools: true},
+		"mimo-v2.6-flash-free":            {Vision: true, AudioInput: true, VideoInput: true, Reasoning: true, ThinkingFormat: "openai", ThinkingCanDisable: new(true), ContextWindow: 1048576, MaxOutput: 131072},
+		"deepseek-v4.1-flash-free":        {Vision: true, Reasoning: true, ThinkingFormat: "deepseek", ContextWindow: 330000, MaxOutput: 128000},
+	},
+	"command-code": {
+		"claude-opus-4-7":                       {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32000},
+		"claude-fable-5":                        {Tools: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-opus-4-6":                       {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32000},
+		"claude-sonnet-5-5":                     {Tools: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-sonnet-4-6":                     {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 16384},
+		"claude-haiku-4-5-20251001":             {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 8192},
+		"gpt-5.5":                               {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.4":                               {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.3-codex":                         {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"gpt-5.4-mini":                          {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 256000, MaxOutput: 128000},
+		"deepseek/deepseek-v4-pro":              {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"deepseek/deepseek-v4-flash":            {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"deepseek/deepseek-v4-flash-vision-exp": {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 131072},
+		"moonshotai/Kimi-K3.1-Pro":              {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 384000},
+		"moonshotai/Kimi-K2.6":                  {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 262144, MaxOutput: 65536},
+		"moonshotai/Kimi-K2.5":                  {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 262144, MaxOutput: 65536},
+		"zai-org/GLM-5.1":                       {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32768},
+		"zai-org/GLM-5":                         {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 200000, MaxOutput: 32768},
+		"MiniMaxAI/MiniMax-M2.7":                {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 65536},
+		"MiniMaxAI/MiniMax-M2.5":                {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1048576, MaxOutput: 65536},
+		"Qwen/Qwen3.6-Max-Preview":              {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
+		"Qwen/Qwen3.6-Plus":                     {Vision: true, Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 1000000, MaxOutput: 32768},
+	},
+	"poe": {
+		"gpt-5.2":         {Tools: true},
+		"claude-opus-4.8": {Reasoning: true, Tools: true, ThinkingFormat: "claude-adaptive", ThinkingEffortSupported: true},
+		"gemini-3.0-pro":  {Tools: true},
+	},
+	"conol-web": {
+		"claude-opus-5":                 {},
+		"claude-opus-4-8":               {},
+		"claude-fable-5":                {},
+		"claude-sonnet-5":               {},
+		"claude-sonnet-4-6":             {},
+		"claude-haiku-4-5":              {},
+		"gpt-5.5":                       {},
+		"gpt-5.5-pro":                   {},
+		"gpt-5.6-sol":                   {},
+		"gpt-5.6-terra":                 {},
+		"gpt-5.6-luna":                  {},
+		"deepseek/deepseek-v4-pro":      {},
+		"z-ai/glm-5.2":                  {},
+		"tencent/hy3":                   {},
+		"moonshotai/kimi-k3":            {},
+		"moonshotai/kimi-k2.7-code":     {},
+		"qwen/qwen3.7-plus":             {},
+		"qwen/qwen3.7-max":              {},
+		"minimax/minimax-m3":            {},
+		"stepfun/step-3.7-flash":        {},
+		"google/gemini-3.7-flash":       {},
+		"google/gemini-3.1-pro-preview": {},
+		"google/gemini-3.1-flash-lite":  {},
+		"x-ai/grok-4.3":                 {},
+		"deepseek/deepseek-v4-flash":    {},
+		"xiaomi/mimo-v2.5":              {},
+		"xiaomi/mimo-v2.5-pro":          {},
+	},
+	"adapta-web": {
+		"adapta-one":      {},
+		"adapta-gpt":      {},
+		"adapta-claude":   {},
+		"adapta-gemini":   {},
+		"adapta-grok":     {},
+		"adapta-deepseek": {},
+		"adapta-llama":    {},
+	},
+	"syntx": {
+		"claude-fable-5-1":               {},
+		"claude-haiku-4-5-20251001":      {},
+		"claude-opus-5":                  {},
+		"claude-fable-5":                 {},
+		"claude-opus-4-6":                {},
+		"claude-opus-4-7":                {},
+		"gpt-5.4-mini":                   {},
+		"gpt-5.5":                        {},
+		"gpt-5.6-sol":                    {},
+		"gpt-5.6-luna":                   {},
+		"gpt-5.6-terra":                  {},
+		"gpt-oss-120b":                   {},
+		"gemini-3.7-flash":               {},
+		"gemini-3.8-flash":               {},
+		"kimi-k2.6":                      {},
+		"kimi-k2.7-code":                 {},
+		"deepseek-v4-pro":                {},
+		"deepseek-v4-flash":              {},
+		"mimo-v2.5-pro":                  {},
+		"mimo-v2.5":                      {},
+		"minimax-m3":                     {},
+		"qwen3.8-max":                    {},
+		"qwen3.7-plus":                   {},
+		"qwen3.6-plus":                   {},
+		"glm-5.2":                        {},
+		"glm-5.3":                        {},
+		"glm-5.3-flash":                  {},
+		"grok-4.6":                       {},
+		"grok-4.7":                       {},
+		"perplexity-sonar-reasoning-pro": {},
+		"perplexity-sonar-pro":           {},
+		"perplexity-sonar":               {},
+		"command-a":                      {},
+	},
+	"chatplayground": {
+		"gpt-6.1-sol":                    {},
+		"gpt-6-luna":                     {},
+		"gemini-3.8-flash-l":             {},
+		"gemini-3.8-flash":               {},
+		"gemini-3.1-pro":                 {},
+		"claude-opus-5-5":                {},
+		"claude-haiku-5-5":               {},
+		"claude-sonnet-5-5":              {},
+		"claude-fable-5-1":               {},
+		"kimi-k2.6":                      {},
+		"deepseek-v4-pro":                {},
+		"deepseek-v4-flash":              {},
+		"grok-4.6":                       {},
+		"mistral-large-3":                {},
+		"kimi-k3":                        {},
+		"deepseek-r1":                    {},
+		"llama-4-maverick":               {},
+		"llama-4-scout":                  {},
+		"command-a":                      {},
+		"command-r-plus":                 {},
+		"minimax-m3":                     {},
+		"qwen3.8-max":                    {},
+		"qwen3.7-plus":                   {},
+		"qwen3.6-flash":                  {},
+		"nova-2-lite-v1":                 {},
+		"mimo-v2.6-pro":                  {},
+		"hy3":                            {},
+		"grok-4.7":                       {},
+		"glm-5.3":                        {},
+		"glm-5.3-flash":                  {},
+		"perplexity-sonar-reasoning-pro": {},
+		"perplexity-sonar-pro":           {},
+		"perplexity-sonar":               {},
+	},
+	"notrack-web": {
+		"notrack-c": {Tools: true},
+	},
+	"keenable": {},
+	"oneminai": {
+		"gpt-4o-mini": {},
+	},
+	"tencent-aistudio-web": {
+		"hy3-g":           {},
+		"hunyuan-default": {},
+		"hunyuan-3d":      {},
+	},
+	"huggingchat": {
+		"baidu/ERNIE-4.5-VL-424B-A47B-Base-PT":              {Vision: true},
+		"CohereLabs/c4ai-command-r7b-12-2024":               {Tools: true},
+		"CohereLabs/command-a-reasoning-08-2025":            {Tools: true},
+		"CohereLabs/command-a-vision-07-2025":               {Vision: true},
+		"deepseek-ai/DeepSeek-V4-Pro":                       {Tools: true, Reasoning: true},
+		"deepseek-ai/DeepSeek-V4-Flash":                     {Tools: true},
+		"google/gemma-4-31B-it":                             {Tools: true, Vision: true},
+		"google/gemma-4-26B-A4B-it":                         {Tools: true, Vision: true},
+		"inclusionAI/Ling-2.6-1T":                           {Tools: true},
+		"meta-llama/Llama-4-Scout-17B-16E-Instruct":         {Tools: true, Vision: true},
+		"meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8": {Vision: true},
+		"MiniMaxAI/MiniMax-M3":                              {Tools: true, Vision: true, Reasoning: true},
+		"moonshotai/Kimi-K2.7-Code":                         {Tools: true, Vision: true, Reasoning: true},
+		"moonshotai/Kimi-K2.6":                              {Tools: true, Vision: true},
+		"nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4":    {Tools: true, Reasoning: true},
+		"openai/gpt-oss-120b":                               {Tools: true, Reasoning: true},
+		"openai/gpt-oss-20b":                                {Tools: true, Reasoning: true},
+		"Qwen/Qwen3.5-122B-A10B":                            {Tools: true, Vision: true},
+		"Qwen/Qwen3.5-397B-A17B":                            {Tools: true, Vision: true},
+		"Qwen/Qwen3.6-27B":                                  {Tools: true, Vision: true},
+		"Qwen/Qwen3.6-35B-A3B":                              {Tools: true, Vision: true},
+		"stepfun-ai/Step-3.7-Flash":                         {Tools: true, Vision: true},
+		"XiaomiMiMo/MiMo-V2.5-Pro":                          {Tools: true},
+		"zai-org/GLM-5.2":                                   {Tools: true, Reasoning: true},
+	},
+	"haiper": {
+		"gen2":       {},
+		"gen2-image": {},
+	},
+	"udio": {
+		"udio-default": {},
+	},
+	"gigachat": {
+		"GigaChat-2-Max":  {Tools: true},
+		"GigaChat-2-Pro":  {Tools: true},
+		"GigaChat-2-Lite": {Tools: true},
+	},
+	"clova-studio": {
+		"HCX-007":      {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingEffortSupported: true, ContextWindow: 128000, MaxOutput: 32768},
+		"HCX-005":      {Vision: true, Tools: true, ContextWindow: 128000, MaxOutput: 4096},
+		"HCX-DASH-002": {Tools: true, ContextWindow: 32000, MaxOutput: 4096},
+	},
+	"cerebrium": {
+		"meta-llama/Meta-Llama-3.1-8B-Instruct": {Tools: true},
+	},
+	"nlpcloud": {
+		"chatdolphin":           {Tools: true, ContextWindow: 8192},
+		"dolphin":               {Tools: true, ContextWindow: 16384},
+		"finetuned-llama-3-70b": {Tools: true},
+		"llama-3-1-405b":        {Tools: true},
+		"llama-3-8b-instruct":   {Tools: true},
 	},
 	"nvidia": {
 		"minimaxai/minimax-m2.7":        {Reasoning: true, Tools: true, ThinkingFormat: "openai", ThinkingCanDisable: new(false)},
@@ -599,6 +813,64 @@ var providerCapabilities = map[string]map[string]Capabilities{
 	"zed": {
 		"claude-haiku-5-5": {Vision: true, Reasoning: true, Search: true, Tools: true, ThinkingFormat: "claude-adaptive", ContextWindow: 1000000, MaxOutput: 128000},
 	},
+	// UncloseAI (OmniRoute pin 632d84f5): the hermes backend is a vLLM server
+	// with max_model_len 65536. The upstream comment explicitly warns against
+	// hanging the window on a pinned model id because the roster rotates every
+	// few weeks — resolveTokenLimit would miss a rotated id and fall through to
+	// the generic catch-all, handing out a budget that overflows the real
+	// window and 400s. Keying the row by basename keeps the 65536 window for
+	// rotated ids sharing the basename; a discovery sync (max_model_len) still
+	// overrides per model. Tool calling is emulated upstream, so Tools stays
+	// off here rather than advertising a native tool loop.
+	"uncloseai": {
+		"Qwen3.8-27B-exl3": {ContextWindow: 65536},
+	},
+	// Cheaper Inference (OmniRoute pin 632d84f5, catalog captured live
+	// 2026-07-31): supportsVision/supportsReasoning mirror each entry's
+	// capabilities object verbatim — 27 of the 39 models carry vision, all 39
+	// reason and take tools. No thinking format is pinned, so reasoning rides
+	// the default lane shape.
+	"cheaperinference": {
+		"aion-labs.aion-2-0":     {Reasoning: true, Tools: true},
+		"claude-fable-5":         {Vision: true, Reasoning: true, Tools: true},
+		"claude-haiku-4.5":       {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4-7-fast":   {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4-8-fast":   {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.5":        {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.6":        {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.7":        {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-4.8":        {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-5":          {Vision: true, Reasoning: true, Tools: true},
+		"claude-opus-5-fast":     {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-4.5":      {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-4.6":      {Vision: true, Reasoning: true, Tools: true},
+		"claude-sonnet-5":        {Vision: true, Reasoning: true, Tools: true},
+		"deepseek-v4-flash":      {Reasoning: true, Tools: true},
+		"deepseek-v4-pro":        {Reasoning: true, Tools: true},
+		"gemini-2.5-flash":       {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.7-flash":       {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3-flash-preview": {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-flash-lite":  {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-pro":         {Vision: true, Reasoning: true, Tools: true},
+		"gemini-3.1-pro-preview": {Reasoning: true, Tools: true},
+		"glm-4.5":                {Reasoning: true, Tools: true},
+		"glm-4.5-air":            {Reasoning: true, Tools: true},
+		"glm-4.6":                {Reasoning: true, Tools: true},
+		"glm-4.7":                {Reasoning: true, Tools: true},
+		"glm-5":                  {Reasoning: true, Tools: true},
+		"glm-5.1":                {Reasoning: true, Tools: true},
+		"glm-5.2":                {Reasoning: true, Tools: true},
+		"gemini-3.5-flash-lite":  {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.4":                {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.4-mini":           {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.5":                {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-luna":           {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-sol":            {Vision: true, Reasoning: true, Tools: true},
+		"gpt-5.6-terra":          {Vision: true, Reasoning: true, Tools: true},
+		"grok-4.5":               {Vision: true, Reasoning: true, Tools: true},
+		"kimi-k3":                {Vision: true, Reasoning: true, Tools: true},
+		"minimax-m2.7":           {Reasoning: true, Tools: true},
+	},
 }
 
 func init() {
@@ -724,6 +996,7 @@ func init() {
 	providerCapabilities["nan"] = providerCapabilities["nanbuilders"]
 	providerCapabilities["hc"] = providerCapabilities["hcnsec"]
 	providerCapabilities["oad"] = providerCapabilities["openadapter"]
+	providerCapabilities["cmd"] = providerCapabilities["command-code"]
 
 	initPatternIndex()
 }
@@ -995,6 +1268,53 @@ var providerTokenLimits = map[string]map[string][2]int{
 		"deepseek-v4-pro":     {1000000, 393216},
 		"deepseek-v4.1-flash": {1000000, 393216},
 	},
+	// Gitlawb GMI Cloud per-model limits (OmniRoute pin 632d84f5, catalog
+	// captured live upstream): rows key the basename after the org prefix, so
+	// openai/gpt-5.5 resolves through "gpt-5.5" and rotated orgs keep the
+	// numbers. Figures are the pinned catalog's contextLength/maxOutputTokens
+	// verbatim.
+	"gitlawb-gmi": {
+		"MiMo-V2.5-Pro":                      {1050000, 131072},
+		"MiMo-V2.5":                          {1050000, 131072},
+		"gpt-5.5":                            {1050000, 131072},
+		"gpt-5.4-pro":                        {409600, 131072},
+		"gpt-5.4":                            {409600, 131072},
+		"gpt-5.4-mini":                       {409600, 131072},
+		"gpt-5.4-nano":                       {409600, 131072},
+		"gpt-5.3-codex":                      {409600, 131072},
+		"gpt-5.2-codex":                      {409600, 131072},
+		"gpt-5.2":                            {409600, 131072},
+		"gpt-5.1":                            {409600, 131072},
+		"gpt-5":                              {409600, 131072},
+		"gpt-4o":                             {131072, 16384},
+		"gpt-4o-mini":                        {131072, 16384},
+		"claude-opus-4.7":                    {409600, 131072},
+		"claude-opus-4.6":                    {409600, 131072},
+		"claude-opus-4.5":                    {409600, 131072},
+		"claude-opus-4.1":                    {409600, 131072},
+		"claude-sonnet-4.6":                  {409600, 131072},
+		"claude-sonnet-4.5":                  {409600, 131072},
+		"claude-sonnet-4":                    {409600, 131072},
+		"claude-haiku-4.5":                   {409600, 131072},
+		"DeepSeek-V4-Pro":                    {1048576, 131072},
+		"DeepSeek-V4-Flash":                  {1048575, 131072},
+		"DeepSeek-R1-0528":                   {163840, 131072},
+		"DeepSeek-V3.2":                      {163840, 131072},
+		"gemini-3.1-pro-preview":             {1048576, 131072},
+		"gemini-3.1-flash-lite-preview":      {1048576, 131072},
+		"gemini-3-flash-preview":             {1048576, 131072},
+		"GLM-5.1-FP8":                        {202752, 131072},
+		"GLM-5-FP8":                          {202752, 131072},
+		"Kimi-K2.6":                          {65536, 131072},
+		"Kimi-K2.5":                          {262144, 131072},
+		"MiniMax-M2.7":                       {196608, 131072},
+		"MiniMax-M2.5":                       {196608, 131072},
+		"Qwen3.6-Max-Preview":                {262144, 131072},
+		"Qwen3.6-Plus":                       {262144, 131072},
+		"Qwen3.5-397B-A17B":                  {262144, 131072},
+		"Qwen3-Coder-480B-A35B-Instruct-FP8": {262128, 131072},
+		"NVIDIA-Nemotron-3-Nano-Omni":        {262144, 131072},
+	},
 }
 
 // lookupProviderTokenLimits returns the limits a provider declares for a model,
@@ -1078,6 +1398,13 @@ func GetCapabilitiesForModel(provider, model string) Capabilities {
 	// (open-sse/providers/capabilities.js:570).
 	if isCommandCodeProvider(provider) {
 		res := commandCodeCapabilities(model)
+		capsCacheMu.Lock()
+		capsCache[key] = res
+		capsCacheMu.Unlock()
+		return res
+	}
+	if isCommandCodeGoatProvider(provider) {
+		res := commandCodeGoatCapabilities(model)
 		capsCacheMu.Lock()
 		capsCache[key] = res
 		capsCacheMu.Unlock()

@@ -19,13 +19,35 @@ const (
 // with more than one transport declare it; everything else routes on the
 // transport its base URL already names.
 var ProviderModelFormats = map[string]map[string]ModelFormats{
-	"muse":         museModelFormats,
-	"kimi":         kimiModelFormats,
-	"kimi-coding":  kimiModelFormats,
-	"ocz":          openCodeZenModelFormats,
-	"opencode-zen": openCodeZenModelFormats,
-	"ocg":          openCodeGoModelFormats,
-	"opencode-go":  openCodeGoModelFormats,
+	"poe":              poeModelFormats,
+	"commandcode-goat": commandcodeGoatModelFormats,
+	"cmc-goat":         commandcodeGoatModelFormats,
+	"command-code":     commandCodeModelFormats,
+	"cmd":              commandCodeModelFormats,
+	"moonshot":         moonshotModelFormats,
+	"ghe-copilot":      gheCopilotFormats,
+	"muse":             museModelFormats,
+	"kimi":             kimiModelFormats,
+	"kimi-coding":      kimiModelFormats,
+	"ocz":              openCodeZenModelFormats,
+	"opencode-zen":     openCodeZenModelFormats,
+	"ocg":              openCodeGoModelFormats,
+	"opencode-go":      openCodeGoModelFormats,
+}
+
+var commandCodeModelFormats = map[string]ModelFormats{
+	"claude-opus-4-7":           openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-fable-5":            openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-opus-4-6":           openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-sonnet-5-5":         openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-sonnet-4-6":         openCodeZenFormats(FormatClaude, FormatClaude),
+	"claude-haiku-4-5-20251001": openCodeZenFormats(FormatClaude, FormatClaude),
+}
+
+var poeModelFormats = map[string]ModelFormats{
+	"gpt-5.2":         {TargetFormat: FormatOpenAI, SupportedFormats: []string{FormatOpenAI}},
+	"claude-opus-4.8": {TargetFormat: FormatClaude, SupportedFormats: []string{FormatClaude}},
+	"gemini-3.0-pro":  {TargetFormat: FormatOpenAI, SupportedFormats: []string{FormatOpenAI}},
 }
 
 // museModelFormats mirrors open-sse/providers/registry/muse.js models[]: Meta

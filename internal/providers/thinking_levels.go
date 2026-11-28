@@ -182,6 +182,11 @@ func codexModelLevels(provider, model string) []string {
 // the model has no reasoning. The returned slice is a fresh copy, safe for the
 // caller to keep or filter.
 func GetThinkingLevels(provider, model string) []string {
+	if provider == "moonshot" {
+		if levels := moonshotThinkingLevels(model); levels != nil {
+			return levels
+		}
+	}
 	if provider == "kiro" && ResolveKiroEffortPath(model) == "" {
 		return nil
 	}

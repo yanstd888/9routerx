@@ -56,6 +56,9 @@ export interface CustomModelData {
 // `minimax-code`, `opencode-zen`, `ollama-search`) but this repo ships distinct
 // artwork for all of those, so aliasing them here would throw away a real logo.
 const ICON_ALIASES: Record<string, string> = {
+  // Same Kimi brand artwork, never a credential or routing alias.
+  'moonshot': 'kimi',
+  'ghe-copilot': 'github',
   'zai-search': 'glm',
   // ZCode rides the GLM/Z.ai brand and wears the same mark. This is an alias
   // rather than a committed copy of `glm.png`: a duplicate file is never

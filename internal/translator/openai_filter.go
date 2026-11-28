@@ -39,7 +39,9 @@ var validOpenAIContentTypes = map[string]bool{
 // keeps the cache_control markers on its content blocks (the alicode family
 // on DashScope), so the filter must not strip them.
 type FilterOptions struct {
-	PreserveCacheControl bool
+	PreserveCacheControl     bool
+	PreserveVideoURL         bool
+	PreservePartialAssistant bool
 }
 
 // FilterToOpenAIFormat normalises a body to clean OpenAI shape — port of

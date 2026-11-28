@@ -17,6 +17,7 @@ import (
 
 func init() {
 	Register("kiro", refreshKiro)
+	Register("amazon-q", refreshKiro)
 }
 
 // Hourly rotating Kiro SDK identity (upstream kiroModels.js parity).

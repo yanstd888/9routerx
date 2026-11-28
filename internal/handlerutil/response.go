@@ -162,6 +162,8 @@ func SetAuthHeader(req *http.Request, apiKey, authHeader, authScheme string) {
 	switch authScheme {
 	case "bearer":
 		req.Header.Set(authHeader, "Bearer "+apiKey)
+	case "key":
+		req.Header.Set(authHeader, "Key "+apiKey)
 	case "raw":
 		req.Header.Set(authHeader, apiKey)
 	default:

@@ -136,7 +136,7 @@ func (h *ChatHandler) handleAccountFallback(
 				log.Debug("fallback", "no zen key to borrow for opencode-go", "error", bErr)
 			}
 		}
-		if cfg, ok := providers.KnownProviders[provider]; ok && (cfg.NoAuth || cfg.DefaultAPIKey != "") {
+		if cfg, ok := providers.KnownProviders[provider]; ok && (cfg.NoAuth || cfg.AuthOptional || cfg.DefaultAPIKey != "") {
 			apiKey := cfg.DefaultAPIKey
 			if apiKey == "" {
 				apiKey = "public"
@@ -655,11 +655,23 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	connectionID, connData := f.ConnectionID, f.ConnData
 	body, isStream := f.Body, f.IsStream
 	translateResponse, endpoint := f.TranslateResponse, f.Endpoint
+	if provider == "moonshot" {
+		body = restoreMoonshotOriginal(ctx, body)
+	}
 	// Unified thinking normalisation, inbound half: capture the client's
 	// reasoning intent before any converter rewrites the body. model stays
 	// the requested id for logs/usage; wireModel is suffix-free.
 	body, wireModel, thinkingIntent := h.prepareInboundThinking(ctx, provider, model, body, f.Endpoint == "/v1/v1/messages" || f.Endpoint == "/v1/messages")
 	ctx = translator.WithUsageCapture(ctx)
+
+	var gheToken string
+	if provider == "ghe-copilot" {
+		var prepareErr error
+		connData, gheToken, prepareErr = h.prepareGHE(ctx, connectionID, connData, false, "")
+		if prepareErr != nil {
+			return fmt.Errorf("GHE credential preparation: %w", prepareErr)
+		}
+	}
 
 	providerCfg, err := h.getProviderConfig(provider, connData)
 	if err != nil {
@@ -698,15 +710,20 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	}
 
 	apiKey := resolveProviderAuthToken(provider, connData, extractAPIKey(connData))
+	if provider == "ghe-copilot" {
+		apiKey = gheToken
+	}
 	if apiKey == "" {
 		if providerCfg.DefaultAPIKey != "" {
 			apiKey = providerCfg.DefaultAPIKey
+		} else if providerCfg.AuthOptional {
+			apiKey = "public"
 		} else {
 			return &upstreamError{StatusCode: http.StatusUnauthorized, Body: []byte(`{"error":{"message":"no API key found","type":"auth_error","code":401}}`)}
 		}
 	}
 
-	if connectionID != "" {
+	if connectionID != "" && provider != "ghe-copilot" {
 		rekey, _, err := h.refreshOAuthTokenIfExpired(connectionID, apiKey)
 		if err == nil {
 			apiKey = rekey
@@ -753,6 +770,7 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	claudeNative := messagesClient && (isAnthropic ||
 		provider == "claude" || provider == "anthropic" ||
 		executor.ServesMessagesEndpoint(provider, model) ||
+		(provider == "ghe-copilot" && providers.GHECopilotTargetFormat(model, connData.ProviderSpecificData) == providers.FormatClaude) ||
 		servesClaudeMessages(provider, providerCfg))
 
 	// upstreamClaude is what the executor needs to translate the Claude reply
@@ -849,7 +867,7 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 
 	// Sanitize tool schemas for all OpenAI-compatible providers (opencode, gemini-openai, etc.)
 	// Fixes misplaced `required` inside `properties` and missing `items` for arrays.
-	if sanitized, err := translator.SanitizeOpenAITools(pipedBody); err == nil && sanitized != nil && string(sanitized) != string(pipedBody) {
+	if sanitized, err := sanitizeProviderTools(pipedBody, provider); err == nil && sanitized != nil && string(sanitized) != string(pipedBody) {
 		log.Debug("fallback", "sanitized tools", "provider", provider, "model", model, "conn", connectionID[:min(8, len(connectionID))], "beforeBytes", len(pipedBody), "afterBytes", len(sanitized))
 		pipedBody = sanitized
 	} else if err != nil {
@@ -875,7 +893,7 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 	// dispatch stage as the tool collapse above. Internal provider/model rules
 	// decide applicability (any provider serving a deepseek/kimi model id), so
 	// the call itself is unconditional on non-Claude lanes.
-	if !upstreamClaude {
+	if !upstreamClaude && provider != "moonshot" {
 		pipedBody = executor.InjectReasoningContent(pipedBody, provider)
 		if provider == "deepseek" {
 			// DeepSeek V4 models think by default and reject required/named
@@ -946,10 +964,14 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 			// API rejects.
 			target = "claude"
 		}
-		pipedBody = thinking.ApplyJSON(pipedBody, target, provider, wireModel, thinkingIntent)
+		if provider != "moonshot" {
+			pipedBody = thinking.ApplyJSON(pipedBody, target, provider, wireModel, thinkingIntent)
+		}
 		if target == "openai" && !providerCfg.IsGeminiNative() {
 			filtered, filterErr := translator.FilterToOpenAIFormatJSON(pipedBody, translator.FilterOptions{
-				PreserveCacheControl: providers.PreservesCacheControl(provider),
+				PreserveCacheControl:     providers.PreservesCacheControl(provider),
+				PreserveVideoURL:         provider == "moonshot",
+				PreservePartialAssistant: provider == "moonshot",
 			})
 			if filterErr != nil {
 				// The request lost every message. The upstream answers an
@@ -1183,7 +1205,16 @@ func (h *ChatHandler) tryForwardWithConnection(f forwardRequestParams) error {
 
 	var ue *upstreamError
 	if errors.As(fwdErr, &ue) && ue.StatusCode == http.StatusUnauthorized && connectionID != "" {
-		refreshedKey, _, rErr := h.forceRefreshOAuthToken(connectionID)
+		var refreshedKey string
+		var rErr error
+		if provider == "ghe-copilot" {
+			connData, refreshedKey, rErr = h.prepareGHE(ctx, connectionID, connData, true, apiKey)
+			if rErr == nil {
+				providerCfg, rErr = h.getProviderConfig(provider, connData)
+			}
+		} else {
+			refreshedKey, _, rErr = h.forceRefreshOAuthToken(connectionID)
+		}
 		if rErr == nil && refreshedKey != "" && refreshedKey != apiKey {
 			log.Info("fallback", "reactive 401 token refresh success, retrying request", "conn", connectionID)
 			apiKey = NormalizeProviderToken(provider, refreshedKey)

@@ -30,6 +30,12 @@ var webCookieBrandExpectations = map[string]struct {
 	"gemini-web":     {mustContain: "Gemini"},
 	"deepseek-web":   {mustContain: "DeepSeek"},
 	"claude-web":     {mustContain: "Claude"},
+	"copilot-web":    {mustContain: "Copilot"},
+	"yuanbao-web":    {mustContain: "Yuanbao"},
+	"zai-web":        {mustContain: "Z.ai"},
+	"notion-web":     {mustContain: "Notion"},
+	"arena-ai":       {mustContain: "Arena"},
+	"uc-web":         {mustContain: "UC"},
 }
 
 // TestWebCookieProviders_KeepTheirBrand walks every web-cookie entry in the

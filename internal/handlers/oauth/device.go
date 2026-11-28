@@ -22,7 +22,7 @@ import (
 // deviceProviders lists providers supporting the device-code family.
 // kimi-coding aliases to kimi (dual-auth merge, like upstream).
 var deviceProviders = []string{
-	"qoder", "qoder-cn", "kilocode", "grok-cli", "github", "kiro", "kimi", "kimi-coding",
+	"qoder", "qoder-cn", "kilocode", "megabrain", "workbuddy", "grok-cli", "github", "ghe-copilot", "kiro", "amazon-q", "kimi", "kimi-coding",
 	"codebuddy-cn", "codebuddy-intl", "muse", "minimax-code", "minimax-code-global", "nous",
 	"glm", "zcode",
 }
@@ -167,6 +167,7 @@ func (h *OAuthHandler) HandleDeviceStart(w http.ResponseWriter, r *http.Request)
 		Region     string `json:"region"`
 		StartURL   string `json:"startUrl"`
 		AuthMethod string `json:"authMethod"`
+		GHEURL     string `json:"gheUrl"`
 	}
 	if raw, err := io.ReadAll(io.LimitReader(r.Body, 1<<20)); err == nil && len(raw) > 0 {
 		_ = json.Unmarshal(raw, &body)
@@ -176,7 +177,13 @@ func (h *OAuthHandler) HandleDeviceStart(w http.ResponseWriter, r *http.Request)
 		handlerutil.WriteJSONError(w, http.StatusBadRequest, "unsupported provider for device flow")
 		return
 	}
-	out, err := deviceStart(r.Context(), provider, body.Region, body.StartURL, body.AuthMethod)
+	var out map[string]any
+	var err error
+	if provider == "ghe-copilot" {
+		out, err = gheStart(r.Context(), body.GHEURL)
+	} else {
+		out, err = deviceStart(r.Context(), provider, body.Region, body.StartURL, body.AuthMethod)
+	}
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusBadGateway, err.Error())
 		return
@@ -191,11 +198,20 @@ func deviceStart(ctx context.Context, provider, region, startURL, authMethod str
 		return qoderStart(ctx, provider)
 	case "kilocode":
 		return kilocodeStart(ctx)
+	case "megabrain":
+		return megabrainStart(ctx)
+	case "workbuddy":
+		return workbuddyStart(ctx)
 	case "grok-cli":
 		return grokcliStart(ctx)
 	case "github":
 		return githubStart(ctx)
 	case "kiro":
+		return kiroStart(ctx, region, startURL, authMethod)
+	case "amazon-q":
+		// Amazon Q shares Kiro's AWS Builder ID / IDC device flow (OmniRoute
+		// providers/index.ts: "shares KiroExecutor + OAuth wiring with kiro
+		// but has no discovery config or registry catalog of its own").
 		return kiroStart(ctx, region, startURL, authMethod)
 	case "kimi":
 		return kimiStart(ctx)
@@ -274,6 +290,63 @@ func kilocodeStart(ctx context.Context) (map[string]any, error) {
 	}, nil
 }
 
+// --- workbuddy: Tencent WorkBuddy's own plugin-auth protocol (OmniRoute
+// workbuddy.ts, pinned 632d84f5, verified live against the gateway): POST
+// state?platform=CLI -> {code:0,data:{state,authUrl}}, then the browser
+// sign-in, then GET token?state=... until code 0 (11217 = login in
+// progress). X-Product: SaaS is the only documented header; CodeBuddy's
+// X-Domain family is intentionally absent.
+
+func workbuddyStart(ctx context.Context) (map[string]any, error) {
+	headers := map[string]string{"X-Product": "SaaS"}
+	data, status, err := postJSON(ctx,
+		"https://www.workbuddy.ai/v2/plugin/auth/state?platform=CLI",
+		map[string]string{"platform": "CLI"}, headers)
+	if err != nil || status != http.StatusOK {
+		return nil, fmt.Errorf("WorkBuddy state request failed: %w status=%d", err, status)
+	}
+	inner, _ := data["data"].(map[string]any)
+	state, authURL := strVal(inner, "state"), strVal(inner, "authUrl")
+	var code float64
+	if c, ok := data["code"].(float64); ok {
+		code = c
+	}
+	if code != 0 || state == "" || authURL == "" {
+		return nil, fmt.Errorf("WorkBuddy state error: %v", strVal(data, "msg"))
+	}
+	return map[string]any{
+		"device_code": state, "user_code": state,
+		"verification_uri": authURL, "verification_uri_complete": authURL,
+		"expires_in": 600, "interval": 5,
+		"session": map[string]any{},
+	}, nil
+}
+
+// --- megabrain: MegaBrain's gateway is built on Kilo's, so the device
+// protocol is the same POST initiate / GET poll on its own host
+// (OmniRoute megabrain.ts = kilocode spread with MEGABRAIN_CONFIG, pinned
+// 632d84f5) ---
+
+func megabrainStart(ctx context.Context) (map[string]any, error) {
+	data, status, err := postJSON(ctx, "https://api.getmegabrain.com/api/device-auth/codes", map[string]string{}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("device auth initiation failed: %w", err)
+	}
+	if status == http.StatusTooManyRequests {
+		return nil, fmt.Errorf("too many pending authorization requests, try again later")
+	}
+	if status != http.StatusOK {
+		return nil, fmt.Errorf("device auth initiation failed: status %d", status)
+	}
+	return map[string]any{
+		"device_code": strVal(data, "code"), "user_code": strVal(data, "code"),
+		"verification_uri":          strVal(data, "verificationUrl"),
+		"verification_uri_complete": strVal(data, "verificationUrl"),
+		"expires_in":                300, "interval": 3,
+		"session": map[string]any{},
+	}, nil
+}
+
 // --- grok-cli: standard device flow, referrer=grok-build ---
 
 var grokcliUA = providers.GrokCLIPagerUserAgent
@@ -295,10 +368,9 @@ func grokcliStart(ctx context.Context) (map[string]any, error) {
 // --- github: standard device flow ---
 
 func githubStart(ctx context.Context) (map[string]any, error) {
-	form := url.Values{"client_id": {"Iv1.b507a08c87ecfe98"}, "scope": {"read:user"}}
-	data, status, err := postForm(ctx, "https://github.com/login/device/code", form, nil)
-	if err != nil || status != http.StatusOK {
-		return nil, fmt.Errorf("device code request failed: %v status=%d", err, status)
+	data, err := (githubDeviceFlow{"Iv1.b507a08c87ecfe98", "https://github.com/login/device/code", "https://github.com/login/oauth/access_token", postForm}).start(ctx)
+	if err != nil {
+		return nil, err
 	}
 	data["session"] = map[string]any{}
 	return data, nil
@@ -472,11 +544,19 @@ func devicePoll(ctx context.Context, provider, code string, session map[string]a
 		t, err = qoderPoll(ctx, provider, session, code)
 	case "kilocode":
 		t, err = kilocodePoll(ctx, code)
+	case "megabrain":
+		t, err = megabrainPoll(ctx, code)
+	case "workbuddy":
+		t, err = workbuddyPoll(ctx, code)
 	case "grok-cli":
 		t, err = grokcliPoll(ctx, code)
 	case "github":
 		t, err = githubPoll(ctx, code)
+	case "ghe-copilot":
+		t, err = ghePoll(ctx, code, session)
 	case "kiro":
+		t, err = kiroPoll(ctx, session, code)
+	case "amazon-q":
 		t, err = kiroPoll(ctx, session, code)
 	case "kimi":
 		t, err = kimiPoll(ctx, session, code)
@@ -519,8 +599,8 @@ func (h *OAuthHandler) saveDeviceConnection(provider string, t deviceTokens) sav
 		email = extractEmailFromJWT(t.access)
 	}
 	name := connectionDisplayName(provider, t.name, email, map[string]string{
-		"qoder": "Qoder", "qoder-cn": "Qoder CN", "kilocode": "KiloCode", "grok-cli": "Grok CLI",
-		"github": "GitHub", "kiro": "Kiro", "kimi": "Kimi", "muse": "Muse",
+		"qoder": "Qoder", "qoder-cn": "Qoder CN", "kilocode": "KiloCode", "megabrain": "MegaBrain", "workbuddy": "WorkBuddy", "grok-cli": "Grok CLI",
+		"github": "GitHub", "ghe-copilot": "GHE Copilot", "kiro": "Kiro", "amazon-q": "Amazon Q", "kimi": "Kimi", "muse": "Muse",
 		"codebuddy-cn": "CodeBuddy", "codebuddy-intl": "CodeBuddy",
 		"zcode": "ZCode",
 		"nous":  "Nous Research", "glm": "Zai GLM Coding",
@@ -709,6 +789,81 @@ func kilocodePoll(ctx context.Context, code string) (deviceTokens, error) {
 	return t, nil
 }
 
+func megabrainPoll(ctx context.Context, code string) (deviceTokens, error) {
+	var t deviceTokens
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.getmegabrain.com/api/device-auth/codes/"+code, nil)
+	req.Header.Set("Accept", "application/json")
+	resp, err := deviceClient.Do(req)
+	if err != nil {
+		return t, fmt.Errorf("poll_failed: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	switch resp.StatusCode {
+	case 202:
+		return t, fmt.Errorf("authorization_pending")
+	case 403:
+		return t, fmt.Errorf("access_denied: authorization denied by user")
+	case 410:
+		return t, fmt.Errorf("expired_token: authorization code expired")
+	}
+	out, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if resp.StatusCode != http.StatusOK {
+		return t, fmt.Errorf("poll_failed: %d", resp.StatusCode)
+	}
+	var data map[string]any
+	if json.Unmarshal(out, &data) != nil {
+		return t, fmt.Errorf("poll_failed: invalid JSON")
+	}
+	if strVal(data, "status") != "approved" || strVal(data, "token") == "" {
+		return t, fmt.Errorf("authorization_pending")
+	}
+	t.access = strVal(data, "token")
+	t.email = strVal(data, "userEmail")
+	return t, nil
+}
+
+func workbuddyPoll(ctx context.Context, state string) (deviceTokens, error) {
+	var t deviceTokens
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet,
+		"https://www.workbuddy.ai/v2/plugin/auth/token?state="+url.QueryEscape(state), nil)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("X-Product", "SaaS")
+	resp, err := deviceClient.Do(req)
+	if err != nil {
+		return t, fmt.Errorf("poll_failed: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	out, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	var data struct {
+		Code float64 `json:"code"`
+		Msg  string  `json:"msg"`
+		Data struct {
+			AccessToken  string `json:"accessToken"`
+			RefreshToken string `json:"refreshToken"`
+			ExpiresIn    int    `json:"expiresIn"`
+		} `json:"data"`
+	}
+	if json.Unmarshal(out, &data) != nil {
+		return t, fmt.Errorf("poll_failed: invalid JSON")
+	}
+	// The token is one-shot: the first successful poll returns it and a
+	// second poll reverts to 11217, so it must be consumed once and stored.
+	if data.Code == 11217 {
+		return t, fmt.Errorf("authorization_pending")
+	}
+	if data.Code != 0 || data.Data.AccessToken == "" {
+		return t, fmt.Errorf("poll_failed: code %v: %s", data.Code, data.Msg)
+	}
+	t.access = data.Data.AccessToken
+	t.refresh = data.Data.RefreshToken
+	t.expiresIn = data.Data.ExpiresIn
+	// Some gateway versions omit expiry for long-lived account tokens.
+	if t.expiresIn <= 0 {
+		t.expiresIn = 31104000
+	}
+	return t, nil
+}
+
 func grokcliPoll(ctx context.Context, code string) (deviceTokens, error) {
 	var t deviceTokens
 	form := url.Values{
@@ -743,11 +898,7 @@ func grokcliPoll(ctx context.Context, code string) (deviceTokens, error) {
 
 func githubPoll(ctx context.Context, code string) (deviceTokens, error) {
 	var t deviceTokens
-	form := url.Values{
-		"client_id": {"Iv1.b507a08c87ecfe98"}, "device_code": {code},
-		"grant_type": {"urn:ietf:params:oauth:grant-type:device_code"},
-	}
-	data, _, err := postForm(ctx, "https://github.com/login/oauth/access_token", form, nil)
+	data, _, err := (githubDeviceFlow{"Iv1.b507a08c87ecfe98", "https://github.com/login/device/code", "https://github.com/login/oauth/access_token", postForm}).poll(ctx, code)
 	if err != nil {
 		return t, fmt.Errorf("poll_failed: %v", err)
 	}

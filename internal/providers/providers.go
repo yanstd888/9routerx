@@ -12,10 +12,12 @@ type ProviderConfig struct {
 	BaseURL       string
 	AuthHeader    string            // "Authorization" or "x-api-key"
 	AuthScheme    string            // "bearer" or "raw"
-	NoAuth        bool              // true = no API key required
+	NoAuth        bool              // true = never send credentials
+	AuthOptional  bool              // anonymous access is allowed; supplied credentials are preserved
 	DefaultAPIKey string            // fallback API key when none provided
 	StaticHeaders map[string]string // extra headers to set on every request
 	Format        string            // "" (OpenAI standard), "gemini-native"
+	CatalogURL    string            // optional model catalog root for a native executor
 	ImageURL      string            // override /images/generations endpoint
 	TTSURL        string            // override /audio/speech endpoint
 	STTURL        string            // override /audio/transcriptions endpoint
@@ -204,7 +206,10 @@ var modelsListURL = map[string]string{
 	// snapshot (minimax/minimax-m3.1-flash, z-ai/glm-5.3-flash, …). The
 	// registry catalog is a fixed 22-model list, so without this entry the
 	// dashboard cannot discover anything the snapshot predates.
-	"commandcode": "https://api.commandcode.ai/provider/v1/models",
+	"command-code":     "https://api.commandcode.ai/provider/v1/models",
+	"commandcode-goat": "https://api.commandcode.ai/provider/v1/models",
+	"cmc-goat":         "https://api.commandcode.ai/provider/v1/models",
+	"commandcode":      "https://api.commandcode.ai/provider/v1/models",
 	// Five more providers whose catalogue is reachable without a valid
 	// credential, so the discovery path that fixed commandcode covers them
 	// unchanged: "Check Latest Models", "Import from /models" and "Sync Models"
@@ -385,6 +390,35 @@ func ApplyHeaderOverrides(headers, overrides map[string]string) map[string]strin
 
 // KnownProviders maps provider IDs to their upstream configuration.
 var KnownProviders = map[string]ProviderConfig{
+	"ghe-copilot": {
+		BaseURL:    "https://api.githubcopilot.com/chat/completions",
+		AuthHeader: "Authorization", AuthScheme: "bearer", Format: FormatOpenAI,
+		StaticHeaders:        GitHubCopilotChatHeaders("text/event-stream", "user"),
+		PreserveCacheControl: true,
+	},
+	"devin-desktop": {
+		BaseURL: "https://server.codeium.com",
+	},
+	"volcengine-agent-plan": {
+		BaseURL:    "https://ark.cn-beijing.volces.com/api/plan/v3/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"volcengine-coding-plan": {
+		BaseURL:    "https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"agnes-cn": {
+		BaseURL:    "https://api.agnes-ai.cn/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"alibaba-cn": {
+		BaseURL:    "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"openai": {
 		BaseURL:    "https://api.openai.com/v1/chat/completions",
 		AuthHeader: "Authorization",
@@ -502,6 +536,101 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
+	"conol-web": {
+		BaseURL:    "https://conol.ai/api/sessions",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
+	"adapta-web": {
+		BaseURL:    "https://agent.adapta.one",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"syntx": {
+		BaseURL:    "https://api.syntx.ai",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"chatplayground": {
+		BaseURL:    "https://app.chatplayground.ai/api/chat",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		CatalogURL: "https://app.chatplayground.ai/api/models",
+		Format:     FormatOpenAI,
+	},
+	"notrack-web": {
+		BaseURL:    "https://notrack.ai",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	"keenable": {
+		BaseURL:       "https://api.keenable.ai",
+		AuthHeader:    "X-API-Key",
+		AuthScheme:    "raw",
+		FetchURL:      "https://api.keenable.ai/v1/fetch/public",
+		FetchMethod:   "GET",
+		SearchURL:     "https://api.keenable.ai/v1/search/public",
+		SearchMethod:  "POST",
+		StaticHeaders: map[string]string{"X-Keenable-Title": "9RouterX"},
+	},
+	"oneminai": {
+		BaseURL:    "https://api.1min.ai/api/chat-with-ai",
+		AuthHeader: "API-KEY",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
+	"tencent-aistudio-web": {
+		BaseURL:    "https://aistudio.tencent.ai",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	"huggingchat": {
+		BaseURL:    "https://huggingface.co/chat",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	"haiper": {
+		BaseURL:    "https://api.haiper.ai/v1",
+		AuthHeader: "HAIPER_KEY",
+		AuthScheme: "raw",
+	},
+	"udio": {
+		BaseURL:    "https://www.udio.com/api/generate-proxy",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	"gigachat": {
+		BaseURL:    "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"clova-studio": {
+		BaseURL:    "https://clovastudio.stream.ntruss.com/v3/chat-completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"cerebrium": {
+		BaseURL:    "https://api.cerebrium.ai/v4",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"nlpcloud": {
+		BaseURL:    "https://api.nlpcloud.io/v1/gpu",
+		AuthHeader: "Authorization",
+		AuthScheme: "raw",
+		Format:     FormatOpenAI,
+	},
+	"poe": {
+		BaseURL:    "https://api.poe.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"openrouter": {
 		BaseURL:        "https://openrouter.ai/api/v1/chat/completions",
 		AuthHeader:     "Authorization",
@@ -538,6 +667,17 @@ var KnownProviders = map[string]ProviderConfig{
 		NoAuth:        true,
 		SystemoneURL:  "https://opencode.ai/zen/v1/systemone",
 		StaticHeaders: map[string]string{"x-opencode-client": "cli", "User-Agent": "opencode/latest/2.1.4/cli"},
+	},
+	// OpenCode CLI Server: the local `opencode serve` v1 API. Keyless by
+	// contract, so no Authorization header is ever built for this lane.
+	// AuthOptional also keeps a custom dashboard URL usable without a key.
+	"opencode-server": {
+		BaseURL:       "http://127.0.0.1:4096",
+		CatalogURL:    "http://127.0.0.1:4096/config/providers",
+		NoAuth:        true,
+		AuthOptional:  true,
+		LocalByDesign: true,
+		Format:        FormatOpenAI,
 	},
 	// Pay-as-you-go lane (upstream open-sse/providers/registry/opencode-zen.js):
 	// a key is required, and the same key answers /chat/completions, /messages
@@ -652,22 +792,22 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme:     "bearer",
 		ThinkingFormat: "openai",
 	},
-		"mimo-free": {
-			BaseURL:       "https://api.xiaomimimimo.com/api/free-ai/openai/chat",
-			AuthHeader:    "Authorization",
-			AuthScheme:    "bearer",
-			DefaultAPIKey: "mimo-dynamic",
-			NoAuth:        true,
-			Hidden:        true,
-		},
-		"mimocode": {
-			BaseURL:       "https://api.xiaomimimimo.com/api/free-ai/openai/chat",
-			AuthHeader:    "Authorization",
-			AuthScheme:    "bearer",
-			DefaultAPIKey: "mimo-dynamic",
-			NoAuth:        true,
-			Hidden:        true,
-		},
+	"mimo-free": {
+		BaseURL:       "https://api.xiaomimimimo.com/api/free-ai/openai/chat",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		DefaultAPIKey: "mimo-dynamic",
+		NoAuth:        true,
+		Hidden:        true,
+	},
+	"mimocode": {
+		BaseURL:       "https://api.xiaomimimimo.com/api/free-ai/openai/chat",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		DefaultAPIKey: "mimo-dynamic",
+		NoAuth:        true,
+		Hidden:        true,
+	},
 	"blackbox": {
 		BaseURL:        "https://api.blackbox.ai/v1/chat/completions",
 		AuthHeader:     "Authorization",
@@ -688,6 +828,35 @@ var KnownProviders = map[string]ProviderConfig{
 		BaseURL:    "https://api.kilo.ai/api/openrouter/chat/completions",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
+	},
+	// MegaBrain: OpenRouter-compatible gateway on its own host (OmniRoute
+	// validation/megabrain.ts, pinned 632d84f5).
+	"megabrain": {
+		BaseURL:    "https://api.getmegabrain.com/api/openrouter/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Maritalk uses Authorization: Key <token> (OmniRoute's authHeader
+	// "key" names the scheme, not an HTTP header; pinned 632d84f5).
+	"maritalk": {
+		BaseURL:    "https://chat.maritaca.ai/api/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "key",
+	},
+	// Openference: OpenAI-compatible gateway (OmniRoute open-sse registry,
+	// pinned 632d84f5).
+	"openference": {
+		BaseURL:    "https://api.openference.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// WorkBuddy: streaming-only gateway on www.workbuddy.ai (OmniRoute
+	// open-sse registry n/workbuddy family, pinned 632d84f5).
+	"workbuddy": {
+		BaseURL:       "https://www.workbuddy.ai/v2/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		StaticHeaders: map[string]string{"X-Product": "SaaS"},
 	},
 	"nanobanana": {
 		BaseURL:    "https://api.nanobananaapi.ai/v1/chat/completions",
@@ -813,6 +982,1091 @@ var KnownProviders = map[string]ProviderConfig{
 	// connection (device-flow login), never a shared key — the same shape as
 	// kimi and muse. Format=claude: the plan endpoint speaks Anthropic Messages,
 	// so the dispatcher converts OpenAI bodies and flags the reply lane.
+	// AI21 Labs: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ai21": {
+		BaseURL:    "https://api.ai21.com/studio/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Codestral: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"codestral": {
+		BaseURL:    "https://codestral.mistral.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Writer: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"writer": {
+		BaseURL:    "https://api.writer.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Upstage: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"upstage": {
+		BaseURL:    "https://api.upstage.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Reka: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"reka": {
+		BaseURL:    "https://api.reka.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Liquid AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"liquid": {
+		BaseURL:    "https://inference.liquid.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Inception: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"inception": {
+		BaseURL:    "https://api.inceptionlabs.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Galadriel: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"galadriel": {
+		BaseURL:    "https://api.galadriel.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Pioneer AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"pioneer": {
+		BaseURL:    "https://api.pioneer.ai/v1/chat/completions",
+		AuthHeader: "x-api-key",
+		AuthScheme: "raw",
+	},
+	// Yi (01.AI): mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"yi": {
+		BaseURL:    "https://api.lingyiwanwu.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Arcee AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"arcee-ai": {
+		BaseURL:    "https://api.arcee.ai/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// BigModel.cn (Zhipu): mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"bigmodel": {
+		BaseURL:    "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// StepFun: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"stepfun": {
+		BaseURL:    "https://api.stepfun.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// SparkDesk: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"sparkdesk": {
+		BaseURL:    "https://spark-api-open.xf-yun.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// InternLM (Intern-S1): mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"internlm": {
+		BaseURL:    "https://chat.intern-ai.org.cn/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// LongCat AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"longcat": {
+		BaseURL:    "https://api.longcat.chat/openai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Ant Ling / Ring (inclusionAI): mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ant-ling": {
+		BaseURL:    "https://api.ant-ling.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Coze: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"coze": {
+		BaseURL:    "https://api.coze.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// PLaMo: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"plamo": {
+		BaseURL:    "https://api.platform.preferredai.jp/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Sarvam AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"sarvam": {
+		BaseURL:    "https://api.sarvam.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Typhoon: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"typhoon": {
+		BaseURL:    "https://api.opentyphoon.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Qwen Cloud: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"qwen-cloud": {
+		BaseURL:    "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Alibaba Cloud Model Studio: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"alibaba": {
+		BaseURL:    "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Qwen Cloud Token Plan: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"qwen-cloud-token-plan": {
+		BaseURL:    "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Xiaomi MiMo Token Plan: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"xiaomi-mimo-token-plan": {
+		BaseURL:    "https://token-plan-sgp.xiaomimimo.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Baichuan: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"baichuan": {
+		BaseURL:    "https://api.baichuan-ai.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Volcengine: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"volcengine": {
+		BaseURL:    "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Doubao: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"doubao": {
+		BaseURL:    "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Z.AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"zai": {
+		BaseURL:             "https://api.z.ai/api/anthropic/v1/messages?beta=true",
+		AuthHeader:          "x-api-key",
+		AuthScheme:          "raw",
+		Format:              FormatClaude,
+		UpstreamIsAnthropic: true,
+		StaticHeaders:       map[string]string{"Anthropic-Version": "2023-06-01"},
+	},
+	// SEA-LION: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"sealion": {
+		BaseURL:    "https://api.sea-lion.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// DeepInfra: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"deepinfra": {
+		BaseURL:    "https://api.deepinfra.com/v1/openai/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Baseten: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"baseten": {
+		BaseURL:    "https://inference.baseten.co/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Heroku AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"heroku": {
+		BaseURL:    "https://us.inference.heroku.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Novita AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"novita": {
+		BaseURL:    "https://api.novita.ai/openai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// nScale: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"nscale": {
+		BaseURL:    "https://inference.api.nscale.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// PublicAI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"publicai": {
+		BaseURL:    "https://api.publicai.co/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Weights & Biases Inference: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"wandb": {
+		BaseURL:    "https://api.inference.wandb.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Ollama Cloud: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ollama-cloud": {
+		BaseURL:    "https://ollama.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ModelScope: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"modelscope": {
+		BaseURL:    "https://api-inference.modelscope.cn/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// DigitalOcean: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"digitalocean": {
+		BaseURL:    "https://inference.do-ai.run/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Lambda AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"lambda-ai": {
+		BaseURL:    "https://api.lambda.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Bytez: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"bytez": {
+		BaseURL:    "https://api.bytez.com/models/v2/openai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Inference.net: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"inference-net": {
+		BaseURL:    "https://api.inference.net/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Hetzner Inference API: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"hetzner": {
+		BaseURL:    "https://inference.hetzner.com/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Modal: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"modal": {
+		BaseURL:    "https://api.modal.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Predibase: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"predibase": {
+		BaseURL:    "https://serving.app.predibase.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Grokified: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"grokified": {
+		BaseURL:    "https://api.grokified.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Featherless AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"featherless-ai": {
+		BaseURL:    "https://api.featherless.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// OVHcloud AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ovhcloud": {
+		BaseURL:      "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",
+		AuthHeader:   "Authorization",
+		AuthScheme:   "bearer",
+		AuthOptional: true,
+	},
+	// KIE.AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"kie": {
+		BaseURL:    "https://api.kie.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// OpenVecta: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"openvecta": {
+		BaseURL:    "https://api.openvecta.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Scaleway AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"scaleway": {
+		BaseURL:    "https://api.scaleway.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Nube.sh: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"nube": {
+		BaseURL:    "https://ai.nube.sh/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ainetcafe: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ainetcafe": {
+		BaseURL:    "https://microquickjs.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// SeekAi: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"seekai": {
+		BaseURL:    "https://seekai.cc/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// TabiToken: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"tabitoken": {
+		BaseURL:             "https://tabitoken.com/v1/messages",
+		AuthHeader:          "x-api-key",
+		AuthScheme:          "raw",
+		Format:              FormatClaude,
+		UpstreamIsAnthropic: true,
+		StaticHeaders:       map[string]string{"Anthropic-Version": "2023-06-01"},
+	},
+	// Speka AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"speka": {
+		BaseURL:    "https://speka.me/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Naga AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"naga-ai": {
+		BaseURL:    "https://api.naga.ac/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// AgentRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"agentrouter": {
+		BaseURL:             "https://agentrouter.org/v1/messages",
+		AuthHeader:          "x-api-key",
+		AuthScheme:          "raw",
+		Format:              FormatClaude,
+		UpstreamIsAnthropic: true,
+		StaticHeaders:       map[string]string{"Anthropic-Version": "2023-06-01"},
+	},
+	// AnyAPI AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"anyapi": {
+		BaseURL:    "https://api.anyapi.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// AINative Studio: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ainative": {
+		BaseURL:    "https://api.ainative.studio/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Aion Labs: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"aion": {
+		BaseURL:    "https://api.aionlabs.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Apmix: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"apmix": {
+		BaseURL:    "https://api.apmix.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Auriko: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"auriko": {
+		BaseURL:    "https://api.auriko.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// BeatAPI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"beatapi": {
+		BaseURL:    "https://api.beatapi.io/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ChatAnywhere: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"chatanywhere": {
+		BaseURL:    "https://api.chatanywhere.org/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Chenzk API: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"chenzk": {
+		BaseURL:    "https://chenzk.top/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// CloudCode.ONE: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"cloudcode-one": {
+		BaseURL:    "https://api.cloudcode.one/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// CrofAI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"crof": {
+		BaseURL:    "https://crof.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Demon Route: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"demonroute": {
+		BaseURL:    "https://api.demonroute.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// DGrid: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"dgrid": {
+		BaseURL:    "https://api.dgrid.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// DIT.ai: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"dit": {
+		BaseURL:    "https://api.dit.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// DXNT / DX Token: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"dxnt": {
+		BaseURL:    "https://www.dxnt.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Electron Hub: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"electronhub": {
+		BaseURL:    "https://api.electronhub.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// EmpirioLabs AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"empiriolabs": {
+		BaseURL:    "https://api.empiriolabs.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// EURouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"eurouter": {
+		BaseURL:    "https://api.eurouter.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Factory: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"factory": {
+		BaseURL:    "https://api.factory.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// FastRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"fastrouter": {
+		BaseURL:    "https://api.fastrouter.ai/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Free.ai: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"free-ai": {
+		BaseURL:    "https://api.free.ai/v1/chat/",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// FreeAIAPIKey: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"freeaiapikey": {
+		BaseURL:    "https://api.freeaiapikey.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// FreeInference: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"freeinference": {
+		BaseURL:    "https://freeinference.org/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// FreeModel.dev: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"freemodel-dev": {
+		BaseURL:    "https://api.freemodel.dev/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// FreeTheAi: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"freetheai": {
+		BaseURL:    "https://api.freetheai.org/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// g4f.space — Gemini: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"g4f-gemini": {
+		BaseURL:    "https://g4f.space/api/gemini/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// g4f.space — Groq: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"g4f-groq": {
+		BaseURL:    "https://g4f.space/api/groq/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// g4f.space — NVIDIA: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"g4f-nvidia": {
+		BaseURL:    "https://g4f.space/api/nvidia/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// g4f.space — Ollama: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"g4f-ollama": {
+		BaseURL:    "https://g4f.space/api/ollama/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// g4f.space — Pollinations: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"g4f-pollinations": {
+		BaseURL:    "https://g4f.space/api/pollinations/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Gisoo: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"gisoo": {
+		BaseURL:    "https://gisoo.pro/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Gitlawb Opengateway (MiMo): mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5). Chat is served at the suffixed lane route: the bare
+	// /v1/xiaomi-mimo prefix answers 404 "Not found. Use POST /v1/chat/completions."
+	// while /v1/xiaomi-mimo/chat/completions reaches authentication (verified live).
+	"gitlawb": {
+		BaseURL:       "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		StaticHeaders: map[string]string{"User-Agent": "OpenClaude/1.0 (linux; x86_64)", "X-Title": "OpenClaude CLI", "HTTP-Referer": "https://github.com/Gitlawb/openclaude"},
+	},
+	// GreenPT: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"greenpt": {
+		BaseURL:    "https://api.greenpt.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// HelixMind: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"helixmind": {
+		BaseURL:    "https://helixmind.online/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Helyx AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"helyxai": {
+		BaseURL:    "https://helyxai.space/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// LiteRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"literouter": {
+		BaseURL:    "https://api.literouter.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// LLM.Kiwi: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"llm-kiwi": {
+		BaseURL:    "https://api.llm.kiwi/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// LLM Gateway: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"llmgateway": {
+		BaseURL:    "https://api.llmgateway.io/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Logfare: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"logfare": {
+		BaseURL:    "https://logfare.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Lyceum: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"lyceum": {
+		BaseURL:    "https://api.lyceum.technology/openai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Mixlayer: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"mixlayer": {
+		BaseURL:    "https://models.mixlayer.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// MNN AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"mnn-ai": {
+		BaseURL:    "https://api.mnnai.ru/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Naga.ac: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"naga-ac": {
+		BaseURL:    "https://api.naga.ac/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// NanoGPT: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"nanogpt": {
+		BaseURL:    "https://nano-gpt.com/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// NaraRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"nara": {
+		BaseURL:    "https://router.bynara.id/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// NavyAI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"navy": {
+		BaseURL:    "https://api.navy/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// OfoxAI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"ofoxai": {
+		BaseURL:    "https://api.ofox.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// onomeo: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"onomeo": {
+		BaseURL:    "https://onomeo.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Openference API: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"openference-api": {
+		BaseURL:    "https://api.openference.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Opper: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"opper": {
+		BaseURL:    "https://api.opper.ai/v3/compat/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ParalonCloud: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"paraloncloud": {
+		BaseURL:    "https://paraloncloud.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Poixe AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"poixe-ai": {
+		BaseURL:    "https://api.poixe.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Qiniu: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"qiniu": {
+		BaseURL:    "https://api.qnaigc.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Regolo AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"regolo": {
+		BaseURL:    "https://api.regolo.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Requesty: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"requesty": {
+		BaseURL:    "https://router.requesty.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Routeway: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"routeway": {
+		BaseURL:    "https://api.routeway.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// UnoRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"unorouter": {
+		BaseURL:    "https://api.unorouter.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Void AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"void-ai": {
+		BaseURL:    "https://api.voidai.app/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Wafer AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"wafer": {
+		BaseURL:             "https://pass.wafer.ai/v1/messages",
+		AuthHeader:          "Authorization",
+		AuthScheme:          "bearer",
+		Format:              FormatClaude,
+		UpstreamIsAnthropic: true,
+		StaticHeaders:       map[string]string{"Anthropic-Version": "2023-06-01"},
+	},
+	// xKiro: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"xkiro": {
+		BaseURL:    "https://api.xkiro.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Y-API: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"y-api": {
+		BaseURL:    "https://api.y-api.bestvirtualgoods.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Yolo-Auto: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"yolo-auto": {
+		BaseURL:    "https://yolo-auto.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ZenMux: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"zenmux": {
+		BaseURL:    "https://zenmux.ai/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// ZeroLimitAI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"zerolimitai": {
+		BaseURL:    "https://www.zerolimitai.com/api/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Zylo API: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"zylo-api": {
+		BaseURL:    "https://api.zyloai.net/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// OrcaRouter: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"orcarouter": {
+		BaseURL:       "https://api.orcarouter.ai/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		StaticHeaders: map[string]string{"HTTP-Referer": "https://endpoint-proxy.local", "X-Title": "Endpoint Proxy"},
+	},
+	// MegaNova AI: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"meganova-ai": {
+		BaseURL:    "https://api.meganova.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Docker Model Runner: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"docker-model-runner": {
+		BaseURL:       "http://localhost:12434/engines/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// Lemonade Server: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"lemonade": {
+		BaseURL:       "http://localhost:13305/api/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// llama.cpp: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"llama-cpp": {
+		BaseURL:       "http://127.0.0.1:8080/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// Llamafile: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"llamafile": {
+		BaseURL:       "http://127.0.0.1:8080/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// LM Studio: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"lm-studio": {
+		BaseURL:       "http://localhost:1234/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// MLX Gemma 26B: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"mlx-gemma": {
+		BaseURL:       "http://localhost:11435/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// MLX Qwen 3.8 27B: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"mlx-qwen": {
+		BaseURL:       "http://localhost:11436/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// oobabooga: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"oobabooga": {
+		BaseURL:       "http://localhost:5000/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// NVIDIA Triton: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"triton": {
+		BaseURL:       "http://localhost:8000/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	// XInference: local self-host lane from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"xinference": {
+		BaseURL:       "http://localhost:9997/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		LocalByDesign: true,
+		AuthOptional:  true,
+	},
+	"river": {
+		BaseURL:    "https://api.river.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"nace": {
+		BaseURL:       "https://console.nace.ai",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		SystemoneURL:  "https://console.nace.ai/v1/systemone",
+		SystemonePath: "/v1/systemone",
+	},
+	"uc-direct": {
+		BaseURL:    "https://api.uncensored.com/api/v1/chat/completions",
+		AuthHeader: "x-api-key",
+		AuthScheme: "raw",
+	},
+	// Synthetic: mechanical passthrough from the OmniRoute open-sse registry
+	// (pinned 632d84f5).
+	"synthetic": {
+		BaseURL:    "https://api.synthetic.new/openai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// UncloseAI: free anonymous hermes lane (OmniRoute pin 632d84f5). Auth
+	// stays optional: the API accepts any non-empty key for identification
+	// and the public beta currently requires one, so a saved key is sent
+	// and an anonymous request is still attempted rather than blocked.
+	"uncloseai": {
+		BaseURL:      "https://hermes.ai.unturf.com/v1/chat/completions",
+		AuthHeader:   "Authorization",
+		AuthScheme:   "bearer",
+		AuthOptional: true,
+	},
+	// FriendliAI: serverless passthrough (OmniRoute pin 632d84f5); see the
+	// registry comment for the flp_* /dedicated 403 that keeps this lane on
+	// the serverless base URL.
+	"friendliai": {
+		BaseURL:    "https://api.friendli.ai/serverless/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Databricks: workspace-local Model Serving (OmniRoute pin 632d84f5).
+	// The default is the pinned placeholder workspace; the executor replaces
+	// it with the connection Base URL and refuses the placeholder outright,
+	// so this default never reaches the wire.
+	"databricks": {
+		BaseURL:    "https://adb-0000000000000000.0.azuredatabricks.net/serving-endpoints/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Snowflake Cortex: account-local inference route (OmniRoute pin
+	// 632d84f5). The default carries the pinned {account} placeholder; the
+	// executor replaces it with the connection Base URL and refuses the
+	// placeholder outright, so this default never reaches the wire.
+	"snowflake": {
+		BaseURL:    "https://{account}.snowflakecomputing.com/api/v2/cortex/inference:complete",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"charm-hyper": {
+		BaseURL:    "https://hyper.charm.land/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"token-kiosk": {
+		BaseURL:    "https://agent-router.gaib.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"tokenmarket": {
+		BaseURL:    "https://api.tokensmarket.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"tokenreply": {
+		BaseURL:    "https://api.tokenreply.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	"unifically": {
+		BaseURL:    "https://api.unifically.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Gitlawb GMI Cloud: passthrough gateway (OmniRoute pin 632d84f5). The
+	// chat route was verified live 2026-11-28: the bare lane prefix answers
+	// "Not found", the /chat/completions suffix reaches authentication.
+	"gitlawb-gmi": {
+		BaseURL:       "https://opengateway.gitlawb.com/v1/gmi-cloud/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		StaticHeaders: map[string]string{"User-Agent": "OpenClaude/1.0 (linux; x86_64)", "X-Title": "OpenClaude CLI", "HTTP-Referer": "https://github.com/Gitlawb/openclaude"},
+	},
+	// Cheaper Inference: dual-surface gateway (OmniRoute pin 632d84f5). The
+	// executor swaps this base for /v1/responses on the six GPT-5.x models
+	// tagged openai-responses and runs the CI payload transport (gzip /
+	// chunked reservation) on both surfaces.
+	"cheaperinference": {
+		BaseURL:    "https://api.cheaperinference.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
 	"zcode": {
 		BaseURL: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
 		Format:  FormatClaude,
@@ -824,6 +2078,22 @@ var KnownProviders = map[string]ProviderConfig{
 		StaticHeaders: map[string]string{
 			"User-Agent": "kimchi/0.1.50",
 		},
+	},
+	"ideogram": {
+		// The image lane POSTs to BaseURL verbatim (no appended path); ImageURL
+		// only advertises the endpoint in the catalog.
+		BaseURL:    "https://api.ideogram.ai",
+		AuthHeader: "Api-Key",
+		AuthScheme: "raw",
+		ImageURL:   "https://api.ideogram.ai/generate",
+	},
+	"leonardo": {
+		// Pinned OmniRoute 632d84f5: API root plus the native generations
+		// endpoint. The media handler POSTs to ImageURL and polls under it.
+		BaseURL:    "https://cloud.leonardo.ai/api/rest/v1",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		ImageURL:   "https://cloud.leonardo.ai/api/rest/v1/generations",
 	},
 	"iflow": {
 		BaseURL:        "https://apis.iflow.cn/v1/chat/completions",
@@ -862,6 +2132,20 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthScheme:            "bearer",
 		RequireClaudeToolType: true,
 	},
+	"moonshot": {
+		BaseURL:    "https://api.moonshot.ai/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"replicate": {
+		// The native executor rebuilds this base into /models/{owner}/{name}/
+		// predictions (or /predictions for a pinned version).
+		BaseURL:    "https://api.replicate.com/v1",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
 	"kimi": {
 		BaseURL:    "https://api.kimi.com/coding/v1/chat/completions",
 		AuthHeader: "Authorization",
@@ -878,6 +2162,19 @@ var KnownProviders = map[string]ProviderConfig{
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 		Format:     "openai-responses",
+	},
+	"command-code": {
+		BaseURL:    "https://api.commandcode.ai",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		Format:     FormatOpenAI,
+	},
+	"commandcode-goat": {
+		BaseURL:       "https://api.commandcode.ai/provider/v1/chat/completions",
+		AuthHeader:    "Authorization",
+		AuthScheme:    "bearer",
+		SystemoneURL:  "https://api.commandcode.ai/provider/v1/systemone",
+		SystemonePath: "/systemone",
 	},
 	"commandcode": {
 		BaseURL:    "https://api.commandcode.ai/alpha/generate",
@@ -991,6 +2288,13 @@ var KnownProviders = map[string]ProviderConfig{
 		// field. Declaring the format keeps the pass from forwarding a
 		// reasoning dialect the envelope does not carry.
 		ThinkingFormat: "kiro",
+	},
+	// Amazon Q rides the same Kiro AWS endpoint (OmniRoute KiroExecutor("amazon-q")
+	// pattern, pinned 632d84f5).
+	"amazon-q": {
+		BaseURL:    "https://q.us-east-1.amazonaws.com/generateAssistantResponse",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
 	},
 	"bedrock": {
 		// The executor substitutes the region per request and signs each request with
@@ -1258,6 +2562,61 @@ var KnownProviders = map[string]ProviderConfig{
 		BaseURL:    "https://grok.com/rest/app-chat/conversations/new",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
+	},
+	// Microsoft Copilot web: OpenAI-format passthrough over the Copilot web
+	// /c/api (xrouter registry transport, pinned 7fd5698). The stored
+	// credential is the browser Cookie header, sent verbatim (scheme raw).
+	"copilot-web": {
+		BaseURL:    "https://copilot.microsoft.com/c/api/chat/completions",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	// Tencent Yuanbao web: same passthrough shape (xrouter registry transport,
+	// pinned 7fd5698) over yuanbao.tencent.com's /api.
+	"yuanbao-web": {
+		BaseURL:    "https://yuanbao.tencent.com/api/chat/completions",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	// Z.ai web (chat.z.ai): the credential is the Local Storage "token" JWT,
+	// sent as Bearer (xrouter registry transport, pinned 7fd5698).
+	"zai-web": {
+		BaseURL:    "https://chat.z.ai/openai/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// Notion AI web: OpenAI-format passthrough over notion.so's internal
+	// /api/v3 (xrouter registry transport, pinned 7fd5698); the credential is
+	// the browser Cookie header carrying token_v2, sent verbatim.
+	"notion-web": {
+		BaseURL:    "https://www.notion.so/api/v3/chat/completions",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
+	},
+	// OVH Kepler AI keyless endpoint (xrouter registry transport, pinned
+	// 7fd5698): anonymous OpenAI chat; the transport sends an empty
+	// Authorization header, which the NoAuth config expresses by sending none.
+	"ovh": {
+		BaseURL:    "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+		NoAuth:     true,
+	},
+	// AI Horde crowdsourced inference: OpenAI-compatible chat over
+	// oai.aihorde.net; the documented anonymous key rides when a connection
+	// carries one, and NoAuth lets keyless requests through.
+	"aihorde": {
+		BaseURL:      "https://oai.aihorde.net/v1/chat/completions",
+		AuthHeader:   "Authorization",
+		AuthScheme:   "bearer",
+		AuthOptional: true,
+	},
+	// arena.ai evaluation lane: the executor owns the wire protocol; the
+	// BaseURL only lets an operator repoint the endpoint.
+	"arena-ai": {
+		BaseURL:    "https://arena.ai/nextjs-api/stream/create-evaluation",
+		AuthHeader: "Cookie",
+		AuthScheme: "raw",
 	},
 	// UC web (uncensored.com persona): image + video over the un-metered
 	// internal API; the credential is the full uncensored.com Cookie header

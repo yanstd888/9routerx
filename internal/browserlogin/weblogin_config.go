@@ -108,6 +108,74 @@ var webLoginConfigs = map[string]WebLoginConfig{
 		},
 		PersistentProfile: true,
 	},
+	"copilot-web": {
+		// The Copilot session rides the _U cookie (OmniRoute capture metadata:
+		// credentialName "p-b"-style single cookie, acceptsFullCookieHeader).
+		ProviderID:   "copilot-web",
+		LoginURL:     "https://copilot.microsoft.com/",
+		CookieDomain: "copilot.microsoft.com",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceCookie, Name: "_U", Domain: "copilot.microsoft.com"},
+		},
+		PersistentProfile: true,
+	},
+	"yuanbao-web": {
+		// OmniRoute capture metadata: the Yuanbao session is the full Cookie
+		// header, of which hy_user + hy_token are the load-bearing pair.
+		ProviderID:   "yuanbao-web",
+		LoginURL:     "https://yuanbao.tencent.com/",
+		CookieDomain: "yuanbao.tencent.com",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceCookie, Name: "hy_token", Domain: "yuanbao.tencent.com"},
+			{Kind: TokenSourceCookie, Name: "hy_user", Domain: "yuanbao.tencent.com"},
+		},
+		PersistentProfile: true,
+	},
+	"zai-web": {
+		// OmniRoute + xrouter capture metadata: the Z.ai credential is the
+		// "token" value in the site's Local Storage, not a cookie.
+		ProviderID:   "zai-web",
+		LoginURL:     "https://chat.z.ai/",
+		CookieDomain: "chat.z.ai",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceLocalStorage, Name: "token"},
+		},
+		PersistentProfile: true,
+	},
+	"notion-web": {
+		// OmniRoute capture metadata: the Notion session rides token_v2
+		// (space_id / notion_browser_id ride the same Cookie header).
+		ProviderID:   "notion-web",
+		LoginURL:     "https://www.notion.so/",
+		CookieDomain: "notion.so",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceCookie, Name: "token_v2", Domain: ".notion.so"},
+		},
+		PersistentProfile: true,
+	},
+	"arena-ai": {
+		// xrouter authHint: the arena.ai credential is the user token /
+		// evaluation_session cookie.
+		ProviderID:   "arena-ai",
+		LoginURL:     "https://arena.ai/",
+		CookieDomain: "arena.ai",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceCookie, Name: "evaluation_session", Domain: "arena.ai"},
+		},
+		PersistentProfile: true,
+	},
+	"uc-web": {
+		// The UC (uncensored.com) session mints per-request Clerk sessions
+		// from __client (see providers.go); the durable sign-in cookie is
+		// what the capture needs.
+		ProviderID:   "uc-web",
+		LoginURL:     "https://uncensored.com/",
+		CookieDomain: "uncensored.com",
+		TokenSources: []TokenSource{
+			{Kind: TokenSourceCookie, Name: "__client", Domain: "uncensored.com"},
+		},
+		PersistentProfile: true,
+	},
 }
 
 // ConfigFor returns the provider's web-login config and whether one exists.

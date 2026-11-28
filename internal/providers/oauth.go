@@ -73,6 +73,16 @@ var KnownOAuthConfigs = map[string]OAuthClientConfig{
 		ClientSecret: envOr("GEMINI_CLI_OAUTH_CLIENT_SECRET", "GOCSPX-"+"4uHgMPm-1o7Sk-geV6Cu5clXFsxl"),
 		TokenURL:     "https://oauth2.googleapis.com/token",
 	},
+	"workbuddy": {
+		ClientID:     envOr("WORKBUDDY_OAUTH_CLIENT_ID", ""),
+		ClientSecret: envOr("WORKBUDDY_OAUTH_CLIENT_SECRET", ""),
+		TokenURL:     "https://www.workbuddy.ai/v2/plugin/auth/token/refresh",
+	},
+	"openference": {
+		ClientID:     envOr("OPENFERENCE_OAUTH_CLIENT_ID", "omniroute"),
+		ClientSecret: envOr("OPENFERENCE_OAUTH_CLIENT_SECRET", ""),
+		TokenURL:     "https://openference.com/oauth/token",
+	},
 	"kimi-coding": {
 		ClientID:     envOr("KIMI_CODING_OAUTH_CLIENT_ID", ""),
 		ClientSecret: envOr("KIMI_CODING_OAUTH_CLIENT_SECRET", ""),

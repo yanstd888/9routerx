@@ -162,7 +162,7 @@ func TestFreeFallbackChain_BadRequestStaysVisible(t *testing.T) {
 // TestFreeFallbackChain_PaidAfterFreeExhausted: every free candidate fails,
 // the paid lane serves, and the response says so in both headers. The model
 // is openai/gpt-oss-120b — catalogued free on groq and nvidia, listed by the
-// paid siliconflow.
+// paid Baseten lane added in the provider batch.
 func TestFreeFallbackChain_PaidAfterFreeExhausted(t *testing.T) {
 	refusals := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusTooManyRequests)
@@ -180,7 +180,7 @@ func TestFreeFallbackChain_PaidAfterFreeExhausted(t *testing.T) {
 	repo := db.NewRepo(database)
 	seedConnDB(t, database, "groq", "conn-groq", "sk-groq", refusals.URL)
 	seedConnDB(t, database, "nvidia", "conn-nvidia", "sk-nvidia", refusals.URL)
-	seedConnDB(t, database, "siliconflow", "conn-siliconflow", "sk-siliconflow", serves.URL)
+	seedConnDB(t, database, "baseten", "conn-baseten", "sk-baseten", serves.URL)
 	handler := NewChatHandler(repo)
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions",
@@ -192,14 +192,13 @@ func TestFreeFallbackChain_PaidAfterFreeExhausted(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Fatalf("expected the paid fallback to serve, got %d: %s", rec.Code, rec.Body.String())
 	}
-	// runcrate also lists the id on the paid side and sorts before
-	// siliconflow; with no connection configured it fails fast and the walk
-	// continues. The paid header names the provider that actually served.
-	if got := rec.Header().Get(HeaderFallbackChain); got != "groq→nvidia→runcrate→siliconflow" {
-		t.Errorf("chain header = %q, want %q", got, "groq→nvidia→runcrate→siliconflow")
+	// Baseten is the first paid candidate in the expanded provider catalog.
+	// The paid header must name the configured provider that actually served.
+	if got := rec.Header().Get(HeaderFallbackChain); got != "groq→nvidia→baseten" {
+		t.Errorf("chain header = %q, want %q", got, "groq→nvidia→baseten")
 	}
-	if got := rec.Header().Get(HeaderFallbackPaid); got != "siliconflow" {
-		t.Errorf("paid header = %q, want siliconflow", got)
+	if got := rec.Header().Get(HeaderFallbackPaid); got != "baseten" {
+		t.Errorf("paid header = %q, want baseten", got)
 	}
 }
 
