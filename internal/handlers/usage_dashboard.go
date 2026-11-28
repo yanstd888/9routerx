@@ -449,7 +449,7 @@ func HandleUsageDashboard(repo *db.Repo) http.HandlerFunc {
 		}()
 		go func() {
 			defer wg.Done()
-			hit, total, cacheHitErr = repo.GetUsageCacheHitTotalsSince(weekAgo)
+			hit, total, cacheHitErr = cachedUsageCacheHitTotals(repo, weekAgo)
 		}()
 		wg.Wait()
 

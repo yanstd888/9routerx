@@ -25,7 +25,7 @@ func TestDetailsSince(t *testing.T) {
 		{name: "a custom hour window", period: "6h", want: "2026-03-10T06:00:00Z"},
 		{name: "a custom day window", period: "7d", want: "2026-03-03T12:00:00Z"},
 		{name: "60d matches the preset", period: "60d", want: "2026-01-09T12:00:00Z"},
-		{name: "an unknown value follows the stats fallback", period: "nonsense", want: "2026-03-03T12:00:00Z"},
+		{name: "an unknown value follows the stats fallback", period: "nonsense", want: "2026-03-09T12:00:00Z"},
 	}
 
 	for _, tt := range tests {

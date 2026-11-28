@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"9routerx/proxy/internal/db"
@@ -200,7 +201,10 @@ func parseChartPeriod(raw string) (kind string, count int) {
 // HandleUsageChart serves GET /api/usage/chart?period=: the time series the
 // Overview chart draws. Today and 24h bucket by hour out of usageHistory;
 // daily periods read the usageDaily rollup for totals and fill the per-family
-// split from usageHistory rows in range.
+// split from usageHistory rows in range. Daily periods are served through the
+// chart window cache: the rollup range read, the whole-window history scan and
+// the oldest-row probe run once per cache entry, and every poll after that
+// folds only the rows written since the last one.
 func HandleUsageChart(repo *db.Repo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		kind, count := parseChartPeriod(r.URL.Query().Get("period"))
@@ -214,7 +218,7 @@ func HandleUsageChart(repo *db.Repo) http.HandlerFunc {
 		case "24h", "hourly":
 			buckets = hourlyChartBuckets(repo, now.Add(-time.Duration(count)*time.Hour), count)
 		default:
-			buckets = dailyChartBuckets(repo, now, count)
+			buckets = chartWindows.getBuckets(repo, now, kind, count)
 		}
 
 		finalizeChartBuckets(buckets, 7)
@@ -254,6 +258,28 @@ func hourlyChartBuckets(repo *db.Repo, start time.Time, count int) []chartBucket
 // scan of usageHistory over the same window (the rollup carries only totals).
 // count == 0 means "all recorded days", derived from the earliest daily row.
 func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
+	build := buildDailyChartBuckets(repo, now, count, (*db.Repo).GetUsageHistoryChartSince)
+	if build == nil {
+		return nil
+	}
+	return build.buckets
+}
+
+// chartBuild is what one full chart build produces: the buckets (unfinalized —
+// every family is still present, the top-7 fold runs per response), the
+// history-derived per-bucket tokens and cost the rollup-empty fallback
+// reports, and whether the rollup carried totals at all.
+type chartBuild struct {
+	buckets      []chartBucket
+	histTokens   []int64
+	histCost     []float64
+	rollupTotals bool
+}
+
+// buildDailyChartBuckets is the once-per-cache-entry build. The history read
+// goes through historyScan so the acceptance test can count the full-range
+// scans a cache entry performs.
+func buildDailyChartBuckets(repo *db.Repo, now time.Time, count int, historyScan func(*db.Repo, string) ([]db.UsageChartRow, error)) *chartBuild {
 	dayRows, err := repo.GetUsageDailyRange(allUsageDays)
 	if err != nil {
 		return nil
@@ -310,9 +336,9 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 	}
 
 	rangeStart := now.AddDate(0, 0, -(count - 1))
-	rows, err := repo.GetUsageHistoryChartSince(rangeStart.UTC().Format(time.RFC3339Nano))
+	rows, err := historyScan(repo, rangeStart.UTC().Format(time.RFC3339Nano))
 	if err != nil {
-		return buckets
+		return &chartBuild{buckets: buckets, rollupTotals: rollupTokens > 0}
 	}
 	histTokens := make([]int64, len(buckets))
 	histCost := make([]float64, len(buckets))
@@ -335,11 +361,205 @@ func dailyChartBuckets(repo *db.Repo, now time.Time, count int) []chartBucket {
 	// (scanned straight from usageHistory) shows data. When the rollup
 	// carries nothing, fall back to the history scan for tokens and cost so
 	// both views tell the same story.
-	if rollupTokens == 0 {
+	rollupTotals := rollupTokens > 0
+	if !rollupTotals {
 		for i := range buckets {
 			buckets[i].Tokens = histTokens[i]
 			buckets[i].Cost = histCost[i]
 		}
 	}
-	return buckets
+	return &chartBuild{buckets: buckets, histTokens: histTokens, histCost: histCost, rollupTotals: rollupTotals}
+}
+
+// chartEntry is one cached daily chart. It holds the UNFINALIZED buckets —
+// every model family is still present — because a delta row can introduce a
+// family that belongs in the top seven; the finalize fold runs per response on
+// a copy.
+type chartEntry struct {
+	buckets      []chartBucket
+	histTokens   []int64
+	histCost     []float64
+	rollupTotals bool
+	todayIdx     int
+	watermark    string
+	rollupSig    string
+	fetchedAt    time.Time
+}
+
+// chartWindowCache caches one built chart per (period, UTC day). The history
+// read is a field rather than a direct call so the acceptance test can count
+// how many full-range scans one cache entry performs — the guarantee R2 is
+// about.
+type chartWindowCache struct {
+	mu          sync.Mutex
+	entries     map[string]*chartEntry
+	historyScan func(*db.Repo, string) ([]db.UsageChartRow, error)
+}
+
+var chartWindows = &chartWindowCache{historyScan: (*db.Repo).GetUsageHistoryChartSince}
+
+// resetChartWindowCache drops every cached chart. Tests use it to observe a
+// cold cache; production never calls it.
+func resetChartWindowCache() {
+	chartWindows.mu.Lock()
+	chartWindows.entries = nil
+	chartWindows.mu.Unlock()
+}
+
+// getBuckets returns the finalized bucket list for a daily chart period,
+// building it on a miss and advancing it from a delta otherwise. The caller
+// receives a copy: the cached buckets are mutated in place by the next poll.
+func (c *chartWindowCache) getBuckets(repo *db.Repo, now time.Time, kind string, count int) []chartBucket {
+	key := kind + ":" + dayKeyFor(now)
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.entries == nil || len(c.entries) >= usageCacheMaxEntries {
+		c.entries = make(map[string]*chartEntry, usageCacheMaxEntries)
+	}
+
+	entry, ok := c.entries[key]
+	if !ok || time.Since(entry.fetchedAt) > usageCacheTTL {
+		return c.rebuild(repo, key, now, kind, count)
+	}
+
+	// A rollup-only change (a corrected day, a backfill) must reach the chart,
+	// which means rebuilding: the totals for the covered days are rollup data.
+	if n, newest, err := repo.GetUsageDailySignature(); err != nil || entry.rollupSig != dailyRollupSignature(n, newest) {
+		return c.rebuild(repo, key, now, kind, count)
+	}
+
+	watermark, err := repo.GetUsageHistoryWatermark()
+	if err != nil {
+		return copyChartBuckets(entry.buckets)
+	}
+	if watermark < entry.watermark {
+		// The ledger moved backwards: the cached buckets may describe rows that
+		// no longer exist.
+		return c.rebuild(repo, key, now, kind, count)
+	}
+
+	if watermark != entry.watermark {
+		rows, err := repo.GetUsageHistoryBetween(entry.watermark, watermark)
+		if err != nil {
+			return copyChartBuckets(entry.buckets)
+		}
+		for _, row := range rows {
+			ts, perr := time.Parse(time.RFC3339Nano, row.Timestamp)
+			if perr != nil || ts.After(now) {
+				continue
+			}
+			day := dayKeyFor(ts)
+			// A delta row can only land in a bucket the window already spans:
+			// the watermark is inside the window, so anything after it is too.
+			// Rows below the window's start are pre-watermark by definition and
+			// cannot appear here.
+			if idx := chartIndexFor(entry, day, now); idx >= 0 {
+				tokens := int64(row.PromptTokens) + int64(row.CompletionTokens)
+				entry.histTokens[idx] += tokens
+				entry.histCost[idx] += row.Cost
+				addFamily(entry.buckets[idx].ByModel, row.Model, tokens)
+				if !entry.rollupTotals {
+					// The rollup never carried totals for this chart, so the
+					// history fallback owns them and moves with the delta.
+					entry.buckets[idx].Tokens += tokens
+					entry.buckets[idx].Cost += row.Cost
+				}
+			}
+		}
+		entry.watermark = watermark
+	}
+
+	if entry.rollupTotals {
+		// Today's totals live in the rollup's today row, which the request
+		// writer updates inline; re-read that one row so the last bucket tracks
+		// the day as it grows. A missing row is a day with no rollup yet.
+		todayKey := dayKeyFor(now)
+		if rowJSON, err := repo.GetUsageDaily(todayKey); err == nil && rowJSON != "" {
+			var dayData struct {
+				PromptTokens     int64   `json:"promptTokens"`
+				CompletionTokens int64   `json:"completionTokens"`
+				Cost             float64 `json:"cost"`
+			}
+			if json.Unmarshal([]byte(rowJSON), &dayData) == nil {
+				entry.buckets[entry.todayIdx].Tokens = dayData.PromptTokens + dayData.CompletionTokens
+				entry.buckets[entry.todayIdx].Cost = dayData.Cost
+			}
+		}
+	}
+
+	return copyChartBuckets(entry.buckets)
+}
+
+// chartIndexFor maps a delta row's day onto its bucket, or -1 when the day is
+// outside the cached window (a rebuilt entry would carry it).
+func chartIndexFor(entry *chartEntry, day string, now time.Time) int {
+	count := len(entry.buckets)
+	if count == 0 {
+		return -1
+	}
+	if day == dayKeyFor(now) {
+		return entry.todayIdx
+	}
+	// The window ends today; walk the day offset backwards from it.
+	dayTime, err := time.Parse("2006-01-02", day)
+	if err != nil {
+		return -1
+	}
+	today, _ := time.Parse("2006-01-02", dayKeyFor(now))
+	offset := int(today.Sub(dayTime) / (24 * time.Hour))
+	idx := count - 1 - offset
+	if idx < 0 || idx >= count {
+		return -1
+	}
+	// Confirm the cached bucket's own label matches: a bucket built for a
+	// different day is not this row's bucket.
+	if entry.buckets[idx].Label != dayTime.Format("Jan 2") {
+		return -1
+	}
+	return idx
+}
+
+// rebuild builds the chart from scratch and installs it as the cache entry.
+// The caller holds c.mu.
+func (c *chartWindowCache) rebuild(repo *db.Repo, key string, now time.Time, kind string, count int) []chartBucket {
+	build := buildDailyChartBuckets(repo, now, count, c.historyScan)
+	if build == nil {
+		delete(c.entries, key)
+		return nil
+	}
+	watermark, err := repo.GetUsageHistoryWatermark()
+	if err != nil {
+		watermark = ""
+	}
+	sig := ""
+	if n, newest, serr := repo.GetUsageDailySignature(); serr == nil {
+		sig = dailyRollupSignature(n, newest)
+	}
+	entry := &chartEntry{
+		buckets:      build.buckets,
+		histTokens:   build.histTokens,
+		histCost:     build.histCost,
+		rollupTotals: build.rollupTotals,
+		todayIdx:     len(build.buckets) - 1,
+		watermark:    watermark,
+		rollupSig:    sig,
+		fetchedAt:    time.Now(),
+	}
+	c.entries[key] = entry
+	return copyChartBuckets(entry.buckets)
+}
+
+// copyChartBuckets deep-copies a bucket list: the totals are plain fields, the
+// per-family maps must not alias the cache.
+func copyChartBuckets(buckets []chartBucket) []chartBucket {
+	out := make([]chartBucket, len(buckets))
+	for i, b := range buckets {
+		out[i] = chartBucket{Label: b.Label, Tokens: b.Tokens, Cost: b.Cost, ByModel: make(map[string]int64, len(b.ByModel))}
+		for fam, t := range b.ByModel {
+			out[i].ByModel[fam] = t
+		}
+	}
+	return out
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"9routerx/proxy/internal/db"
 )
@@ -14,28 +15,13 @@ func TestHandleUsageStats_PopulatesByEndpoint(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()
 	repo := db.NewRepo(database)
+	resetUsageWindowCache()
+	t.Cleanup(resetUsageWindowCache)
 
-	// Insert daily usage containing byEndpoint
-	dailyJSON := `{
-		"byProvider": {
-			"openai": {"requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-		},
-		"byEndpoint": {
-			"/v1/chat/completions|gpt-4o|openai": {
-				"endpoint": "/v1/chat/completions",
-				"rawModel": "gpt-4o",
-				"provider": "openai",
-				"requests": 5,
-				"promptTokens": 100,
-				"completionTokens": 50,
-				"cost": 0.002
-			}
-		}
-	}`
-	_, err := database.Exec(`INSERT INTO usageDaily (dateKey, data) VALUES ('2026-10-14', ?)`, dailyJSON)
-	if err != nil {
-		t.Fatalf("seed usageDaily: %v", err)
-	}
+	// The daily window folds raw history rows, so the seeded row carries its
+	// endpoint directly and lands in byEndpoint the same way it does on the
+	// sub-day windows.
+	seedDailyHistoryAt(t, repo, time.Now().UTC().Add(-2*time.Hour), "sk-test", 100, 50, 0.002)
 
 	handler := HandleUsageStats(repo)
 	req := httptest.NewRequest(http.MethodGet, "/api/usage/stats?period=7d", nil)
@@ -56,15 +42,15 @@ func TestHandleUsageStats_PopulatesByEndpoint(t *testing.T) {
 		t.Fatalf("expected byEndpoint to be populated, got empty map")
 	}
 
-	item, ok := resp.ByEndpoint["/v1/chat/completions|gpt-4o|openai"]
+	item, ok := resp.ByEndpoint["/v1/chat/completions|deepseek-chat|deepseek"]
 	if !ok {
-		t.Fatalf("expected key '/v1/chat/completions|gpt-4o|openai' in byEndpoint: %v", resp.ByEndpoint)
+		t.Fatalf("expected key '/v1/chat/completions|deepseek-chat|deepseek' in byEndpoint: %v", resp.ByEndpoint)
 	}
 	if item.Endpoint != "/v1/chat/completions" {
 		t.Errorf("expected Endpoint='/v1/chat/completions', got %q", item.Endpoint)
 	}
-	if item.Requests != 5 {
-		t.Errorf("expected Requests=5, got %d", item.Requests)
+	if item.Requests != 1 {
+		t.Errorf("expected Requests=1, got %d", item.Requests)
 	}
 	if item.PromptTokens != 100 {
 		t.Errorf("expected PromptTokens=100, got %d", item.PromptTokens)

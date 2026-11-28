@@ -58,16 +58,16 @@ const (
 	usageCacheMaxEntries = 32
 )
 
-// windowShape names a sub-day window for the aggregate cache.
+// windowShape names a window for the aggregate cache.
 //
 // It is decided in resolveUsagePeriod rather than reconstructed from the window's
 // start afterwards, because that is where the difference is actually known: the
 // instant alone does not distinguish "starts at midnight" from "24 hours ago",
 // even though the two must be cached differently.
 type windowShape struct {
-	// anchoredStart is set for a window whose start is fixed, such as `today`.
-	// Every poll in that period shares the one instant, so the entry is keyed on
-	// it and simply advanced.
+	// anchoredStart is set for a window whose start is fixed, such as `today`
+	// or a daily calendar span. Every poll in that period shares the one
+	// instant, so the entry is keyed on it and simply advanced.
 	anchoredStart string
 	// width is the span of a sliding window such as `24h` or `<n>h`. Its start
 	// moves on every request, so the entry is keyed on the width instead.
@@ -76,10 +76,21 @@ type windowShape struct {
 	// cold read — the cache missed every time, which is the same as having no
 	// cache at all.
 	width time.Duration
+	// dailyRollup marks a daily calendar span (7d/30d/60d/all). Such an entry
+	// also tracks the usageDaily rollup's signature: the aggregate is folded
+	// from raw history, but a rollup-only change (a backfill, a correction, a
+	// restore) must rebuild the entry rather than leave it standing.
+	dailyRollup bool
 }
 
 func anchoredShape(start time.Time) windowShape {
 	return windowShape{anchoredStart: start.UTC().Format(time.RFC3339)}
+}
+
+// dailyShape anchors a daily calendar span and opts the entry into the rollup
+// signature check.
+func dailyShape(start time.Time) windowShape {
+	return windowShape{anchoredStart: start.UTC().Format(time.RFC3339), dailyRollup: true}
 }
 
 func slidingShape(width time.Duration) windowShape {
@@ -87,9 +98,13 @@ func slidingShape(width time.Duration) windowShape {
 }
 
 // key identifies the entry this window may share with others. Two windows with
-// one key hold the same rows.
+// one key hold the same rows. Daily spans get their own namespace so a
+// rollup-checking entry is never shared with a sub-day window that would
+// silently skip the check.
 func (s windowShape) key() string {
 	switch {
+	case s.anchoredStart != "" && s.dailyRollup:
+		return "daily:" + s.anchoredStart
 	case s.anchoredStart != "":
 		return "anchored:" + s.anchoredStart
 	case s.width > 0:
@@ -373,6 +388,21 @@ type rawWindowEntry struct {
 	// are subtracted from the aggregate rather than folded again.
 	cutoff    string
 	fetchedAt time.Time
+	// checkRollup is set for daily calendar spans: the entry describes raw
+	// history, and a change in the usageDaily rollup must rebuild it.
+	checkRollup bool
+	// rollupSig is the usageDaily signature (row count, newest date) the entry
+	// was last built or checked against. Empty until the first check.
+	rollupSig string
+	// rdErrors is the requestDetails error count for the window (failures that
+	// never wrote a ledger row). It advances by delta exactly like the ledger
+	// fold: a COUNT since the cutoff on every poll is a growing scan otherwise.
+	rdErrors int
+	// rdWatermark is the newest requestDetails timestamp the count has folded.
+	rdWatermark string
+	// rdCutoff is the window's lower bound in requestDetails' millisecond
+	// RFC3339 spelling at the time of the last error fold.
+	rdCutoff string
 }
 
 // rawWindowCache caches one aggregate per window shape.
@@ -387,21 +417,26 @@ type rawWindowCache struct {
 
 var rawWindows rawWindowCache
 
-// getRawWindow returns an immutable snapshot of the folded aggregate for window,
-// building it on a miss and advancing it from a delta otherwise.
+// getRawWindow returns an immutable snapshot of the folded aggregate for window
+// alongside the window's requestDetails error count, building both on a miss
+// and advancing them from a delta otherwise.
 //
 // The snapshot is a copy, and the caller must treat it as read-only. The cached
 // aggregate itself is mutated in place by the next reader, so returning the
 // live pointer would let applyRawAggregate walk a map while a concurrent poll
 // is folding rows into it — which shows up as a response that reports some of a
 // delta and not the rest.
-func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAggregate, error) {
+func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAggregate, int, error) {
 	key := window.shape.key()
 	if key == "" {
-		return nil, fmt.Errorf("raw window cache: window %q is not a raw-history window", window.shape.key())
+		return nil, 0, fmt.Errorf("raw window cache: window %q is not a raw-history window", window.shape.key())
 	}
 	now := time.Now()
 	cutoff := window.since.UTC().Format(time.RFC3339)
+	// requestDetails stores RFC3339 with milliseconds, so its cutoff spells the
+	// same instant in that format: the strings must compare consistently
+	// against the stored timestamps.
+	rdCutoff := window.since.UTC().Format("2006-01-02T15:04:05.000Z")
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -412,32 +447,48 @@ func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAg
 
 	entry, ok := c.entries[key]
 	if !ok || now.Sub(entry.fetchedAt) > usageCacheTTL {
-		return c.rebuild(repo, key, cutoff, now)
+		return c.rebuild(repo, key, cutoff, rdCutoff, now)
+	}
+
+	// A daily span describes raw history, but the usageDaily rollup is written
+	// alongside it and can change without a history row (a backfill, a manual
+	// correction, a restore of an older database). A signature change means the
+	// cached aggregate no longer describes what the ledger says it should, so
+	// the entry rebuilds. A failed signature read also rebuilds: the worst case
+	// is the pre-cache cost, while serving a stale aggregate under-reads spend.
+	if entry.checkRollup {
+		count, newest, err := repo.GetUsageDailySignature()
+		if err != nil || entry.rollupSig != dailyRollupSignature(count, newest) {
+			return c.rebuild(repo, key, cutoff, rdCutoff, now)
+		}
 	}
 
 	watermark, err := repo.GetUsageHistoryWatermark()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	switch {
 	case watermark == entry.watermark && cutoff == entry.cutoff:
 		// Nothing was written and nothing aged out.
 		entry.fetchedAt = now
-		return snapshotOf(entry.agg), nil
+		if err := entry.advanceErrorCount(repo, rdCutoff); err != nil {
+			return nil, 0, err
+		}
+		return snapshotOf(entry.agg), entry.rdErrors, nil
 	case watermark < entry.watermark:
 		// The newest row moved backwards, which no append-only writer produces.
 		// The database was swapped, restored or truncated, so the cached totals
 		// may describe rows that no longer exist.
-		return c.rebuild(repo, key, cutoff, now)
+		return c.rebuild(repo, key, cutoff, rdCutoff, now)
 	case cutoff < entry.cutoff:
 		// The window widened, so the cached aggregate is too narrow to advance.
-		return c.rebuild(repo, key, cutoff, now)
+		return c.rebuild(repo, key, cutoff, rdCutoff, now)
 	}
 
 	if cutoff != entry.cutoff {
 		if err := entry.agg.subtractOutOfWindow(repo, entry.cutoff, cutoff); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		entry.cutoff = cutoff
 	}
@@ -448,7 +499,7 @@ func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAg
 	}
 	rows, err := repo.GetUsageHistoryBetween(from, watermark)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	// GetUsageHistoryBetween returns oldest-first, which is the fold order.
 	for _, row := range rows {
@@ -456,17 +507,84 @@ func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAg
 	}
 	entry.watermark = watermark
 	entry.fetchedAt = now
-	return snapshotOf(entry.agg), nil
+
+	if err := entry.advanceErrorCount(repo, rdCutoff); err != nil {
+		return nil, 0, err
+	}
+	return snapshotOf(entry.agg), entry.rdErrors, nil
+}
+
+// advanceErrorCount moves the cached requestDetails error count forward: rows
+// that aged out of a moved cutoff are subtracted, rows written since the last
+// watermark are added, and a watermark that moves backwards (a restore or
+// truncation) recounts the window. The full recount is the delta read with
+// empty bounds: everything up to the watermark at or above the cutoff.
+func (e *rawWindowEntry) advanceErrorCount(repo *db.Repo, rdCutoff string) error {
+	rdWatermark, err := repo.GetRequestDetailsWatermark()
+	if err != nil {
+		return err
+	}
+
+	recount := func() error {
+		n, err := repo.GetRequestDetailsErrorCountDelta("", rdWatermark, rdCutoff)
+		if err != nil {
+			return err
+		}
+		e.rdErrors = n
+		e.rdWatermark = rdWatermark
+		e.rdCutoff = rdCutoff
+		return nil
+	}
+
+	switch {
+	case rdWatermark < e.rdWatermark || rdCutoff < e.rdCutoff:
+		// The ring was truncated or the window widened: neither can be undone by
+		// subtracting rows we no longer track, so the window is recounted.
+		return recount()
+	case rdWatermark == e.rdWatermark && rdCutoff == e.rdCutoff:
+		// Nothing was written and nothing aged out.
+		return nil
+	}
+
+	if rdCutoff != e.rdCutoff {
+		aged, err := repo.GetRequestDetailsErrorCountAgedOut(e.rdCutoff, rdCutoff)
+		if err != nil {
+			return err
+		}
+		e.rdErrors -= aged
+		e.rdCutoff = rdCutoff
+	}
+	if rdWatermark != e.rdWatermark {
+		added, err := repo.GetRequestDetailsErrorCountDelta(e.rdWatermark, rdWatermark, rdCutoff)
+		if err != nil {
+			return err
+		}
+		e.rdErrors += added
+		e.rdWatermark = rdWatermark
+	}
+	if e.rdErrors < 0 {
+		// Subtraction should never undershoot — the aged rows were counted by
+		// this entry — but a negative count on the wire reads as corruption, so
+		// the window is recounted rather than reported.
+		return recount()
+	}
+	return nil
 }
 
 // rebuild folds the whole window from scratch and installs it as the entry.
 // The caller must hold c.mu.
-func (c *rawWindowCache) rebuild(repo *db.Repo, key, cutoff string, now time.Time) (*rawAggregate, error) {
-	agg, err := c.rebuildAgg(repo, key, cutoff, now)
+func (c *rawWindowCache) rebuild(repo *db.Repo, key, cutoff, rdCutoff string, now time.Time) (*rawAggregate, int, error) {
+	agg, err := c.rebuildAgg(repo, key, cutoff, rdCutoff, now)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return snapshotOf(agg), nil
+	return snapshotOf(agg), c.entries[key].rdErrors, nil
+}
+
+// dailyRollupSignature composes the fingerprint the cache compares between
+// polls: the rollup's row count and its newest date key.
+func dailyRollupSignature(count int64, newest string) string {
+	return fmt.Sprintf("%d|%s", count, newest)
 }
 
 // rebuildAgg folds the whole window and stores it as the live cache entry.
@@ -475,7 +593,7 @@ func (c *rawWindowCache) rebuild(repo *db.Repo, key, cutoff string, now time.Tim
 // the two reads is newer than the watermark, so the next delta re-reads it and
 // nothing is silently dropped. Reading it afterwards would skip exactly that
 // row.
-func (c *rawWindowCache) rebuildAgg(repo *db.Repo, key, cutoff string, now time.Time) (*rawAggregate, error) {
+func (c *rawWindowCache) rebuildAgg(repo *db.Repo, key, cutoff, rdCutoff string, now time.Time) (*rawAggregate, error) {
 	watermark, err := repo.GetUsageHistoryWatermark()
 	if err != nil {
 		return nil, err
@@ -491,13 +609,33 @@ func (c *rawWindowCache) rebuildAgg(repo *db.Repo, key, cutoff string, now time.
 		agg.foldRow(rows[i])
 	}
 
-	entry := &rawWindowEntry{agg: agg, watermark: watermark, cutoff: cutoff, fetchedAt: now}
+	entry := &rawWindowEntry{agg: agg, watermark: watermark, cutoff: cutoff, fetchedAt: now, rdCutoff: rdCutoff}
 	if watermark != "" && watermark <= cutoff {
 		// Nothing in this window has been written yet. An empty watermark would
 		// let the first delta re-read from the window start, which is correct but
 		// wasteful; the cutoff is the honest answer.
 		entry.watermark = cutoff
 	}
+	// A daily span opts into the rollup signature check; store the signature the
+	// rebuild saw so the next hit compares against it.
+	if strings.HasPrefix(key, "daily:") {
+		entry.checkRollup = true
+		if count, newest, err := repo.GetUsageDailySignature(); err == nil {
+			entry.rollupSig = dailyRollupSignature(count, newest)
+		}
+	}
+	// The error count is built alongside the ledger fold: the requestDetails
+	// failures at or above the cutoff, up to the watermark this build read.
+	rdWatermark, err := repo.GetRequestDetailsWatermark()
+	if err != nil {
+		return nil, err
+	}
+	n, err := repo.GetRequestDetailsErrorCountDelta("", rdWatermark, rdCutoff)
+	if err != nil {
+		return nil, err
+	}
+	entry.rdErrors = n
+	entry.rdWatermark = rdWatermark
 	c.entries[key] = entry
 	return agg, nil
 }
@@ -688,4 +826,109 @@ func applyRawAggregate(resp *UsageStatsResponse, agg *rawAggregate, nodeNameMap,
 			resp.ByEndpoint[key] = e
 		}
 	}
+}
+
+// cacheHitTotalsEntry is one cached cache-hit read: the JSON-extracting CTE
+// over the window's rows, gated on the ledger watermark.
+type cacheHitTotalsEntry struct {
+	hit       int64
+	total     int64
+	watermark string
+	fetchedAt time.Time
+}
+
+// cacheHitTotalsCache caches one read per since string. The dashboard's
+// ledger read fixed its 7-day window per request and the CTE json_extract-extracts
+// four fields from every row in it; a watermark seek per read folds in only
+// ledger changes.
+type cacheHitTotalsCache struct {
+	mu      sync.Mutex
+	entries map[string]*cacheHitTotalsEntry
+}
+
+var cacheHitTotals cacheHitTotalsCache
+
+// resetCacheHitTotalsCache drops the cached reads. Tests use it to observe a
+// cold cache; production never calls it.
+func resetCacheHitTotalsCache() {
+	cacheHitTotals.mu.Lock()
+	cacheHitTotals.entries = nil
+	cacheHitTotals.mu.Unlock()
+}
+
+// cachedUsageCacheHitTotals serves the cache-hit totals for since from the
+// cache, recounting when the ledger watermark moved. A watermark read that
+// itself fails falls through to the uncached read rather than blocking it.
+func cachedUsageCacheHitTotals(repo *db.Repo, since string) (int64, int64, error) {
+	cacheHitTotals.mu.Lock()
+	defer cacheHitTotals.mu.Unlock()
+
+	if entry, ok := cacheHitTotals.entries[since]; ok && time.Since(entry.fetchedAt) <= usageCacheTTL {
+		if watermark, err := repo.GetUsageHistoryWatermark(); err == nil && watermark == entry.watermark {
+			entry.fetchedAt = time.Now()
+			return entry.hit, entry.total, nil
+		}
+	}
+
+	hit, total, err := repo.GetUsageCacheHitTotalsSince(since)
+	if err != nil {
+		return 0, 0, err
+	}
+	if wm, werr := repo.GetUsageHistoryWatermark(); werr == nil {
+		if cacheHitTotals.entries == nil {
+			cacheHitTotals.entries = make(map[string]*cacheHitTotalsEntry)
+		}
+		cacheHitTotals.entries[since] = &cacheHitTotalsEntry{hit: hit, total: total, watermark: wm, fetchedAt: time.Now()}
+	}
+	return hit, total, nil
+}
+
+// recentHistoryEntry is one cached recent-request fallback list. The live SSE
+// stream merges recent requests into the same panel; the five-second (or
+// fifteen-second, on long ranges) stats poll refreshes the fallback list, and
+// re-reading 60 ledger rows on every poll is the residual cost once the window
+// aggregate is cached. A short TTL keeps the fallback within a couple of
+// seconds of the ledger while removing that read from the poll.
+type recentHistoryEntry struct {
+	rows      []db.UsageHistoryRow
+	fetchedAt time.Time
+}
+
+var recentHistoryCache = struct {
+	mu    sync.Mutex
+	entry *recentHistoryEntry
+}{}
+
+// recentHistoryTTL is deliberately shorter than a poll: a missed live event
+// is repaired by the next SSE frame or by the next poll, never held for a
+// full cache TTL.
+const recentHistoryTTL = 2 * time.Second
+
+// resetRecentHistoryCache drops the cached fallback list. Tests use it to
+// observe a cold cache; production never calls it.
+func resetRecentHistoryCache() {
+	recentHistoryCache.mu.Lock()
+	recentHistoryCache.entry = nil
+	recentHistoryCache.mu.Unlock()
+}
+
+// cachedRecentHistory serves the recent-request fallback list from a short-TTL
+// cache, reading through when it expires.
+func cachedRecentHistory(repo *db.Repo) ([]db.UsageHistoryRow, error) {
+	recentHistoryCache.mu.Lock()
+	if entry := recentHistoryCache.entry; entry != nil && time.Since(entry.fetchedAt) <= recentHistoryTTL {
+		rows := entry.rows
+		recentHistoryCache.mu.Unlock()
+		return rows, nil
+	}
+	recentHistoryCache.mu.Unlock()
+
+	rows, err := repo.GetRecentUsageHistory(60)
+	if err != nil {
+		return nil, err
+	}
+	recentHistoryCache.mu.Lock()
+	recentHistoryCache.entry = &recentHistoryEntry{rows: rows, fetchedAt: time.Now()}
+	recentHistoryCache.mu.Unlock()
+	return rows, nil
 }

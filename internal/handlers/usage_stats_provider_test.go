@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"9routerx/proxy/internal/db"
 )
@@ -66,20 +67,22 @@ func TestApplyRawAggregate_ByProviderCarriesLastUsed(t *testing.T) {
 	}
 }
 
-// A daily window aggregates usageDaily rows, which are keyed by date and carry
-// no time of day. LastUsed stays empty there rather than being invented, and the
-// omitempty tag keeps the field out of the payload entirely.
-func TestHandleUsageStats_DailyByProviderHasNoLastUsed(t *testing.T) {
+// A daily window folds raw history rows, which carry real timestamps, so
+// LastUsed is filled the same way the sub-day windows fill it — the raw fold
+// tracks the newest row per bucket without an extra query.
+func TestHandleUsageStats_DailyByProviderHasLastUsed(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()
 
-	dailyJSON := `{
-		"byProvider": {
-			"openai": {"requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-		}
-	}`
-	if _, err := database.Exec(`INSERT INTO usageDaily (dateKey, data) VALUES ('2026-10-14', ?)`, dailyJSON); err != nil {
-		t.Fatalf("seed usageDaily: %v", err)
+	resetUsageWindowCache()
+	t.Cleanup(resetUsageWindowCache)
+
+	rowAt := time.Now().UTC().Add(-2 * time.Hour)
+	if _, err := database.Exec(
+		`INSERT INTO usageHistory (timestamp, provider, model, connectionId, apiKey, endpoint, promptTokens, completionTokens, cost, status, tokens)
+		 VALUES (?, 'openai', 'gpt-4o', 'conn-1', 'sk-test', '/v1/chat/completions', 100, 50, 0.002, 'success', '{}')`,
+		rowAt.Format(time.RFC3339)); err != nil {
+		t.Fatalf("seed usageHistory: %v", err)
 	}
 
 	handler := HandleUsageStats(db.NewRepo(database))
@@ -100,10 +103,10 @@ func TestHandleUsageStats_DailyByProviderHasNoLastUsed(t *testing.T) {
 	if !ok {
 		t.Fatalf("missing openai in byProvider: %v", resp.ByProvider)
 	}
-	if item.Requests != 5 {
-		t.Errorf("requests = %d, want 5", item.Requests)
+	if item.Requests != 1 {
+		t.Errorf("requests = %d, want 1", item.Requests)
 	}
-	if item.LastUsed != "" {
-		t.Errorf("lastUsed = %q, want empty for a daily window", item.LastUsed)
+	if item.LastUsed != rowAt.Format(time.RFC3339) {
+		t.Errorf("lastUsed = %q, want the seeded row's timestamp %q", item.LastUsed, rowAt.Format(time.RFC3339))
 	}
 }

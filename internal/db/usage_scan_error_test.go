@@ -13,34 +13,6 @@ import (
 // from "this provider had no traffic". Each case below plants a row that cannot
 // be scanned and asserts the failure reaches the caller.
 
-func TestGetUsageDailyRecent_ScanFailureIsNotSilent(t *testing.T) {
-	database, cleanup := setupTestDB(t)
-	defer cleanup()
-
-	if _, err := database.Exec(`CREATE TABLE usageDaily (
-		dateKey TEXT PRIMARY KEY,
-		data TEXT
-	);`); err != nil {
-		t.Fatalf("create usageDaily: %v", err)
-	}
-	// dateKey DESC ordering puts 03-02 first, so the good row is read before the
-	// NULL row fails to scan.
-	if _, err := database.Exec(`INSERT INTO usageDaily (dateKey, data) VALUES
-		('2026-03-01', '{"requests":1}'),
-		('2026-03-02', '{"requests":2}'),
-		('2026-03-03', NULL);`); err != nil {
-		t.Fatalf("seed usageDaily: %v", err)
-	}
-
-	rows, err := NewRepo(database).GetUsageDailyRecent(30)
-	if err == nil {
-		t.Fatalf("GetUsageDailyRecent returned %d rows and no error; a NULL data column must surface as an error, not a truncated list", len(rows))
-	}
-	if rows != nil {
-		t.Errorf("rows = %v, want nil alongside the error", rows)
-	}
-}
-
 func TestGetRecentUsageHistory_ScanFailureIsNotSilent(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()

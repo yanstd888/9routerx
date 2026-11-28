@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -221,32 +222,26 @@ type UsageHistoryRow struct {
 	Tokens           string
 }
 
-// GetUsageDailyRecent returns the most recent daily usage records up to limit.
-
-func (r *Repo) GetUsageDailyRecent(limit int) ([]string, error) {
-	rows, err := r.db.Query(`SELECT data FROM usageDaily ORDER BY dateKey DESC LIMIT ?`, limit)
+// GetUsageDailySignature returns a cheap fingerprint of the usageDaily rollup:
+// its row count and newest date key. The daily usage windows are aggregated
+// from raw history through the window cache, so the rollup is not a data
+// source — but a change in it (a backfill, a correction, a restore) must
+// invalidate a cached daily aggregate anyway, and this signature is what the
+// cache compares between polls. Both aggregates are covering reads over the
+// dateKey primary key.
+func (r *Repo) GetUsageDailySignature() (int64, string, error) {
+	var count int64
+	var newest string
+	err := r.db.QueryRow(`SELECT COUNT(*), COALESCE(MAX(dateKey), '') FROM usageDaily`).Scan(&count, &newest) //nolint:noctx
 	if err != nil {
-		return nil, fmt.Errorf("query recent usageDaily: %w", err)
+		return 0, "", fmt.Errorf("read usageDaily signature: %w", err)
 	}
-	defer rows.Close()
-
-	var res []string
-	for rows.Next() {
-		var data string
-		if err := rows.Scan(&data); err != nil {
-			return nil, fmt.Errorf("scan usageDaily recent: %w", err)
-		}
-		res = append(res, data)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate usageDaily recent: %w", err)
-	}
-	return res, nil
+	return count, newest, nil
 }
 
 // UsageDailyRow is one usageDaily row: the local date key plus its aggregate
-// payload. The chart endpoint needs the key (the existing
-// GetUsageDailyRecent drops it), so this keeps both.
+// payload. The chart endpoint needs the key next to the totals, so this keeps
+// both.
 type UsageDailyRow struct {
 	DateKey string
 	Data    string
@@ -806,9 +801,15 @@ func (r *Repo) GetRequestDetailsPaged(ctx context.Context, limit, offset int, si
 		where = "WHERE timestamp >= ?"
 		args = append(args, since)
 	}
-	var total int
-	if err := r.db.QueryRowContext(ctx, fmt.Sprintf(requestDetailCount, where), args...).Scan(&total); err != nil {
-		return nil, 0, fmt.Errorf("count requestDetails: %w", err)
+	// R10: the COUNT runs over the whole filtered range per page change — on
+	// 'all' that is a full-table count per click. The count is cached behind a
+	// table-watermark signature (the newest and oldest timestamps, both index
+	// seeks): page navigations within one watermark serve the cached count,
+	// and any insert or boundary delete recounts. A watermark read failure
+	// falls through to the uncached count rather than blocking the page.
+	total, countErr := r.cachedRequestDetailCount(ctx, since, where, args)
+	if countErr != nil {
+		return nil, 0, fmt.Errorf("count requestDetails: %w", countErr)
 	}
 
 	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(requestDetailListSelect, where), append(args, limit, offset)...)
@@ -844,6 +845,74 @@ func (r *Repo) GetRequestDetailsPaged(ctx context.Context, limit, offset int, si
 	return res, total, nil
 }
 
+// requestDetailCountEntry is one cached page count.
+type requestDetailCountEntry struct {
+	total     int
+	watermark string
+	fetchedAt time.Time
+}
+
+// requestDetailCounts caches the Details-tab page count per since-filter,
+// keyed behind a table-watermark signature: the newest and oldest timestamps,
+// both index seeks on idx_rd_ts. Page navigations within one watermark serve
+// the cached count; any insert or boundary delete recounts. Entries expire on
+// the same TTL the other usage caches use — a quiet table cannot pin a stale
+// count past it.
+var requestDetailCounts = struct {
+	mu      sync.Mutex
+	entries map[string]*requestDetailCountEntry
+}{entries: make(map[string]*requestDetailCountEntry)}
+
+// cachedRequestDetailCount serves the filtered row count from the cache,
+// recounting when the watermark signature moved or the entry expired. A
+// watermark read failure counts uncached: the page must not block on the
+// cache's own plumbing.
+func (r *Repo) cachedRequestDetailCount(ctx context.Context, since, where string, args []any) (int, error) {
+	signature, sigErr := func() (string, error) {
+		var sig struct {
+			newest string
+			oldest string
+		}
+		if err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), ''), COALESCE(MIN(timestamp), '') FROM requestDetails`).Scan(&sig.newest, &sig.oldest); err != nil { //nolint:noctx
+			return "", err
+		}
+		return sig.newest + "|" + sig.oldest, nil
+	}()
+
+	requestDetailCounts.mu.Lock()
+	if sigErr == nil {
+		if entry, ok := requestDetailCounts.entries[since]; ok && entry.watermark == signature && time.Since(entry.fetchedAt) <= usageDetailCountTTL {
+			entry.fetchedAt = time.Now()
+			total := entry.total
+			requestDetailCounts.mu.Unlock()
+			return total, nil
+		}
+	}
+	requestDetailCounts.mu.Unlock()
+
+	var total int
+	if err := r.db.QueryRowContext(ctx, fmt.Sprintf(requestDetailCount, where), args...).Scan(&total); err != nil {
+		return 0, err
+	}
+	if sigErr == nil {
+		requestDetailCounts.mu.Lock()
+		if len(requestDetailCounts.entries) >= requestDetailCountMaxEntries {
+			requestDetailCounts.entries = make(map[string]*requestDetailCountEntry, requestDetailCountMaxEntries)
+		}
+		requestDetailCounts.entries[since] = &requestDetailCountEntry{total: total, watermark: signature, fetchedAt: time.Now()}
+		requestDetailCounts.mu.Unlock()
+	}
+	return total, nil
+}
+
+const (
+	// usageDetailCountTTL bounds how long one watermark's count is served,
+	// matching the other usage caches.
+	usageDetailCountTTL = 5 * time.Minute
+	// requestDetailCountMaxEntries bounds the per-filter cache.
+	requestDetailCountMaxEntries = 16
+)
+
 // GetRequestDetailByID returns the full stored payload for one request, which
 // is what the inspector shows. It is a primary-key lookup, so opening a row
 // costs the same whether the table holds ten rows or ten million.
@@ -858,12 +927,51 @@ func (r *Repo) GetRequestDetailByID(id string) (string, error) {
 	return data, nil
 }
 
-// GetRequestDetailsErrorCountSince returns the count of failed requests recorded in requestDetails since cutoff.
-func (r *Repo) GetRequestDetailsErrorCountSince(ctx context.Context, since string) (int, error) {
-	var count int
-	err := r.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp >= ?`, since).Scan(&count)
+// The requestDetails error count rides the usage window cache: the handler
+// read it per request — a COUNT over the table since the cutoff on the
+// dashboard's five-second poll — and the count advances by delta exactly like
+// the ledger fold does. The three reads below are its moving parts: a
+// watermark seek, the rows that age out when a sliding cutoff moves forward,
+// and the rows written since the last watermark. All are index seeks or
+// bounded counts on idx_rd_ts, never a whole-window scan.
+
+// GetRequestDetailsWatermark returns the newest requestDetails timestamp
+// ("" when the ring is empty).
+func (r *Repo) GetRequestDetailsWatermark() (string, error) {
+	var ts string
+	err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), '') FROM requestDetails`).Scan(&ts) //nolint:noctx
 	if err != nil {
-		return 0, fmt.Errorf("count requestDetails errors since %s: %w", since, err)
+		return "", fmt.Errorf("read requestDetails watermark: %w", err)
+	}
+	return ts, nil
+}
+
+// GetRequestDetailsErrorCountAgedOut counts the failed requests recorded in
+// requestDetails with timestamp in [oldCutoff, newCutoff): exactly the rows
+// that leave a sliding window when its cutoff moves forward from oldCutoff to
+// newCutoff.
+func (r *Repo) GetRequestDetailsErrorCountAgedOut(oldCutoff, newCutoff string) (int, error) {
+	var count int
+	err := r.db.QueryRow( //nolint:noctx
+		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp >= ? AND timestamp < ?`,
+		oldCutoff, newCutoff).Scan(&count) //nolint:noctx
+	if err != nil {
+		return 0, fmt.Errorf("count requestDetails errors aged out of [%s, %s): %w", oldCutoff, newCutoff, err)
+	}
+	return count, nil
+}
+
+// GetRequestDetailsErrorCountDelta counts the failed requests recorded in
+// requestDetails with timestamp in (after, until] and at or after floor: the
+// rows a cached count has yet to fold in, excluding anything the window no
+// longer covers.
+func (r *Repo) GetRequestDetailsErrorCountDelta(after, until, floor string) (int, error) {
+	var count int
+	err := r.db.QueryRow( //nolint:noctx
+		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp > ? AND timestamp <= ? AND timestamp >= ?`,
+		after, until, floor).Scan(&count) //nolint:noctx
+	if err != nil {
+		return 0, fmt.Errorf("count requestDetails errors in (%s, %s] above %s: %w", after, until, floor, err)
 	}
 	return count, nil
 }

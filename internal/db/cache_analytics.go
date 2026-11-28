@@ -86,12 +86,68 @@ const (
 
 // cacheScanRow is one usageHistory row reduced to the numbers the cache
 // analytics need, with the JSON token payloads already resolved in SQL.
+// Timestamp carries the row's UTC hour bucket (the trend query's strftime
+// shape) for the readers that fold the trend; the full-build query leaves it
+// empty.
 type cacheScanRow struct {
+	Timestamp      string
 	Provider       string
 	Model          string
 	InputTokens    int64
 	CachedTokens   int64
 	CreationTokens int64
+}
+
+// CacheScanRow is the exported spelling of cacheScanRow: the cached analytics
+// fold delta rows outside this file, through the same SQL-resolved shape the
+// full build reads.
+type CacheScanRow = cacheScanRow
+
+// GetPromptCacheRowsBetween returns the resolved cache-analytics rows with
+// timestamp in (from, until] — the delta a cached aggregate has yet to fold.
+func (r *Repo) GetPromptCacheRowsBetween(from, until string) ([]CacheScanRow, error) {
+	return r.promptCacheRows("timestamp > ? AND timestamp <= ?", from, until)
+}
+
+// GetPromptCacheRowsAgedOut returns the resolved cache-analytics rows with
+// timestamp in [oldCutoff, newCutoff): exactly the rows that leave a sliding
+// window when its cutoff moves forward.
+func (r *Repo) GetPromptCacheRowsAgedOut(oldCutoff, newCutoff string) ([]CacheScanRow, error) {
+	return r.promptCacheRows("timestamp >= ? AND timestamp < ?", oldCutoff, newCutoff)
+}
+
+// promptCacheRows reads the resolved per-row shape under the given bounds. The
+// SELECT list is byte-for-byte the expressions the full build reads, so a
+// delta fold and a full fold cannot disagree about what a row is worth.
+func (r *Repo) promptCacheRows(where string, args ...any) ([]CacheScanRow, error) {
+	rows, err := r.db.QueryContext(context.Background(), `
+SELECT
+	strftime('%Y-%m-%dT%H:00:00Z', timestamp),
+	COALESCE(provider, 'unknown'),
+	COALESCE(model, 'unknown'),
+	COALESCE(promptTokens, 0),
+	COALESCE(`+sqlCachedTokensExpr+`, 0),
+	COALESCE(`+sqlCacheCreationTokensExpr+`, 0)
+FROM usageHistory
+WHERE `+where, args...) //nolint:noctx
+	if err != nil {
+		return nil, fmt.Errorf("query prompt cache rows: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	var res []CacheScanRow
+	for rows.Next() {
+		var row CacheScanRow
+		if err := rows.Scan(&row.Timestamp, &row.Provider, &row.Model, &row.InputTokens,
+			&row.CachedTokens, &row.CreationTokens); err != nil {
+			return nil, fmt.Errorf("scan prompt cache rows: %w", err)
+		}
+		res = append(res, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate prompt cache rows: %w", err)
+	}
+	return res, nil
 }
 
 // cacheBucket accumulates one provider, model or provider/model group.

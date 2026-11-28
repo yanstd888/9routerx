@@ -51,10 +51,11 @@ func statsResponse(t *testing.T, repo *db.Repo, period string) UsageStatsRespons
 	return resp
 }
 
-// TestUsageStats_RollupEmptyFallsBackToHistory pins the audit finding's fix:
-// a day+ window reads the usageDaily rollup, and when the rollup carries
-// nothing (lost or backfilled ledger) the stats recompute from raw history
-// instead of reporting zeros next to a working chart.
+// TestUsageStats_RollupEmptyFallsBackToHistory pins the daily-window read: a
+// day+ window is aggregated from raw history through the window cache (the
+// usageDaily rollup is no longer a data source for this endpoint), so a rollup
+// that carries nothing still reports the rows the ledger holds instead of
+// zeros next to a working chart.
 func TestUsageStats_RollupEmptyFallsBackToHistory(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()
@@ -90,36 +91,7 @@ func TestUsageStats_RollupEmptyFallsBackToHistory(t *testing.T) {
 	}
 }
 
-// TestUsageStats_RollupPresentWins pins the other half: a populated rollup
-// keeps its numbers and the history fallback never stacks on top of it.
-func TestUsageStats_RollupPresentWins(t *testing.T) {
-	database, cleanup := setupTestDB(t)
-	defer cleanup()
-	repo := db.NewRepo(database)
-	resetUsageWindowCache()
-	t.Cleanup(resetUsageWindowCache)
-
-	yesterday := time.Now().UTC().AddDate(0, 0, -1).Format("2006-01-02")
-	rollup := `{"promptTokens":1000,"completionTokens":500,"cost":1.5,` +
-		`"byProvider":{"deepseek":{"requests":10,"promptTokens":1000,"completionTokens":500,"cost":1.5}}}`
-	if err := repo.UpsertUsageDaily(yesterday, rollup); err != nil {
-		t.Fatalf("seed usageDaily: %v", err)
-	}
-	seedFallbackHistory(t, repo)
-
-	resp := statsResponse(t, repo, "7d")
-	if resp.TotalRequests != 10 {
-		t.Errorf("TotalRequests = %d, want the rollup's 10 (no history double count)", resp.TotalRequests)
-	}
-	if resp.TotalPromptTokens != 1000 || resp.TotalCompletionTokens != 500 {
-		t.Errorf("totals = %d/%d, want the rollup's 1000/500", resp.TotalPromptTokens, resp.TotalCompletionTokens)
-	}
-	if resp.TotalCost < 1.49 || resp.TotalCost > 1.51 {
-		t.Errorf("TotalCost = %f, want the rollup's 1.5", resp.TotalCost)
-	}
-}
-
-// TestUsageStats_EmptyWindowStaysEmpty proves the fallback is silent when
+// TestUsageStats_EmptyWindowStaysEmpty proves a daily window stays silent when
 // there is genuinely nothing to report: no rollup AND no history rows keeps
 // the zero response the panel renders as an empty state.
 func TestUsageStats_EmptyWindowStaysEmpty(t *testing.T) {

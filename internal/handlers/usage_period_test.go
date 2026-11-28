@@ -74,22 +74,19 @@ func TestResolveUsagePeriod(t *testing.T) {
 			wantDays:  90,
 		},
 		{
-			name:      "unknown input falls back to 7d rather than erroring",
+			name:      "unknown input falls back to the shared 24h window",
 			raw:       "last-tuesday",
-			wantDaily: true,
-			wantDays:  7,
+			wantSince: now.Add(-24 * time.Hour),
 		},
 		{
 			name:      "a zero day count is not a window",
 			raw:       "0d",
-			wantDaily: true,
-			wantDays:  7,
+			wantSince: now.Add(-24 * time.Hour),
 		},
 		{
 			name:      "a negative day count is not a window",
 			raw:       "-7d",
-			wantDaily: true,
-			wantDays:  7,
+			wantSince: now.Add(-24 * time.Hour),
 		},
 	}
 

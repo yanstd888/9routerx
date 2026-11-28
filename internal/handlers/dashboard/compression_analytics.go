@@ -23,7 +23,7 @@ func (h *DashboardHandler) HandleGetCompressionAnalytics(w http.ResponseWriter, 
 	}
 	win := analyticsrange.Resolve(raw, time.Now())
 
-	summary, err := h.Repo.GetCompressionAnalyticsSummary(r.Context(), win)
+	summary, err := h.Repo.GetCompressionAnalyticsSummaryCached(r.Context(), win, raw)
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
