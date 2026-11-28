@@ -9,13 +9,13 @@
     "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-windows-amd64.exe"
   },
   "sha256s": {
-    "darwin_amd64": "a37ed92fd95f80f6aca29e876c748a9973be1d97f78039d221370188f13d5b5c",
-    "darwin_arm64": "d057578294c466fcc7e40c843b75d845bb355c3d5360d8ba821a577133330138",
-    "linux_amd64": "0396682a6deb4132e84e3544b30a9184bb2277531d2415198d68acd2b2575cb0",
-    "linux_arm64": "40824aa340d613ce25f7ee8f7d2ae69de716904b55b403a4150c5e3378ed3e89",
-    "windows_amd64": "ef0d12c3ff2354230e06111c6e2ea05c0785035e89c2dcb5b3dc59e1aabd156e"
+    "darwin_amd64": "51bec1047fdaa0658fdb4ce6574dcca3f2d63d463f73c3df43be14528c3e3f5d",
+    "darwin_arm64": "3b2bbd3c8acf84c879d63eb6acd89c7b4eb94942dfa8a164d951553db2e7f1f5",
+    "linux_amd64": "5df27d2c8d55044ce18f994a0f72b31977a5f8fc9c12ac5bc075020e6e52361e",
+    "linux_arm64": "17a1bf672b84d638804864558c5d6c29059311ad5502c5cc6d739e50c850b25e",
+    "windows_amd64": "4bc735bf3f570cb68824212648ccb93b61aafe2c5b8a5688762173786289a73f"
   },
-  "releaseNotes": "\n\n### Fixed\n- **Long-range Usage windows are cached** — 7d/30d/60d/all stats aggregate from raw history through a watermark-advanced window cache instead of re-reading the daily rollup on every poll; a 50k-row ledger drops from 100-480ms cold folds to roughly 10-20ms cached reads.\n- **The daily chart, burn rate, cache-hit totals, Details count, prompt-cache and compression analytics** now serve repeated dashboard reads from cached, watermark-advanced aggregates. Unknown periods fall back to 24h on both resolvers, and daily breakdowns carry LastUsed timestamps.\n- **The Overview slows to 15s/60s polls on long ranges** and caps breakdown tables at 200 rendered rows with a Show more control; short windows keep the fast schedules.\n",
+  "releaseNotes": "\n\n- Release sections carry the `v` prefix (`## [v1.0.0]`), matching what the\n  release workflow's notes extraction and the dashboard changelog both expect;\n  the pending-fragment splice now lands under this Unreleased heading instead\n  of above the file title.\n",
   "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.65",
-  "publishedAt": "2026-11-28T00:29:09Z"
+  "publishedAt": "2026-11-28T06:49:54Z"
 }
