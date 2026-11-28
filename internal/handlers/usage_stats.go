@@ -401,7 +401,7 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 		}
 
 		// Build recent requests list (20 deduped from usageHistory)
-		recentHistory, err := repo.GetRecentUsageHistory(60)
+		recentHistory, err := cachedRecentHistory(repo)
 		if err != nil {
 			handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 			return

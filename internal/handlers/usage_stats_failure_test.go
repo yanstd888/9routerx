@@ -113,6 +113,8 @@ func TestUsageStats_HealthyReadStillAggregates(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()
 	repo := db.NewRepo(database)
+	resetRecentHistoryCache()
+	t.Cleanup(resetRecentHistoryCache)
 
 	if err := repo.UpsertUsageDaily("2026-03-03", `{"byProvider":{"openai":{"requests":4,"promptTokens":100,"cost":1.5}}}`); err != nil {
 		t.Fatalf("seed usageDaily: %v", err)

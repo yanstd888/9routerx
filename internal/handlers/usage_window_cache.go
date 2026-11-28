@@ -882,3 +882,53 @@ func cachedUsageCacheHitTotals(repo *db.Repo, since string) (int64, int64, error
 	}
 	return hit, total, nil
 }
+
+// recentHistoryEntry is one cached recent-request fallback list. The live SSE
+// stream merges recent requests into the same panel; the five-second (or
+// fifteen-second, on long ranges) stats poll refreshes the fallback list, and
+// re-reading 60 ledger rows on every poll is the residual cost once the window
+// aggregate is cached. A short TTL keeps the fallback within a couple of
+// seconds of the ledger while removing that read from the poll.
+type recentHistoryEntry struct {
+	rows      []db.UsageHistoryRow
+	fetchedAt time.Time
+}
+
+var recentHistoryCache = struct {
+	mu      sync.Mutex
+	entry   *recentHistoryEntry
+}{}
+
+// recentHistoryTTL is deliberately shorter than a poll: a missed live event
+// is repaired by the next SSE frame or by the next poll, never held for a
+// full cache TTL.
+const recentHistoryTTL = 2 * time.Second
+
+// resetRecentHistoryCache drops the cached fallback list. Tests use it to
+// observe a cold cache; production never calls it.
+func resetRecentHistoryCache() {
+	recentHistoryCache.mu.Lock()
+	recentHistoryCache.entry = nil
+	recentHistoryCache.mu.Unlock()
+}
+
+// cachedRecentHistory serves the recent-request fallback list from a short-TTL
+// cache, reading through when it expires.
+func cachedRecentHistory(repo *db.Repo) ([]db.UsageHistoryRow, error) {
+	recentHistoryCache.mu.Lock()
+	if entry := recentHistoryCache.entry; entry != nil && time.Since(entry.fetchedAt) <= recentHistoryTTL {
+		rows := entry.rows
+		recentHistoryCache.mu.Unlock()
+		return rows, nil
+	}
+	recentHistoryCache.mu.Unlock()
+
+	rows, err := repo.GetRecentUsageHistory(60)
+	if err != nil {
+		return nil, err
+	}
+	recentHistoryCache.mu.Lock()
+	recentHistoryCache.entry = &recentHistoryEntry{rows: rows, fetchedAt: time.Now()}
+	recentHistoryCache.mu.Unlock()
+	return rows, nil
+}
