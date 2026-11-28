@@ -325,7 +325,6 @@ func RegisterAll() {
 	Register("zed", func() Executor { return ForwardZed })
 	Register("minimax-code", func() Executor { return ForwardMinimaxCode })
 	Register("minimax-code-global", func() Executor { return ForwardMinimaxCode })
-	Register("mimocode", func() Executor { return ForwardOpenAI })
 	Register("daoxe", func() Executor { return ForwardOpenAI })
 	Register("nan", func() Executor { return ForwardOpenAI })
 	Register("openadapter", func() Executor { return ForwardOpenAI })

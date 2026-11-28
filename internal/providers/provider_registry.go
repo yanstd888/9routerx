@@ -2649,18 +2649,6 @@ var ProviderRegistry = map[string]ProviderMeta{
 		ServiceKinds:  []string{"llm"},
 		ModelsFetcher: &Fetcher{URL: "https://models.dev/api.json", Type: "mimo-free"},
 	},
-	"mimocode": {
-		ID:            "mimocode",
-		Name:          "MiMoCode Free",
-		Alias:         "mmf",
-		Category:      CategoryFree,
-		Color:         "#FF6900",
-		Icon:          "smart_toy",
-		NoAuth:        true,
-		Hidden:        true,
-		ServiceKinds:  []string{"llm"},
-		ModelsFetcher: &Fetcher{URL: "https://models.dev/api.json", Type: "mimo-free"},
-	},
 	"opencode": {
 		ID:            "opencode",
 		Name:          "OpenCode Free",
