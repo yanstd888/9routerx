@@ -14,6 +14,17 @@ Release history up to the fork point is archived in the upstream repo's
   the pending-fragment splice now lands under this Unreleased heading instead
   of above the file title.
 
+## [v1.5.64] - 2026-11-28
+
+### Added
+- **NoTrack Web, ChatPlayground, SYNTX.ai, Adapta One and Conol web-chat providers** — native executors ported from the pinned registry, with per-provider catalog metadata, artwork and frontend tests.
+- **Eleven API-key providers** — UncloseAI (free anonymous gateway), FriendliAI, Databricks Model Serving, Snowflake Cortex, Charm Hyper, Token Kiosk, Token Market, TokenReply, Unifically, Gitlawb Opengateway (GMI Cloud) and Cheaper Inference. Cheaper Inference carries the 39-model catalog, the dual chat/Responses surface with a hard `store:false`, the CI payload transport (gzip tier, chunked reservation above 4MiB, 20MiB ceiling) and the fail-closed media guard.
+
+### Fixed
+- **Gitlawb MiMo lane chat route** — the config posted to the bare `/v1/xiaomi-mimo` prefix, which the gateway answers with 404 `Not found. Use POST /v1/chat/completions.`; the suffixed `/chat/completions` route is verified live and now registered.
+- **Model lookup test flake** — catalog probe ids are percent-encoded, so display names containing spaces (baseten's "Kimi K2.7 Code") can no longer randomly break the synthesized request line.
+- **golangci-lint debt** — 143 findings across the never-CI-linted provider batches resolved: unchecked closes, capitalized error strings, misformatted files, dead code, bodyclose and errorlint wrap-style fixes.
+
 ## [v1.5.63] - 2026-11-27
 
 ### Fixed
