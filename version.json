@@ -1,12 +1,12 @@
 {
-  "latestVersion": "1.5.64",
+  "latestVersion": "1.5.65",
   "downloadUrl": "https://github.com/yanstd888/9routerx/releases/latest",
   "downloadUrls": {
-    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-linux-amd64",
-    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-linux-arm64",
-    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-darwin-amd64",
-    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-darwin-arm64",
-    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.64/9routerx-windows-amd64.exe"
+    "linux_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-linux-amd64",
+    "linux_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-linux-arm64",
+    "darwin_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-darwin-amd64",
+    "darwin_arm64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-darwin-arm64",
+    "windows_amd64": "https://github.com/yanstd888/9routerx/releases/download/v1.5.65/9routerx-windows-amd64.exe"
   },
   "sha256s": {
     "darwin_amd64": "a37ed92fd95f80f6aca29e876c748a9973be1d97f78039d221370188f13d5b5c",
@@ -15,7 +15,7 @@
     "linux_arm64": "40824aa340d613ce25f7ee8f7d2ae69de716904b55b403a4150c5e3378ed3e89",
     "windows_amd64": "ef0d12c3ff2354230e06111c6e2ea05c0785035e89c2dcb5b3dc59e1aabd156e"
   },
-  "releaseNotes": "\n\n### Added\n- **NoTrack Web, ChatPlayground, SYNTX.ai, Adapta One and Conol web-chat providers** — native executors ported from the pinned registry, with per-provider catalog metadata, artwork and frontend tests.\n- **Eleven API-key providers** — UncloseAI (free anonymous gateway), FriendliAI, Databricks Model Serving, Snowflake Cortex, Charm Hyper, Token Kiosk, Token Market, TokenReply, Unifically, Gitlawb Opengateway (GMI Cloud) and Cheaper Inference. Cheaper Inference carries the 39-model catalog, the dual chat/Responses surface with a hard `store:false`, the CI payload transport (gzip tier, chunked reservation above 4MiB, 20MiB ceiling) and the fail-closed media guard.\n\n### Fixed\n- **Gitlawb MiMo lane chat route** — the config posted to the bare `/v1/xiaomi-mimo` prefix, which the gateway answers with 404 `Not found. Use POST /v1/chat/completions.`; the suffixed `/chat/completions` route is verified live and now registered.\n- **Model lookup test flake** — catalog probe ids are percent-encoded, so display names containing spaces (baseten's \"Kimi K2.7 Code\") can no longer randomly break the synthesized request line.\n- **golangci-lint debt** — 143 findings across the never-CI-linted provider batches resolved: unchecked closes, capitalized error strings, misformatted files, dead code, bodyclose and errorlint wrap-style fixes.\n",
-  "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.64",
+  "releaseNotes": "\n\n### Fixed\n- **Long-range Usage windows are cached** — 7d/30d/60d/all stats aggregate from raw history through a watermark-advanced window cache instead of re-reading the daily rollup on every poll; a 50k-row ledger drops from 100-480ms cold folds to roughly 10-20ms cached reads.\n- **The daily chart, burn rate, cache-hit totals, Details count, prompt-cache and compression analytics** now serve repeated dashboard reads from cached, watermark-advanced aggregates. Unknown periods fall back to 24h on both resolvers, and daily breakdowns carry LastUsed timestamps.\n- **The Overview slows to 15s/60s polls on long ranges** and caps breakdown tables at 200 rendered rows with a Show more control; short windows keep the fast schedules.\n",
+  "releaseUrl": "https://github.com/yanstd888/9routerx/releases/tag/v1.5.65",
   "publishedAt": "2026-11-28T00:29:09Z"
 }
