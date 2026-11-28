@@ -43,6 +43,11 @@ type Window struct {
 	cutoff time.Time
 	// hours is the window's width in hours, rounded up. Zero for unbounded.
 	hours int
+	// fallback records that the requested period was not recognised and the
+	// shared 24h default was served instead. The response label reports the
+	// window actually served, so a client can tell a period it named from one
+	// the server answered for it.
+	fallback bool
 }
 
 // Cutoff returns the inclusive lower bound, or the zero time for an unbounded
@@ -60,12 +65,15 @@ func (w Window) Hours() int { return w.hours }
 func (w Window) Unbounded() bool { return w.cutoff.IsZero() }
 
 // Label names the window the way the dashboard's picker does, so a response can
-// say which period produced it. An unrecognised period is reported verbatim
-// rather than as its fallback, which is the only way a caller could notice the
-// server answered a different window than the one it asked for.
+// say which period produced it. A period the resolver recognised is echoed
+// verbatim; an unrecognised one is reported as the 24h fallback the resolver
+// actually served, so a stale label can never dress one window up as another.
 func (w Window) Label(requested string) string {
 	if w.Unbounded() {
 		return "all"
+	}
+	if w.fallback {
+		return "24h"
 	}
 	return requested
 }
@@ -105,8 +113,11 @@ func Resolve(raw string, now time.Time) Window {
 	}
 
 	// Unrecognised input falls back to the 24h default rather than erroring:
-	// the SPA can be newer than the gateway it talks to.
-	return since(now, 24*time.Hour)
+	// the SPA can be newer than the gateway it talks to. The window carries the
+	// fallback flag so the response label reports what was actually served.
+	win := since(now, 24*time.Hour)
+	win.fallback = true
+	return win
 }
 
 // since builds a window ending at now.

@@ -70,10 +70,12 @@ func resolveUsagePeriod(raw string, now time.Time) usagePeriod {
 		return usagePeriod{since: now.Add(-span), shape: slidingShape(span)}
 	}
 
-	// Unrecognized input falls back to the 7-day window rather than erroring: the
-	// dashboard keeps working against an older gateway that does not know a
-	// period, which is the common case when the SPA is newer than the server.
-	return usagePeriod{daily: true, days: 7}
+	// Unrecognized input falls back to the shared 24h window rather than erroring:
+	// the dashboard keeps working against an older gateway that does not know a
+	// period, which is the common case when the SPA is newer than the server. The
+	// fallback matches analyticsrange.Resolve so one typo'd period cannot mean a
+	// 7-day rollup on the Overview and a 24h window on Cache Analytics.
+	return usagePeriod{since: now.Add(-24 * time.Hour), shape: slidingShape(24 * time.Hour)}
 }
 
 // fallbackRawWindow mirrors the calendar-day span the daily rollup read
