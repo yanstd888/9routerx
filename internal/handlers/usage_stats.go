@@ -354,7 +354,7 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 			// (see dailyShape) — so rollup numbers can never stack on top of the
 			// history fold. LastUsed comes free: the raw rows carry timestamps.
 			dailyWin := dailyRawWindow(repo, window, now)
-			agg, err := rawWindows.getRawWindow(repo, dailyWin)
+			agg, rdErrors, err := rawWindows.getRawWindow(repo, dailyWin)
 			if err != nil {
 				handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 				return
@@ -362,13 +362,9 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 			applyRawAggregate(&resp, agg, nodeNameMap, connMap, keyNames, views)
 			// Mirror the sub-day branch: errors that only exist in requestDetails
 			// (a failure that never wrote a usage row) are counted on top of the
-			// ledger rows.
-			if !dailyWin.since.IsZero() {
-				cutoff := dailyWin.since.UTC().Format("2006-01-02T15:04:05.000Z")
-				if errCount, err := repo.GetRequestDetailsErrorCountSince(r.Context(), cutoff); err == nil {
-					resp.TotalErrors = errCount
-				}
-			}
+			// ledger rows. The count rides the same cache entry, advanced by
+			// delta instead of rescanned per poll.
+			resp.TotalErrors = rdErrors
 		} else {
 			// Sub-day windows read raw history: a daily rollup cannot express
 			// "since 14:00 yesterday".
@@ -377,18 +373,16 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 			// aggregate once and then advances it from a delta. The first read
 			// costs what the handler always cost; every poll after it reads only
 			// the rows written since the previous poll.
-			agg, err := rawWindows.getRawWindow(repo, window)
+			agg, rdErrors, err := rawWindows.getRawWindow(repo, window)
 			if err != nil {
 				handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 			applyRawAggregate(&resp, agg, nodeNameMap, connMap, keyNames, views)
-			if !window.since.IsZero() {
-				cutoff := window.since.UTC().Format("2006-01-02T15:04:05.000Z")
-				if errCount, err := repo.GetRequestDetailsErrorCountSince(r.Context(), cutoff); err == nil {
-					resp.TotalErrors = errCount
-				}
-			}
+			// Errors that only exist in requestDetails (a failure that never
+			// wrote a ledger row) ride the same cache entry, advanced by delta
+			// instead of a COUNT over the table on every poll.
+			resp.TotalErrors = rdErrors
 		}
 
 		// Calculate total aggregates from byProvider

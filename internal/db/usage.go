@@ -852,12 +852,51 @@ func (r *Repo) GetRequestDetailByID(id string) (string, error) {
 	return data, nil
 }
 
-// GetRequestDetailsErrorCountSince returns the count of failed requests recorded in requestDetails since cutoff.
-func (r *Repo) GetRequestDetailsErrorCountSince(ctx context.Context, since string) (int, error) {
-	var count int
-	err := r.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp >= ?`, since).Scan(&count)
+// The requestDetails error count rides the usage window cache: the handler
+// read it per request — a COUNT over the table since the cutoff on the
+// dashboard's five-second poll — and the count advances by delta exactly like
+// the ledger fold does. The three reads below are its moving parts: a
+// watermark seek, the rows that age out when a sliding cutoff moves forward,
+// and the rows written since the last watermark. All are index seeks or
+// bounded counts on idx_rd_ts, never a whole-window scan.
+
+// GetRequestDetailsWatermark returns the newest requestDetails timestamp
+// ("" when the ring is empty).
+func (r *Repo) GetRequestDetailsWatermark() (string, error) {
+	var ts string
+	err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), '') FROM requestDetails`).Scan(&ts) //nolint:noctx
 	if err != nil {
-		return 0, fmt.Errorf("count requestDetails errors since %s: %w", since, err)
+		return "", fmt.Errorf("read requestDetails watermark: %w", err)
+	}
+	return ts, nil
+}
+
+// GetRequestDetailsErrorCountAgedOut counts the failed requests recorded in
+// requestDetails with timestamp in [oldCutoff, newCutoff): exactly the rows
+// that leave a sliding window when its cutoff moves forward from oldCutoff to
+// newCutoff.
+func (r *Repo) GetRequestDetailsErrorCountAgedOut(oldCutoff, newCutoff string) (int, error) {
+	var count int
+	err := r.db.QueryRow(
+		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp >= ? AND timestamp < ?`,
+		oldCutoff, newCutoff).Scan(&count) //nolint:noctx
+	if err != nil {
+		return 0, fmt.Errorf("count requestDetails errors aged out of [%s, %s): %w", oldCutoff, newCutoff, err)
+	}
+	return count, nil
+}
+
+// GetRequestDetailsErrorCountDelta counts the failed requests recorded in
+// requestDetails with timestamp in (after, until] and at or after floor: the
+// rows a cached count has yet to fold in, excluding anything the window no
+// longer covers.
+func (r *Repo) GetRequestDetailsErrorCountDelta(after, until, floor string) (int, error) {
+	var count int
+	err := r.db.QueryRow(
+		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp > ? AND timestamp <= ? AND timestamp >= ?`,
+		after, until, floor).Scan(&count) //nolint:noctx
+	if err != nil {
+		return 0, fmt.Errorf("count requestDetails errors in (%s, %s] above %s: %w", after, until, floor, err)
 	}
 	return count, nil
 }
