@@ -2976,6 +2976,7 @@
   const ModelsListURLs = new Set([
     'tokenharbor',
     'sumopod',
+    'martllm',
     'dahl',
     'atria',
     'agnes',

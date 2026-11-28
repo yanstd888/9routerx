@@ -194,6 +194,9 @@ var modelsListURL = map[string]string{
 	// SumoPod exposes the standard OpenAI /v1/models catalogue (auth required,
 	// same contract as tokenharbor/dahl).
 	"sumopod": "https://ai.sumopod.com/v1/models",
+	// MartLLM publishes its catalogue on the standard OpenAI /v1/models shape
+	// without a key, so Check Latest Models works before a key is pasted.
+	"martllm": "https://api.martllm.com/v1/models",
 	// AI/ML API lists every model it serves (chat, image, video, speech) in one
 	// catalogue; the dashboard keeps only the chat-completions rows
 	// (FilterAimlapiChatModels), since those are what the chat lane can route.
@@ -510,6 +513,13 @@ var KnownProviders = map[string]ProviderConfig{
 	},
 	"sumopod": {
 		BaseURL:    "https://ai.sumopod.com/v1/chat/completions",
+		AuthHeader: "Authorization",
+		AuthScheme: "bearer",
+	},
+	// MartLLM — OpenAI-compatible API (api.martllm.com) for chat models from
+	// many vendors; ids carry the vendor (anthropic/…, google/…, deepseek/…).
+	"martllm": {
+		BaseURL:    "https://api.martllm.com/v1/chat/completions",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
 	},
