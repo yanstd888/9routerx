@@ -3,8 +3,19 @@ import { describe, expect, test } from 'bun:test'
 import {
   formatCheckAllSummary,
   getBlockedModelIds,
+  isDeadProbeStatus,
   parseModelTestVerdict,
 } from './modelCheckAll'
+
+describe('isDeadProbeStatus', () => {
+  test('only a hard error disables a model', () => {
+    expect(isDeadProbeStatus('error')).toBe(true)
+    expect(isDeadProbeStatus('blocked')).toBe(false)
+    expect(isDeadProbeStatus('testing')).toBe(false)
+    expect(isDeadProbeStatus('ok')).toBe(false)
+    expect(isDeadProbeStatus(undefined)).toBe(false)
+  })
+})
 
 describe('parseModelTestVerdict', () => {
   test('returns ok when res.ok is true', () => {

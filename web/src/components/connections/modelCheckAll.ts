@@ -1,6 +1,13 @@
 // 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id
 export type ModelTestStatus = 'ok' | 'error' | 'blocked' | 'testing'
 
+// Only a hard failure proves a model is dead. "blocked" is an account cooldown
+// that resolves on its own; disabling on it removes the model from /v1/models
+// and every combo permanently for a temporary condition.
+export function isDeadProbeStatus(status: ModelTestStatus | undefined): boolean {
+  return status === 'error'
+}
+
 export interface ModelTestVerdict {
   status: 'ok' | 'error' | 'blocked'
   error: string | null

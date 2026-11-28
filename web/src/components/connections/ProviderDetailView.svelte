@@ -58,6 +58,7 @@
   import {
     formatCheckAllSummary,
     getBlockedModelIds,
+    isDeadProbeStatus,
     parseModelTestVerdict,
     type CheckAllSummary,
     type ModelTestStatus,
@@ -3211,31 +3212,24 @@
   }
 
   /**
-   * Disables every model whose last probe failed or whose account is in
-   * cooldown, in one request.
+   * Disables every model whose last probe failed, in one request.
    *
    * The verdicts are already on screen from the sweep that produced them, so
    * this sends only the failures — the server merges them into the stored
    * list, which is what keeps two open tabs from disabling each other's
-   * models. "Blocked" counts as dead here: the account is parked and the model
-   * cannot serve until the cooldown lifts, which is the same operator-visible
-   * outcome as a failure. A model that was never probed is not included —
-   * nobody has evidence about it.
+   * models. "Blocked" is a temporary account cooldown and is deliberately not
+   * included: disabling it would remove the model from /v1/models and every
+   * combo for a condition that resolves on its own. A model that was never
+   * probed is not included — nobody has evidence about it.
    */
   async function handleAutoDisableDeadModels() {
     const pid = providerId
     const deadIds = isCompatibleNode
       ? compatibleRows
-          .filter((r) => {
-            const s = compatibleTestResults[r.id]
-            return s === 'error' || s === 'blocked'
-          })
+          .filter((r) => isDeadProbeStatus(compatibleTestResults[r.id]))
           .map((r) => r.id)
       : allAvailableModels
-          .filter((m) => {
-            const s = modelTestStatuses[m.id]
-            return s === 'error' || s === 'blocked'
-          })
+          .filter((m) => isDeadProbeStatus(modelTestStatuses[m.id]))
           .map((m) => m.id)
     if (deadIds.length === 0) {
       notifications.error('No dead models — every model that was probed either passed or has not been tested yet.')
@@ -4335,7 +4329,7 @@
             type="button"
             onclick={handleAutoDisableDeadModels}
             disabled={compatibleRows.length === 0}
-            title={t('Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
+            title={t('Disable every model whose last probe failed. Models in cooldown are left alone; disabled models stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
             class="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-amber-500/40 bg-amber-500/10 px-3 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-500/20 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed dark:text-amber-400"
           >
             <span class="material-symbols-outlined text-[16px]">heart_broken</span>{t('Disable dead models')}</button>
@@ -4800,7 +4794,7 @@
           onclick={handleAutoDisableDeadModels}
           disabled={isCheckingAll}
           class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-2 text-xs text-amber-600 transition-colors sm:w-auto cursor-pointer disabled:opacity-50 dark:text-amber-400"
-          title={t('Disable every model whose last probe failed or whose account is in cooldown. They stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
+          title={t('Disable every model whose last probe failed. Models in cooldown are left alone; disabled models stop appearing in /v1/models and every model picker, and leave the combos they were in.')}
         >
           <span class="material-symbols-outlined text-sm">heart_broken</span>{t('Disable dead models')}</button>
       {/if}
