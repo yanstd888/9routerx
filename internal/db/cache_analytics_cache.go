@@ -351,4 +351,3 @@ func (r *Repo) GetPromptCacheTrendCached(win analyticsrange.Window) ([]CacheTren
 	}
 	return entry.trendAssemble(), nil
 }
-

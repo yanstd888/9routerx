@@ -120,7 +120,7 @@ func (r *Repo) GetPromptCacheRowsAgedOut(oldCutoff, newCutoff string) ([]CacheSc
 // SELECT list is byte-for-byte the expressions the full build reads, so a
 // delta fold and a full fold cannot disagree about what a row is worth.
 func (r *Repo) promptCacheRows(where string, args ...any) ([]CacheScanRow, error) {
-	rows, err := r.db.Query(`
+	rows, err := r.db.QueryContext(context.Background(), `
 SELECT
 	strftime('%Y-%m-%dT%H:00:00Z', timestamp),
 	COALESCE(provider, 'unknown'),

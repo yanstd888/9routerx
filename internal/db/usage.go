@@ -873,7 +873,7 @@ func (r *Repo) cachedRequestDetailCount(ctx context.Context, since, where string
 			newest string
 			oldest string
 		}
-		if err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), ''), COALESCE(MIN(timestamp), '') FROM requestDetails`).Scan(&sig.newest, &sig.oldest); err != nil {
+		if err := r.db.QueryRow(`SELECT COALESCE(MAX(timestamp), ''), COALESCE(MIN(timestamp), '') FROM requestDetails`).Scan(&sig.newest, &sig.oldest); err != nil { //nolint:noctx
 			return "", err
 		}
 		return sig.newest + "|" + sig.oldest, nil
@@ -952,7 +952,7 @@ func (r *Repo) GetRequestDetailsWatermark() (string, error) {
 // newCutoff.
 func (r *Repo) GetRequestDetailsErrorCountAgedOut(oldCutoff, newCutoff string) (int, error) {
 	var count int
-	err := r.db.QueryRow(
+	err := r.db.QueryRow( //nolint:noctx
 		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp >= ? AND timestamp < ?`,
 		oldCutoff, newCutoff).Scan(&count) //nolint:noctx
 	if err != nil {
@@ -967,7 +967,7 @@ func (r *Repo) GetRequestDetailsErrorCountAgedOut(oldCutoff, newCutoff string) (
 // longer covers.
 func (r *Repo) GetRequestDetailsErrorCountDelta(after, until, floor string) (int, error) {
 	var count int
-	err := r.db.QueryRow(
+	err := r.db.QueryRow( //nolint:noctx
 		`SELECT COUNT(*) FROM requestDetails WHERE status = 'error' AND timestamp > ? AND timestamp <= ? AND timestamp >= ?`,
 		after, until, floor).Scan(&count) //nolint:noctx
 	if err != nil {

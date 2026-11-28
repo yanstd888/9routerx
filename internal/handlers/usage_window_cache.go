@@ -831,10 +831,10 @@ func applyRawAggregate(resp *UsageStatsResponse, agg *rawAggregate, nodeNameMap,
 // cacheHitTotalsEntry is one cached cache-hit read: the JSON-extracting CTE
 // over the window's rows, gated on the ledger watermark.
 type cacheHitTotalsEntry struct {
-	hit        int64
-	total      int64
-	watermark  string
-	fetchedAt  time.Time
+	hit       int64
+	total     int64
+	watermark string
+	fetchedAt time.Time
 }
 
 // cacheHitTotalsCache caches one read per since string. The dashboard's
@@ -895,8 +895,8 @@ type recentHistoryEntry struct {
 }
 
 var recentHistoryCache = struct {
-	mu      sync.Mutex
-	entry   *recentHistoryEntry
+	mu    sync.Mutex
+	entry *recentHistoryEntry
 }{}
 
 // recentHistoryTTL is deliberately shorter than a poll: a missed live event
