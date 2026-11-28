@@ -329,8 +329,6 @@ export const PROVIDER_ID_TO_ALIAS: Record<string, string> = {
   "trae": "trae",
   "venice": "venice",
   "vercel-ai-gateway": "vercel-ai-gateway",
-  "vertex": "vx",
-  "vertex-partner": "vxp",
   "volcengine-ark": "ark",
   "v1m": "v1m",
   "voyage-ai": "voyage",
@@ -11701,100 +11699,6 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
         "quality"
       ],
       "kind": "image"
-    }
-  ],
-  "vertex-partner": [
-    {
-      "id": "deepseek-ai/deepseek-v3.2-maas",
-      "name": "DeepSeek V3.2 (Vertex)"
-    },
-    {
-      "id": "qwen/qwen3-next-80b-a3b-thinking-maas",
-      "name": "Qwen3 Next 80B Thinking (Vertex)"
-    },
-    {
-      "id": "qwen/qwen3-next-80b-a3b-instruct-maas",
-      "name": "Qwen3 Next 80B Instruct (Vertex)"
-    },
-    {
-      "id": "zai-org/glm-5-maas",
-      "name": "GLM-5 (Vertex)"
-    }
-  ],
-  "vertex": [
-    {
-      "id": "gemini-4-argon",
-      "name": "Gemini 4 Argon"
-    },
-    {
-      "id": "gemini-3.1-pro-preview",
-      "name": "Gemini 3.1 Pro Preview"
-    },
-    {
-      "id": "gemini-3.1-flash-lite-preview",
-      "name": "Gemini 3.1 Flash Lite Preview"
-    },
-    {
-      "id": "gemini-3-flash-preview",
-      "name": "Gemini 3 Flash Preview"
-    },
-    {
-      "id": "gemini-2.5-flash",
-      "name": "Gemini 2.5 Flash"
-    },
-    {
-      "id": "veo-3.1-generate-preview",
-      "name": "Veo 3.1 (Preview)",
-      "params": [
-        "duration",
-        "aspect_ratio",
-        "resolution",
-        "negative_prompt",
-        "seed",
-        "storage_uri",
-        "generate_audio"
-      ],
-      "kind": "video"
-    },
-    {
-      "id": "veo-3.1-fast-generate-preview",
-      "name": "Veo 3.1 Fast (Preview)",
-      "params": [
-        "duration",
-        "aspect_ratio",
-        "resolution",
-        "negative_prompt",
-        "seed",
-        "storage_uri",
-        "generate_audio"
-      ],
-      "kind": "video"
-    },
-    {
-      "id": "veo-3.0-generate-001",
-      "name": "Veo 3",
-      "params": [
-        "duration",
-        "aspect_ratio",
-        "resolution",
-        "negative_prompt",
-        "seed",
-        "storage_uri",
-        "generate_audio"
-      ],
-      "kind": "video"
-    },
-    {
-      "id": "veo-2.0-generate-001",
-      "name": "Veo 2",
-      "params": [
-        "duration",
-        "aspect_ratio",
-        "negative_prompt",
-        "seed",
-        "storage_uri"
-      ],
-      "kind": "video"
     }
   ],
   "volcengine-ark": [

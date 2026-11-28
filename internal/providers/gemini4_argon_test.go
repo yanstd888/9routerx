@@ -87,8 +87,8 @@ func TestGemini4ArgonWiring(t *testing.T) {
 		}
 	})
 
-	t.Run("registered on gemini, vertex, gemini-cli and antigravity", func(t *testing.T) {
-		for _, p := range []string{"gemini", "vertex", "gemini-cli", "antigravity", "ag"} {
+	t.Run("registered on gemini, gemini-cli and antigravity", func(t *testing.T) {
+		for _, p := range []string{"gemini", "gemini-cli", "antigravity", "ag"} {
 			models := ProviderModels[p]
 			if !slices.Contains(models, "gemini-4-argon") {
 				t.Errorf("provider %s does not contain gemini-4-argon in ProviderModels", p)

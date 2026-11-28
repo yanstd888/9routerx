@@ -296,8 +296,7 @@ func RegisterAll() {
 	// "arena" resolve here as wire aliases.
 	Register("arena-ai", func() Executor { return ForwardArenaAI })
 	// One executor serves both Bedrock entries: the registry entry's Format picks the
-	// wire shape (Anthropic Messages vs OpenAI Chat Completions), the way one Vertex
-	// executor serves vertex and vertex-partner.
+	// wire shape (Anthropic Messages vs OpenAI Chat Completions).
 	Register("bedrock", func() Executor { return ForwardBedrock })
 	Register("bedrock-xai", func() Executor { return ForwardBedrock })
 	Register("azure", func() Executor { return ForwardAzure })

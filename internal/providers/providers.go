@@ -2509,16 +2509,6 @@ var KnownProviders = map[string]ProviderConfig{
 		SearchURL:    "https://api.z.ai/api/mcp/web_search",
 		SearchMethod: "POST",
 	},
-	"vertex": {
-		BaseURL:    "https://aiplatform.googleapis.com/v1",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
-	"vertex-partner": {
-		BaseURL:    "https://aiplatform.googleapis.com/v1",
-		AuthHeader: "Authorization",
-		AuthScheme: "bearer",
-	},
 	"voyage-ai": {
 		BaseURL:    "https://api.voyageai.com/v1/embeddings",
 		AuthHeader: "Authorization",
@@ -2683,6 +2673,7 @@ var KnownProviders = map[string]ProviderConfig{
 		BaseURL:    "https://daily-cloudcode-pa.googleapis.com/v1internal",
 		AuthHeader: "Authorization",
 		AuthScheme: "bearer",
+		Format:     "gemini-native",
 	},
 	"google-pse": {
 		BaseURL:      "https://www.googleapis.com/customsearch/v1",
