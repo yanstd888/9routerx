@@ -221,32 +221,26 @@ type UsageHistoryRow struct {
 	Tokens           string
 }
 
-// GetUsageDailyRecent returns the most recent daily usage records up to limit.
-
-func (r *Repo) GetUsageDailyRecent(limit int) ([]string, error) {
-	rows, err := r.db.Query(`SELECT data FROM usageDaily ORDER BY dateKey DESC LIMIT ?`, limit)
+// GetUsageDailySignature returns a cheap fingerprint of the usageDaily rollup:
+// its row count and newest date key. The daily usage windows are aggregated
+// from raw history through the window cache, so the rollup is not a data
+// source — but a change in it (a backfill, a correction, a restore) must
+// invalidate a cached daily aggregate anyway, and this signature is what the
+// cache compares between polls. Both aggregates are covering reads over the
+// dateKey primary key.
+func (r *Repo) GetUsageDailySignature() (int64, string, error) {
+	var count int64
+	var newest string
+	err := r.db.QueryRow(`SELECT COUNT(*), COALESCE(MAX(dateKey), '') FROM usageDaily`).Scan(&count, &newest) //nolint:noctx
 	if err != nil {
-		return nil, fmt.Errorf("query recent usageDaily: %w", err)
+		return 0, "", fmt.Errorf("read usageDaily signature: %w", err)
 	}
-	defer rows.Close()
-
-	var res []string
-	for rows.Next() {
-		var data string
-		if err := rows.Scan(&data); err != nil {
-			return nil, fmt.Errorf("scan usageDaily recent: %w", err)
-		}
-		res = append(res, data)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate usageDaily recent: %w", err)
-	}
-	return res, nil
+	return count, newest, nil
 }
 
 // UsageDailyRow is one usageDaily row: the local date key plus its aggregate
-// payload. The chart endpoint needs the key (the existing
-// GetUsageDailyRecent drops it), so this keeps both.
+// payload. The chart endpoint needs the key next to the totals, so this keeps
+// both.
 type UsageDailyRow struct {
 	DateKey string
 	Data    string

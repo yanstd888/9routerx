@@ -58,16 +58,16 @@ const (
 	usageCacheMaxEntries = 32
 )
 
-// windowShape names a sub-day window for the aggregate cache.
+// windowShape names a window for the aggregate cache.
 //
 // It is decided in resolveUsagePeriod rather than reconstructed from the window's
 // start afterwards, because that is where the difference is actually known: the
 // instant alone does not distinguish "starts at midnight" from "24 hours ago",
 // even though the two must be cached differently.
 type windowShape struct {
-	// anchoredStart is set for a window whose start is fixed, such as `today`.
-	// Every poll in that period shares the one instant, so the entry is keyed on
-	// it and simply advanced.
+	// anchoredStart is set for a window whose start is fixed, such as `today`
+	// or a daily calendar span. Every poll in that period shares the one
+	// instant, so the entry is keyed on it and simply advanced.
 	anchoredStart string
 	// width is the span of a sliding window such as `24h` or `<n>h`. Its start
 	// moves on every request, so the entry is keyed on the width instead.
@@ -76,10 +76,21 @@ type windowShape struct {
 	// cold read — the cache missed every time, which is the same as having no
 	// cache at all.
 	width time.Duration
+	// dailyRollup marks a daily calendar span (7d/30d/60d/all). Such an entry
+	// also tracks the usageDaily rollup's signature: the aggregate is folded
+	// from raw history, but a rollup-only change (a backfill, a correction, a
+	// restore) must rebuild the entry rather than leave it standing.
+	dailyRollup bool
 }
 
 func anchoredShape(start time.Time) windowShape {
 	return windowShape{anchoredStart: start.UTC().Format(time.RFC3339)}
+}
+
+// dailyShape anchors a daily calendar span and opts the entry into the rollup
+// signature check.
+func dailyShape(start time.Time) windowShape {
+	return windowShape{anchoredStart: start.UTC().Format(time.RFC3339), dailyRollup: true}
 }
 
 func slidingShape(width time.Duration) windowShape {
@@ -87,9 +98,13 @@ func slidingShape(width time.Duration) windowShape {
 }
 
 // key identifies the entry this window may share with others. Two windows with
-// one key hold the same rows.
+// one key hold the same rows. Daily spans get their own namespace so a
+// rollup-checking entry is never shared with a sub-day window that would
+// silently skip the check.
 func (s windowShape) key() string {
 	switch {
+	case s.anchoredStart != "" && s.dailyRollup:
+		return "daily:" + s.anchoredStart
 	case s.anchoredStart != "":
 		return "anchored:" + s.anchoredStart
 	case s.width > 0:
@@ -373,6 +388,12 @@ type rawWindowEntry struct {
 	// are subtracted from the aggregate rather than folded again.
 	cutoff    string
 	fetchedAt time.Time
+	// checkRollup is set for daily calendar spans: the entry describes raw
+	// history, and a change in the usageDaily rollup must rebuild it.
+	checkRollup bool
+	// rollupSig is the usageDaily signature (row count, newest date) the entry
+	// was last built or checked against. Empty until the first check.
+	rollupSig string
 }
 
 // rawWindowCache caches one aggregate per window shape.
@@ -413,6 +434,19 @@ func (c *rawWindowCache) getRawWindow(repo *db.Repo, window usagePeriod) (*rawAg
 	entry, ok := c.entries[key]
 	if !ok || now.Sub(entry.fetchedAt) > usageCacheTTL {
 		return c.rebuild(repo, key, cutoff, now)
+	}
+
+	// A daily span describes raw history, but the usageDaily rollup is written
+	// alongside it and can change without a history row (a backfill, a manual
+	// correction, a restore of an older database). A signature change means the
+	// cached aggregate no longer describes what the ledger says it should, so
+	// the entry rebuilds. A failed signature read also rebuilds: the worst case
+	// is the pre-cache cost, while serving a stale aggregate under-reads spend.
+	if entry.checkRollup {
+		count, newest, err := repo.GetUsageDailySignature()
+		if err != nil || entry.rollupSig != dailyRollupSignature(count, newest) {
+			return c.rebuild(repo, key, cutoff, now)
+		}
 	}
 
 	watermark, err := repo.GetUsageHistoryWatermark()
@@ -469,6 +503,12 @@ func (c *rawWindowCache) rebuild(repo *db.Repo, key, cutoff string, now time.Tim
 	return snapshotOf(agg), nil
 }
 
+// dailyRollupSignature composes the fingerprint the cache compares between
+// polls: the rollup's row count and its newest date key.
+func dailyRollupSignature(count int64, newest string) string {
+	return fmt.Sprintf("%d|%s", count, newest)
+}
+
 // rebuildAgg folds the whole window and stores it as the live cache entry.
 //
 // The watermark is read before the rows, deliberately: a row written between
@@ -497,6 +537,14 @@ func (c *rawWindowCache) rebuildAgg(repo *db.Repo, key, cutoff string, now time.
 		// let the first delta re-read from the window start, which is correct but
 		// wasteful; the cutoff is the honest answer.
 		entry.watermark = cutoff
+	}
+	// A daily span opts into the rollup signature check; store the signature the
+	// rebuild saw so the next hit compares against it.
+	if strings.HasPrefix(key, "daily:") {
+		entry.checkRollup = true
+		if count, newest, err := repo.GetUsageDailySignature(); err == nil {
+			entry.rollupSig = dailyRollupSignature(count, newest)
+		}
 	}
 	c.entries[key] = entry
 	return agg, nil

@@ -78,15 +78,36 @@ func resolveUsagePeriod(raw string, now time.Time) usagePeriod {
 	return usagePeriod{since: now.Add(-24 * time.Hour), shape: slidingShape(24 * time.Hour)}
 }
 
-// fallbackRawWindow mirrors the calendar-day span the daily rollup read
-// covered: local midnight, (days-1) days back — the same seven calendar days
-// the usageDaily rows would have summed for "7d". The anchored shape shares
-// the raw-window cache with the sub-day windows, so repeated polls of a
-// fallback window advance by delta instead of rescanning.
-func fallbackRawWindow(window usagePeriod, now time.Time) usagePeriod {
-	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).
-		AddDate(0, 0, -(window.days - 1))
-	return usagePeriod{since: start, shape: anchoredShape(start)}
+// localMidnight truncates an instant to the start of its local day.
+func localMidnight(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+}
+
+// dailyRawWindow maps a daily calendar span onto the raw-history window the
+// aggregate cache serves it from: local midnight of the earliest day in range.
+// A <n>d window anchors at today-(n-1) midnight — the same calendar days the
+// usageDaily rollup used to sum — and an unbounded window anchors at the
+// oldest recorded row's midnight, so "all" folds recorded data rather than ten
+// empty years. A daily window keyed this way is built once and advanced by
+// delta, and when the anchor moves at local midnight the rows that aged out are
+// subtracted (see usageWindowCache).
+//
+// An oldest-row read failure falls back to the calendar anchor rather than
+// failing the request: the calendar window is a superset scan that returns the
+// same data, only slower.
+func dailyRawWindow(repo *db.Repo, window usagePeriod, now time.Time) usagePeriod {
+	if window.days >= allUsageDays {
+		if oldest, err := repo.GetUsageHistoryOldestTimestamp(); err == nil && oldest != "" {
+			if ts, perr := time.Parse(time.RFC3339Nano, oldest); perr == nil {
+				start := localMidnight(ts)
+				return usagePeriod{since: start, shape: dailyShape(start)}
+			}
+		}
+		start := localMidnight(now)
+		return usagePeriod{since: start, shape: dailyShape(start)}
+	}
+	start := localMidnight(now).AddDate(0, 0, -(window.days - 1))
+	return usagePeriod{since: start, shape: dailyShape(start)}
 }
 
 // usagePeriodCount parses the "<n><unit>" shorthand, accepting only a positive
@@ -322,239 +343,29 @@ func HandleUsageStats(repo *db.Repo) http.HandlerFunc {
 			}
 		}
 
-		// addAPIKeyUsage folds one request into the byApiKey bucket. The bucket is
-		// keyed by the stored key value, not by a freshly derived display mask:
-		// every key an instance mints shares the same prefix, so a re-derived
-		// mask collapsed a whole team key set into a single row and attributed
-		// one key's usage to another (upstream v0.5.91, same class of fix).
-		addAPIKeyUsage := func(apiKey, rawModel, provider, providerDisplay, timestamp string, requests int, promptTok, complTok, cachedTok int64, cost float64) {
-			trimmed := strings.TrimSpace(apiKey)
-			if trimmed == "" || trimmed == "***" {
-				apiKey = "local-no-key"
-				trimmed = "local-no-key"
-			}
-			bucketKey := apiKey + "|" + rawModel + "|" + provider
-			cur := resp.ByApiKey[bucketKey]
-			cur.RawModel = rawModel
-			cur.Provider = providerDisplay
-			masked := maskAPIKeyForStats(apiKey)
-			if masked == "" {
-				masked = "local-no-key"
-			}
-			cur.ApiKeyMasked = masked
-			cur.ApiKeyKey = masked
-			switch {
-			case keyNames[trimmed] != "":
-				cur.KeyName = keyNames[trimmed]
-			case keyNames[apiKey] != "":
-				cur.KeyName = keyNames[apiKey]
-			case trimmed == "local-no-key":
-				cur.KeyName = "Local (No Key)"
-			default:
-				if masked != "local-no-key" {
-					cur.KeyName = masked
-				} else {
-					cur.KeyName = "Local (No Key)"
-				}
-			}
-			cur.Requests += requests
-			cur.PromptTokens += promptTok
-			cur.CompletionTokens += complTok
-			cur.CachedTokens += cachedTok
-			cur.Cost += cost
-			if timestamp > cur.LastUsed {
-				cur.LastUsed = timestamp
-			}
-			resp.ByApiKey[bucketKey] = cur
-		}
-
 		if window.daily {
-			dailyRows, err := repo.GetUsageDailyRecent(window.days)
+			// Daily calendar windows are aggregated from raw history through the
+			// same window cache the sub-day windows use, keyed by the calendar
+			// span (local midnight of the earliest day). Re-reading and
+			// JSON-unmarshalling every usageDaily row per request is what made a
+			// 30d/60d/all poll cost a full re-fold every five seconds; the cached
+			// path folds once and then advances by delta. The rollup is no longer
+			// a data source for this read — a change in it rebuilds the entry
+			// (see dailyShape) — so rollup numbers can never stack on top of the
+			// history fold. LastUsed comes free: the raw rows carry timestamps.
+			dailyWin := dailyRawWindow(repo, window, now)
+			agg, err := rawWindows.getRawWindow(repo, dailyWin)
 			if err != nil {
 				handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			for _, rowJSON := range dailyRows {
-				var dayData map[string]any
-				if err := json.Unmarshal([]byte(rowJSON), &dayData); err != nil {
-					continue
-				}
-
-				// byProvider
-				if bp, ok := dayData["byProvider"].(map[string]any); ok {
-					for prov, pVal := range bp {
-						if pm, ok := pVal.(map[string]any); ok {
-							cur := resp.ByProvider[prov]
-							cur.Requests += getMapInt(pm, "requests")
-							cur.Errors += getMapInt(pm, "errors")
-							cur.PromptTokens += getMapInt64(pm, "promptTokens")
-							cur.CompletionTokens += getMapInt64(pm, "completionTokens")
-							cur.CachedTokens += getMapInt64(pm, "cachedTokens")
-							cur.Cost += getMapFloat(pm, "cost")
-							resp.ByProvider[prov] = cur
-						}
-					}
-				}
-
-				// byModel
-				if bm, ok := dayData["byModel"].(map[string]any); ok && views.model {
-					for mk, mVal := range bm {
-						if mm, ok := mVal.(map[string]any); ok {
-							rawModel, _ := mm["rawModel"].(string)
-							prov, _ := mm["provider"].(string)
-							if rawModel == "" {
-								parts := strings.Split(mk, "|")
-								rawModel = parts[0]
-								if len(parts) > 1 && prov == "" {
-									prov = parts[1]
-								}
-							}
-							statsKey := rawModel
-							if prov != "" {
-								statsKey = rawModel + " (" + prov + ")"
-							}
-							displayName := prov
-							if dn, ok := nodeNameMap[prov]; ok && dn != "" {
-								displayName = dn
-							}
-
-							cur := resp.ByModel[statsKey]
-							cur.RawModel = rawModel
-							cur.Provider = displayName
-							cur.Requests += getMapInt(mm, "requests")
-							cur.PromptTokens += getMapInt64(mm, "promptTokens")
-							cur.CompletionTokens += getMapInt64(mm, "completionTokens")
-							cur.CachedTokens += getMapInt64(mm, "cachedTokens")
-							cur.Cost += getMapFloat(mm, "cost")
-							resp.ByModel[statsKey] = cur
-						}
-					}
-				}
-
-				// byAccount
-				if ba, ok := dayData["byAccount"].(map[string]any); ok && views.account {
-					for connID, aVal := range ba {
-						if am, ok := aVal.(map[string]any); ok {
-							rawModel, _ := am["rawModel"].(string)
-							prov, _ := am["provider"].(string)
-							accName := connMap[connID]
-							if accName == "" {
-								if len(connID) > 8 {
-									accName = "Account " + connID[:8] + "..."
-								} else {
-									accName = "Account " + connID
-								}
-							}
-							accountKey := rawModel + " (" + prov + " - " + accName + ")"
-							displayName := prov
-							if dn, ok := nodeNameMap[prov]; ok && dn != "" {
-								displayName = dn
-							}
-
-							cur := resp.ByAccount[accountKey]
-							cur.RawModel = rawModel
-							cur.Provider = displayName
-							cur.ConnectionID = connID
-							cur.AccountName = accName
-							cur.Requests += getMapInt(am, "requests")
-							cur.PromptTokens += getMapInt64(am, "promptTokens")
-							cur.CompletionTokens += getMapInt64(am, "completionTokens")
-							cur.CachedTokens += getMapInt64(am, "cachedTokens")
-							cur.Cost += getMapFloat(am, "cost")
-							resp.ByAccount[accountKey] = cur
-						}
-					}
-				}
-
-				// byApiKey. The daily payload carries no per-request timestamp
-				// (the date is the row key), so LastUsed stays empty here — same
-				// as the other daily branches.
-				if bak, ok := dayData["byApiKey"].(map[string]any); ok && views.apiKey {
-					for _, kVal := range bak {
-						km, ok := kVal.(map[string]any)
-						if !ok {
-							continue
-						}
-						rawModel, _ := km["rawModel"].(string)
-						prov, _ := km["provider"].(string)
-						apiKey, _ := km["apiKey"].(string)
-						displayName := prov
-						if dn, ok := nodeNameMap[prov]; ok && dn != "" {
-							displayName = dn
-						}
-						addAPIKeyUsage(
-							apiKey, rawModel, prov, displayName, "",
-							getMapInt(km, "requests"),
-							getMapInt64(km, "promptTokens"),
-							getMapInt64(km, "completionTokens"),
-							getMapInt64(km, "cachedTokens"),
-							getMapFloat(km, "cost"),
-						)
-					}
-				}
-
-				// byEndpoint
-				if be, ok := dayData["byEndpoint"].(map[string]any); ok && views.endpoint {
-					for epKey, eVal := range be {
-						if em, ok := eVal.(map[string]any); ok {
-							endpoint, _ := em["endpoint"].(string)
-							rawModel, _ := em["rawModel"].(string)
-							prov, _ := em["provider"].(string)
-							if endpoint == "" {
-								parts := strings.Split(epKey, "|")
-								endpoint = parts[0]
-								if len(parts) > 1 && rawModel == "" {
-									rawModel = parts[1]
-								}
-								if len(parts) > 2 && prov == "" {
-									prov = parts[2]
-								}
-							}
-							displayName := prov
-							if dn, ok := nodeNameMap[prov]; ok && dn != "" {
-								displayName = dn
-							}
-
-							cur := resp.ByEndpoint[epKey]
-							cur.Endpoint = endpoint
-							cur.RawModel = rawModel
-							cur.Provider = displayName
-							cur.Requests += getMapInt(em, "requests")
-							cur.PromptTokens += getMapInt64(em, "promptTokens")
-							cur.CompletionTokens += getMapInt64(em, "completionTokens")
-							cur.CachedTokens += getMapInt64(em, "cachedTokens")
-							cur.Cost += getMapFloat(em, "cost")
-							resp.ByEndpoint[epKey] = cur
-						}
-					}
-				}
-			}
-
-			// The rollup is an optimisation, not the source of truth: an empty
-			// or lost usageDaily table would leave the cards at zero while the
-			// chart — which falls back to raw history — shows real usage. When
-			// the fold contributed nothing, recompute over the same calendar
-			// span from raw history. A populated rollup keeps its numbers and
-			// the fallback never runs.
-			rollupEmpty := true
-			for _, p := range resp.ByProvider {
-				if p.Requests != 0 || p.PromptTokens != 0 || p.CompletionTokens != 0 || p.Cost != 0 {
-					rollupEmpty = false
-					break
-				}
-			}
-			if rollupEmpty {
-				fb := fallbackRawWindow(window, now)
-				agg, err := rawWindows.getRawWindow(repo, fb)
-				if err != nil {
-					handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
-					return
-				}
-				applyRawAggregate(&resp, agg, nodeNameMap, connMap, keyNames, views)
-				// Mirror the sub-day branch: errors that only exist in
-				// requestDetails (a failure that never wrote a usage row) are
-				// counted on top of the ledger rows.
-				if errCount, err := repo.GetRequestDetailsErrorCountSince(r.Context(), fb.since.UTC().Format("2006-01-02T15:04:05.000Z")); err == nil {
+			applyRawAggregate(&resp, agg, nodeNameMap, connMap, keyNames, views)
+			// Mirror the sub-day branch: errors that only exist in requestDetails
+			// (a failure that never wrote a usage row) are counted on top of the
+			// ledger rows.
+			if !dailyWin.since.IsZero() {
+				cutoff := dailyWin.since.UTC().Format("2006-01-02T15:04:05.000Z")
+				if errCount, err := repo.GetRequestDetailsErrorCountSince(r.Context(), cutoff); err == nil {
 					resp.TotalErrors = errCount
 				}
 			}
@@ -838,43 +649,4 @@ func HandleRequestDetail(repo *db.Repo) http.HandlerFunc {
 
 		handlerutil.WriteJSON(w, http.StatusOK, map[string]any{"detail": item})
 	}
-}
-
-// Helper functions for map extraction
-func getMapInt(m map[string]any, key string) int {
-	if v, ok := m[key]; ok {
-		switch n := v.(type) {
-		case float64:
-			return int(n)
-		case int:
-			return n
-		}
-	}
-	return 0
-}
-
-func getMapInt64(m map[string]any, key string) int64 {
-	if v, ok := m[key]; ok {
-		switch n := v.(type) {
-		case float64:
-			return int64(n)
-		case int64:
-			return n
-		case int:
-			return int64(n)
-		}
-	}
-	return 0
-}
-
-func getMapFloat(m map[string]any, key string) float64 {
-	if v, ok := m[key]; ok {
-		switch n := v.(type) {
-		case float64:
-			return n
-		case int:
-			return float64(n)
-		}
-	}
-	return 0
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"9routerx/proxy/internal/db"
 )
@@ -24,25 +25,15 @@ func TestHandleUsageStats_ViewsSelectsBreakdowns(t *testing.T) {
 		database, cleanup := setupTestDB(t)
 		t.Cleanup(cleanup)
 		repo := db.NewRepo(database)
-		dailyJSON := `{
-			"byProvider": {
-				"openai": {"requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-			},
-			"byModel": {
-				"gpt-4o|openai": {"rawModel": "gpt-4o", "provider": "openai", "requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-			},
-			"byAccount": {
-				"conn-1|gpt-4o|openai": {"rawModel": "gpt-4o", "provider": "openai", "requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-			},
-			"byApiKey": {
-				"sk-test|gpt-4o|openai": {"rawModel": "gpt-4o", "provider": "openai", "apiKey": "sk-test", "requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-			},
-			"byEndpoint": {
-				"/v1/chat/completions|gpt-4o|openai": {"endpoint": "/v1/chat/completions", "rawModel": "gpt-4o", "provider": "openai", "requests": 5, "promptTokens": 100, "completionTokens": 50, "cost": 0.002}
-			}
-		}`
-		if _, err := database.Exec(`INSERT INTO usageDaily (dateKey, data) VALUES ('2026-10-14', ?)`, dailyJSON); err != nil {
-			t.Fatalf("seed usageDaily: %v", err)
+		resetUsageWindowCache()
+		t.Cleanup(resetUsageWindowCache)
+		// One raw-history row lands in every breakdown the views parameter can
+		// select: provider, model, account, API key and endpoint.
+		if _, err := database.Exec(
+			`INSERT INTO usageHistory (timestamp, provider, model, connectionId, apiKey, endpoint, promptTokens, completionTokens, cost, status, tokens)
+			 VALUES (?, 'openai', 'gpt-4o', 'conn-1', 'sk-test', '/v1/chat/completions', 100, 50, 0.002, 'success', '{}')`,
+			time.Now().UTC().Add(-2*time.Hour).Format(time.RFC3339)); err != nil {
+			t.Fatalf("seed usageHistory: %v", err)
 		}
 		return repo
 	}

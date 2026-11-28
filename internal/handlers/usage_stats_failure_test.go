@@ -49,17 +49,21 @@ func TestUsageStats_BrokenDailyReadIs500NotZeroedTotals(t *testing.T) {
 	database, cleanup := setupTestDB(t)
 	defer cleanup()
 	repo := db.NewRepo(database)
+	resetUsageWindowCache()
+	t.Cleanup(resetUsageWindowCache)
 
 	// Seed a real row first, so the zeroed response cannot be explained by an
 	// empty database.
-	if err := repo.UpsertUsageDaily("2026-03-03", `{"byProvider":{"openai":{"requests":7}}}`); err != nil {
-		t.Fatalf("seed usageDaily: %v", err)
+	if err := repo.InsertUsageHistory("openai", "gpt-5.5", "conn-1", "sk-1", "/v1/chat/completions", 10, 5, 0.5, "success", 15, "{}", "{}"); err != nil {
+		t.Fatalf("seed usageHistory: %v", err)
 	}
-	if _, err := database.Exec(`DROP TABLE usageDaily;`); err != nil {
-		t.Fatalf("drop usageDaily: %v", err)
+	if _, err := database.Exec(`DROP TABLE usageHistory;`); err != nil {
+		t.Fatalf("drop usageHistory: %v", err)
 	}
 
-	// "7d" is a daily window, so it reads usageDaily.
+	// "7d" is a daily window, and daily windows read raw history through the
+	// window cache — the same ledger the sub-day windows read — so the broken
+	// read surfaces the same way.
 	rec := statsRequest(t, repo, "7d")
 	assertStatsRejected(t, "7d", rec)
 
