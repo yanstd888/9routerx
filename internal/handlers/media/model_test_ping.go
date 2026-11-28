@@ -465,6 +465,26 @@ func parseProbeBody(raw []byte) probeBody {
 	body := probeBody{raw: raw}
 	if json.Unmarshal(raw, &body.object) != nil {
 		body.object = nil
+		return body
+	}
+
+	// One more envelope level is common among OpenAI-compatible gateways:
+	// {"data":{...}}. Unwrap only when there is exactly one object field and it
+	// carries a completion shape, and only once — deeper nesting is a different
+	// protocol, not an envelope we should guess at.
+	if len(body.object) == 1 {
+		for _, value := range body.object {
+			var inner map[string]jsontext.Value
+			if json.Unmarshal(value, &inner) != nil {
+				break
+			}
+			_, hasChoices := inner["choices"]
+			_, hasContent := inner["content"]
+			if hasChoices || hasContent {
+				body.raw = []byte(value)
+				body.object = inner
+			}
+		}
 	}
 	return body
 }
