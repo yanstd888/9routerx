@@ -3,6 +3,7 @@
   import { t } from '../../lib/i18n.svelte'
   import Badge from '../../lib/ui/Badge.svelte'
   import Card from '../../lib/ui/Card.svelte'
+  import { BREAKDOWN_RENDER_CAP, nextVisibleCount, visibleRows } from '../../lib/pollPacing'
   import ProviderArtwork from '../providers/ProviderArtwork.svelte'
   import {
     fmt,
@@ -26,6 +27,16 @@
 
   let tableView = $state<TableView>('model')
   let viewMode = $state<ViewMode>('costs')
+
+  // R5: an all-time ledger can carry thousands of breakdown buckets. Render
+  // one bounded page and grow it on demand, so a poll never blocks the main
+  // thread building every row at once. The rows are the same sorted list the
+  // table always drew — nothing is filtered out, just deferred until asked.
+  let visibleCount = $state(BREAKDOWN_RENDER_CAP)
+  $effect(() => {
+    tableView // a different breakdown starts at the first page
+    visibleCount = BREAKDOWN_RENDER_CAP
+  })
 
   // Every column of the breakdown table is sortable: click a header for that
   // column, click it again to reverse. The default (requests, descending) is
@@ -126,6 +137,12 @@
       }
     })
   })
+
+  // R5: tableData is a derived factory (the template calls it), so invoke it
+  // once here to get the full sorted list. The table renders one bounded page
+  // and the Show more control grows it; nothing is dropped from the response.
+  const allRows = $derived(tableData())
+  const shownRows = $derived(visibleRows(allRows, visibleCount))
 
   const nameHeader = $derived(
     tableView === 'model'
@@ -264,7 +281,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-border/60">
-            {#each tableData() as row}
+            {#each shownRows as row}
               <tr class="hover:bg-surface-2/60 transition-colors">
                 <td data-label={nameHeader} class="py-3 px-4 font-mono font-medium text-text-main text-xs">
                   <div class="flex items-center gap-2">
@@ -344,6 +361,17 @@
             {/each}
           </tbody>
         </table>
+        {#if allRows.length > visibleCount}
+          <div class="flex justify-center py-3">
+            <button
+              type="button"
+              class="text-xs text-accent hover:underline px-4 py-2"
+              onclick={() => (visibleCount = nextVisibleCount(visibleCount, allRows.length))}
+            >
+              {t('Show more')} — {allRows.length - visibleCount} {t('more rows')}
+            </button>
+          </div>
+        {/if}
       </div>
     {/if}
   </Card>

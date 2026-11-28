@@ -1,6 +1,7 @@
 <!-- 9RouterX — all source code port and modification by https://github.com/yanstd888/ — https://t.me/aiclub_id -->
 <script lang="ts">
   import { t } from '../../lib/i18n.svelte'
+  import { isLongRange, LONG_POLLS, SHORT_POLLS } from '../../lib/pollPacing'
   import { api, getAuthHeaders, normalizeLastError, type ProviderConnection, type ProviderNode } from '../../api/client'
   import { PROVIDER_CATALOG } from '../../lib/providers'
   import {
@@ -59,6 +60,10 @@
   let section = $state<UsageSection>(USAGE_SECTION_BY_TAB[tab] ?? 'overview')
   let period = $state<Period>(storedPeriod('usage', 'today'))
   $effect(() => rememberPeriod('usage', period))
+  // R5: a week-or-longer period polls slower. The derived is a string so the
+  // polling effect below re-creates its timers only when the pacing class
+  // changes — picking another long period does not reconnect the live stream.
+  const pacingClass = $derived(isLongRange(period) ? 'long' : 'short')
   let isFetching = $state(false)
 
   // The two optional Overview panels start collapsed and say so with a chevron,
@@ -338,6 +343,9 @@
     // every one of them hidden, the connection would stream numbers into a
     // page that draws none of them (issue #506).
     if (!overviewLive) return
+    // Read the pacing class synchronously so this effect depends on it: the
+    // intervals are rebuilt when the window shape changes, not on every tick.
+    const pacing = pacingClass === 'long' ? LONG_POLLS : SHORT_POLLS
     let isCancelled = false
     let controller: AbortController | null = null
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
@@ -423,7 +431,8 @@
 
     connectStream()
 
-    // Auto-poll stats every 5s so KPI counters smoothly increment in real time.
+    // Auto-poll stats so KPI counters increment in real time. Five seconds
+    // for today/24h, fifteen for a long window (see pollPacing.ts).
     //
     // The poll asks for totals only. The four per-model breakdown maps are 98%
     // of the payload (415 KB at 411 models) and the breakdown table draws one
@@ -434,16 +443,15 @@
       if (section === 'overview' && (typeof document === 'undefined' || !document.hidden)) {
         loadStats(period, 'none')
       }
-    }, 5000)
+    }, pacing.totalsMs)
 
-    // The breakdown maps change slowly enough that a table four seconds stale
-    // reads the same as a fresh one, and this keeps them current without
-    // paying the per-poll cost.
+    // The breakdown maps change slowly enough that a stale table reads the
+    // same as a fresh one; long windows use a sixty-second schedule.
     const breakdownTimer = setInterval(() => {
       if (section === 'overview' && (typeof document === 'undefined' || !document.hidden)) {
         loadStats(period)
       }
-    }, 30000)
+    }, pacing.breakdownMs)
 
     return () => {
       isCancelled = true
