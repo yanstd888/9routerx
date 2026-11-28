@@ -728,6 +728,7 @@ func SetupServerRouter(r chi.Router, repo *db.Repo, ts *TokenSaverConfig) *chat.
 	}
 	r.Get("/api/auth/status", dashH.HandleAuthStatus)
 	r.Post("/api/auth/login", dashH.HandleAuthLogin)
+	r.Post("/api/auth/login/totp", dashH.HandleAuthLoginTOTP)
 	r.Post("/api/auth/logout", dashH.HandleAuthLogout)
 	r.Get("/api/settings/require-login", dashH.HandleRequireLogin)
 	// /api/tunnel/status is registered in SetupDashboardRoutes; a copy here

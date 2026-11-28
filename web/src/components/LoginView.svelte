@@ -34,6 +34,19 @@
   let samlConfigured = $state(false)
   let samlLoginLabel = $state('Sign in with SAML SSO')
   let mustChange = $state(false)
+  let totpRequired = $state(false)
+  let totpCode = $state('')
+
+  function completeLogin() {
+    // Live routing flow (TASK-9routerX-anim-bg 2.5.2), wiring point 2 of
+    // 2: a successful login submit fires a background data burst.
+    routingBurst()
+    if (onSuccess) {
+      onSuccess()
+    } else {
+      window.location.assign('/dashboard')
+    }
+  }
 
   // Countdown for rate-limit lockout (upstream retryAfter).
   $effect(() => {
@@ -117,15 +130,13 @@
 
     try {
       const res = await api.login(password)
-      if (res.success) {
-        // Live routing flow (TASK-9routerX-anim-bg 2.5.2), wiring point 2 of
-        // 2: a successful login submit fires a background data burst.
-        routingBurst()
-        if (onSuccess) {
-          onSuccess()
-        } else {
-          window.location.assign('/dashboard')
-        }
+      if (res.totpRequired) {
+        // Password passed; the server issued no session. Ask for the second
+        // factor on this same screen instead of reloading the login page.
+        totpRequired = true
+        errorMessage = ''
+      } else if (res.success) {
+        completeLogin()
       } else {
         errorMessage = res.error || 'Invalid password'
       }
@@ -157,17 +168,43 @@
 
     try {
       const res = await api.login(password, newPassword)
-      if (res.success) {
-        if (onSuccess) {
-          onSuccess()
-        } else {
-          window.location.assign('/dashboard')
-        }
+      if (res.totpRequired) {
+        totpRequired = true
+        errorMessage = ''
+      } else if (res.success) {
+        completeLogin()
       } else {
         errorMessage = res.error || 'Failed to set password'
       }
     } catch (err: unknown) {
       errorMessage = err instanceof Error ? err.message : 'Failed to set password'
+    } finally {
+      isLoading = false
+    }
+  }
+
+  async function handleTotpSubmit(e: SubmitEvent) {
+    e.preventDefault()
+    const code = totpCode.trim()
+    if (!password.trim() || !code || isLoading || retryAfter > 0) return
+
+    isLoading = true
+    errorMessage = ''
+
+    try {
+      // Keep the pending password rotation in the same request: the first
+      // step never changed it, so the second factor sees the stored password.
+      const res = await api.loginTotp(password, code, mustChange ? newPassword : undefined)
+      if (res.success) {
+        completeLogin()
+      } else {
+        errorMessage = res.error || 'Invalid authentication code'
+      }
+    } catch (err: unknown) {
+      const failure = err as LoginFailure
+      errorMessage = err instanceof Error ? err.message : 'Invalid authentication code'
+      if (typeof failure?.retryAfter === 'number') retryAfter = failure.retryAfter
+      if (typeof failure?.resetHint === 'string') resetHint = failure.resetHint
     } finally {
       isLoading = false
     }
@@ -248,7 +285,42 @@
             <h1 class="font-headline font-light lowercase text-[clamp(24px,5vw,30px)] leading-tight mb-6 tracking-tight" use:scramble>{t('welcome back,')}<span class="text-[var(--9x-accent)]">&rarr;9x:</span>
             </h1>
 
-            {#if mustChange}
+            {#if totpRequired}
+              <form onsubmit={handleTotpSubmit} class="flex flex-col gap-4">
+                <p class="text-xs text-[var(--9x-ink)]/60 text-center font-code leading-relaxed">
+                  {t('Enter the code from your authenticator app, or a backup code.')}
+                </p>
+                <div class="flex flex-col gap-2">
+                  <label for="login-totp-code" class="text-sm font-medium text-[var(--9x-ink)]/80 font-headline">{t('Authentication code')}</label>
+                  <input
+                    id="login-totp-code"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    placeholder="000000"
+                    bind:value={totpCode}
+                    required
+                    data-login-focus
+                    class="gl-input"
+                  />
+                  {#if errorMessage}
+                    <p class="gl-error" role="alert">{errorMessage}</p>
+                  {/if}
+                  {#if retryAfter > 0}
+                    <p class="text-xs text-[var(--9x-wait)] font-code">{t('Locked. Retry in')}<span>{retryAfter}s</span>.
+                    </p>
+                  {/if}
+                </div>
+                <button type="submit" disabled={isLoading || !totpCode.trim() || retryAfter > 0} class="gl-btn">
+                  {#if isLoading}
+                    <span class="gl-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span>{t('routing...')}</span>
+                  {:else}
+                    <span>{t('sign in')}</span>
+                  {/if}
+                </button>
+              </form>
+            {:else if mustChange}
               <form onsubmit={handleSetNewPassword} class="flex flex-col gap-4">
                 <p class="text-sm text-[var(--9x-wait)] text-center font-code text-xs leading-relaxed">{t('Set a new password before accessing the dashboard remotely.')}</p>
                 <div class="flex flex-col gap-2">
