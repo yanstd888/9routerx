@@ -827,3 +827,58 @@ func applyRawAggregate(resp *UsageStatsResponse, agg *rawAggregate, nodeNameMap,
 		}
 	}
 }
+
+// cacheHitTotalsEntry is one cached cache-hit read: the JSON-extracting CTE
+// over the window's rows, gated on the ledger watermark.
+type cacheHitTotalsEntry struct {
+	hit        int64
+	total      int64
+	watermark  string
+	fetchedAt  time.Time
+}
+
+// cacheHitTotalsCache caches one read per since string. The dashboard's
+// ledger read fixed its 7-day window per request and the CTE json_extract-extracts
+// four fields from every row in it; a watermark seek per read folds in only
+// ledger changes.
+type cacheHitTotalsCache struct {
+	mu      sync.Mutex
+	entries map[string]*cacheHitTotalsEntry
+}
+
+var cacheHitTotals cacheHitTotalsCache
+
+// resetCacheHitTotalsCache drops the cached reads. Tests use it to observe a
+// cold cache; production never calls it.
+func resetCacheHitTotalsCache() {
+	cacheHitTotals.mu.Lock()
+	cacheHitTotals.entries = nil
+	cacheHitTotals.mu.Unlock()
+}
+
+// cachedUsageCacheHitTotals serves the cache-hit totals for since from the
+// cache, recounting when the ledger watermark moved. A watermark read that
+// itself fails falls through to the uncached read rather than blocking it.
+func cachedUsageCacheHitTotals(repo *db.Repo, since string) (int64, int64, error) {
+	cacheHitTotals.mu.Lock()
+	defer cacheHitTotals.mu.Unlock()
+
+	if entry, ok := cacheHitTotals.entries[since]; ok && time.Since(entry.fetchedAt) <= usageCacheTTL {
+		if watermark, err := repo.GetUsageHistoryWatermark(); err == nil && watermark == entry.watermark {
+			entry.fetchedAt = time.Now()
+			return entry.hit, entry.total, nil
+		}
+	}
+
+	hit, total, err := repo.GetUsageCacheHitTotalsSince(since)
+	if err != nil {
+		return 0, 0, err
+	}
+	if wm, werr := repo.GetUsageHistoryWatermark(); werr == nil {
+		if cacheHitTotals.entries == nil {
+			cacheHitTotals.entries = make(map[string]*cacheHitTotalsEntry)
+		}
+		cacheHitTotals.entries[since] = &cacheHitTotalsEntry{hit: hit, total: total, watermark: wm, fetchedAt: time.Now()}
+	}
+	return hit, total, nil
+}
