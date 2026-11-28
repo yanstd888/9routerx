@@ -2709,10 +2709,12 @@
 
   async function handleTestCompatibleModel(modelId: string) {
     if (compatibleTesting[modelId]) return
+    const pid = providerId
     compatibleTesting[modelId] = true
     compatibleTestErrors[modelId] = null
     try {
       const res = await api.testModel(`${storageAlias}/${modelId}`)
+      if (pid !== providerId) return
       // Kept absent when the server reports nothing, so the latency sort
       // treats it as unmeasured rather than as the fastest model on the list.
       if (res.latencyMs !== undefined) compatibleTestLatency[modelId] = res.latencyMs
@@ -2720,6 +2722,7 @@
       compatibleTestResults[modelId] = verdict.status
       compatibleTestErrors[modelId] = verdict.error
     } catch (err) {
+      if (pid !== providerId) return
       compatibleTestResults[modelId] = 'error'
       compatibleTestErrors[modelId] = err instanceof Error ? err.message : 'Model test failed'
     } finally {
