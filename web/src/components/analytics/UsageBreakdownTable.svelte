@@ -34,7 +34,7 @@
   // table always drew — nothing is filtered out, just deferred until asked.
   let visibleCount = $state(BREAKDOWN_RENDER_CAP)
   $effect(() => {
-    tableView // a different breakdown starts at the first page
+    void tableView // a different breakdown starts at the first page
     visibleCount = BREAKDOWN_RENDER_CAP
   })
 
