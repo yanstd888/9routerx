@@ -4080,33 +4080,6 @@ export const BUILTIN_MODELS_BY_PROVIDER: Record<string, ProviderModel[]> = {
       "kind": "image"
     },
     {
-      "id": "gemini-2.5-pro",
-      "name": "Gemini 2.5 Pro (Best)",
-      "params": [
-        "language",
-        "prompt"
-      ],
-      "kind": "stt"
-    },
-    {
-      "id": "gemini-2.5-flash",
-      "name": "Gemini 2.5 Flash",
-      "params": [
-        "language",
-        "prompt"
-      ],
-      "kind": "stt"
-    },
-    {
-      "id": "gemini-2.5-flash-lite",
-      "name": "Gemini 2.5 Flash Lite (Cheapest)",
-      "params": [
-        "language",
-        "prompt"
-      ],
-      "kind": "stt"
-    },
-    {
       "id": "gemini-2.0-flash",
       "name": "Gemini 2.0 Flash",
       "params": [
