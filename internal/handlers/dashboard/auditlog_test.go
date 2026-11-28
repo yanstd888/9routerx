@@ -338,3 +338,65 @@ func TestAuditSettingsKeysSorts(t *testing.T) {
 		t.Error("auditSettingsKeys(nil) = nil, want an empty slice")
 	}
 }
+
+func TestRecordAuditWritesChainedEntry(t *testing.T) {
+	repo, cleanup := setupTestDB(t)
+	defer cleanup()
+	if _, err := repo.RawDB().Exec(`DELETE FROM auditLog`); err != nil {
+		t.Fatalf("clear audit log: %v", err)
+	}
+	h := NewDashboardHandler(repo)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/keys", nil)
+	h.recordAudit(req, AuditActionCreateKey, "chained-key", nil, nil)
+	entries := waitForAudit(t, repo, func(entries []db.AuditLogEntry) bool {
+		return len(entries) == 1
+	})
+
+	status, err := repo.VerifyAuditChain(context.Background())
+	if err != nil {
+		t.Fatalf("verify: %v", err)
+	}
+	if !status.Intact || status.Total != 1 {
+		t.Fatalf("chain status = %+v, want one intact entry", status)
+	}
+
+	if _, err := repo.RawDB().Exec(`UPDATE auditLog SET action = 'tampered' WHERE id = ?`, entries[0].ID); err != nil {
+		t.Fatalf("tamper: %v", err)
+	}
+	status, err = repo.VerifyAuditChain(context.Background())
+	if err != nil {
+		t.Fatalf("verify after tamper: %v", err)
+	}
+	if status.Intact || status.BrokenID != entries[0].ID {
+		t.Fatalf("tampered chain status = %+v, want broken at id %d", status, entries[0].ID)
+	}
+}
+
+func TestHandleVerifyAuditChain(t *testing.T) {
+	repo, cleanup := setupTestDB(t)
+	defer cleanup()
+	ctx := context.Background()
+	if _, err := repo.RawDB().Exec(`DELETE FROM auditLog`); err != nil {
+		t.Fatalf("clear audit log: %v", err)
+	}
+	if err := repo.RecordAuditChainEntry(ctx, db.AuditLogEntry{
+		Actor: "dashboard", Action: AuditActionCreateKey, Target: "verified-key",
+	}); err != nil {
+		t.Fatalf("seed chain: %v", err)
+	}
+
+	rec := httptest.NewRecorder()
+	NewDashboardHandler(repo).HandleVerifyAuditChain(rec,
+		httptest.NewRequest(http.MethodGet, "/api/audit/verify", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d: %s", rec.Code, rec.Body.String())
+	}
+	var status db.AuditChainStatus
+	if err := json.Unmarshal(rec.Body.Bytes(), &status); err != nil {
+		t.Fatalf("decode status: %v", err)
+	}
+	if !status.Intact || status.Total != 1 {
+		t.Fatalf("status = %+v, want one intact entry", status)
+	}
+}

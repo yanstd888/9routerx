@@ -728,6 +728,7 @@ func SetupServerRouter(r chi.Router, repo *db.Repo, ts *TokenSaverConfig) *chat.
 	}
 	r.Get("/api/auth/status", dashH.HandleAuthStatus)
 	r.Post("/api/auth/login", dashH.HandleAuthLogin)
+	r.Post("/api/auth/login/totp", dashH.HandleAuthLoginTOTP)
 	r.Post("/api/auth/logout", dashH.HandleAuthLogout)
 	r.Get("/api/settings/require-login", dashH.HandleRequireLogin)
 	// /api/tunnel/status is registered in SetupDashboardRoutes; a copy here
@@ -782,6 +783,10 @@ func SetupServerRouter(r chi.Router, repo *db.Repo, ts *TokenSaverConfig) *chat.
 		// Admin session/CLI token AND UPDATE_DEBUG_ENDPOINT=1 — the handler
 		// answers 404 on a default install (internal/handlers/dashboard/update.go).
 		r.Get("/api/update/debug", dashH.HandleUpdateDebug)
+		// Hash-chain verification for the compliance audit trail. Admin-only
+		// like the other integrity/debug surfaces; a normal dashboard session
+		// is not enough to read the whole chain.
+		r.Get("/api/audit/verify", dashH.HandleVerifyAuditChain)
 
 		// Profiling endpoints (pprof) — disabled by default in production for security;
 		// enable explicitly via PPROF_ENABLED=true. Gated behind RequireAdminAuth

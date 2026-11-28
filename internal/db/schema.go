@@ -939,6 +939,9 @@ func EnsureCoreSchema(db *sql.DB) error {
 	if err := EnsureAdditiveColumns(db); err != nil {
 		return err
 	}
+	if err := EnsureAuditChainColumns(db); err != nil {
+		return err
+	}
 	// Only now does every go-only column exist, so the indexes that name one
 	// can be created. A failure here is a boot failure: TeamUsageReport and
 	// TeamSpendInWindow falling back to a ledger scan would put a multi-second

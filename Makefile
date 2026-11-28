@@ -302,6 +302,10 @@ docker:
 docker-build:
 	docker build -t $(BINARY_NAME) .
 
+## readme-count — regenerate the provider-count numbers in README.md and wiki/
+readme-count:
+	go run ./tools/sitegen/providercount -write
+
 ## wiki-build — generate the project page + wiki into _site/
 wiki-build:
 	go run ./tools/sitegen -out _site

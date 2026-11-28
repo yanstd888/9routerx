@@ -9,6 +9,7 @@ import (
 
 	"9routerx/proxy/internal/auth"
 	"9routerx/proxy/internal/handlerutil"
+	"9routerx/proxy/internal/log"
 )
 
 // TOTP 2FA (E2): the settings endpoints manage the enrollment, and the login
@@ -52,9 +53,9 @@ func (h *DashboardHandler) writeTOTPConfig(cfg auth.TOTPConfig) error {
 func (h *DashboardHandler) HandleTOTPStatus(w http.ResponseWriter, r *http.Request) {
 	cfg := h.readTOTPConfig()
 	handlerutil.WriteJSON(w, http.StatusOK, map[string]any{
-		"enabled":      cfg.Enabled,
-		"backupCount":  len(cfg.BackupCodes),
-		"enrolledAt":   cfg.EnrolledAt,
+		"enabled":     cfg.Enabled,
+		"backupCount": len(cfg.BackupCodes),
+		"enrolledAt":  cfg.EnrolledAt,
 	})
 }
 
@@ -128,6 +129,11 @@ func (h *DashboardHandler) HandleTOTPDisable(w http.ResponseWriter, r *http.Requ
 // totpLoginGate is the login handler's second factor: when the enrollment is
 // enabled, a correct password alone is not enough. The code may be a TOTP
 // code or one of the one-time backup codes (which burns on use).
+//
+// The gate is deliberately pure: it never writes a response. The login handler
+// owns the wire shape — a missing code is a 200 "totpRequired" prompt, a wrong
+// code is a generic 401 — so both the first and second login step share one
+// decision without double-writing the response.
 func (h *DashboardHandler) totpLoginGate(w http.ResponseWriter, r *http.Request, payload struct {
 	Password    string `json:"password"`
 	NewPassword string `json:"newPassword"`
@@ -137,26 +143,20 @@ func (h *DashboardHandler) totpLoginGate(w http.ResponseWriter, r *http.Request,
 	if !cfg.Enabled {
 		return false, true
 	}
-	if strings.TrimSpace(payload.Code) != "" {
-		if auth.VerifyTOTPCode(cfg.Secret, payload.Code) {
-			return false, true
-		}
-		if idx, matched := auth.MatchBackupCode(cfg.BackupCodes, payload.Code); matched {
-			cfg.BackupCodes = auth.BurnBackupCode(cfg.BackupCodes, idx)
-			if err := h.writeTOTPConfig(cfg); err != nil {
-				handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
-				return false, false
-			}
-			return false, true
-		}
+	code := strings.TrimSpace(payload.Code)
+	if code == "" {
+		return true, false
 	}
-	// Wrong or missing code: the same generic 401 wording the password path
-	// writes for a bad credential — the error never says which factor failed.
-	noStore(w)
-	handlerutil.WriteJSON(w, http.StatusUnauthorized, map[string]any{
-		"success":          false,
-		"totpRequired":     true,
-		"error":            "Authentication failed.",
-	})
-	return true, false
+	if auth.VerifyTOTPCode(cfg.Secret, code) {
+		return false, true
+	}
+	if idx, matched := auth.MatchBackupCode(cfg.BackupCodes, code); matched {
+		cfg.BackupCodes = auth.BurnBackupCode(cfg.BackupCodes, idx)
+		if err := h.writeTOTPConfig(cfg); err != nil {
+			log.Warn("auth", "totp backup code could not be burned", "error", err)
+			return false, false
+		}
+		return false, true
+	}
+	return false, false
 }

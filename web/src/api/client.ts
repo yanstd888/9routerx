@@ -1086,10 +1086,59 @@ export interface RequireLoginResponse {
 export interface LoginResponse {
   success: boolean
   mustChangePassword?: boolean
+  totpRequired?: boolean
   error?: string
   retryAfter?: number
   resetHint?: string
   remainingBeforeLock?: number
+}
+
+async function postLogin(
+  path: string,
+  body: { password: string; newPassword?: string; code?: string },
+): Promise<LoginResponse> {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (res.ok) {
+    const data = await res.json()
+    // The server sets the httpOnly auth_token cookie; this flag only drives
+    // the client-side gate (isAuthenticated) since JS cannot read it.
+    sessionStorage.setItem('9routerx_auth', 'true')
+    localStorage.setItem('9routerx_auth', 'true')
+    return {
+      success: true,
+      mustChangePassword: !!data.mustChangePassword,
+      totpRequired: data.totpRequired === true,
+    }
+  }
+  let errText = 'Invalid password'
+  let retryAfter: number | undefined
+  let resetHint: string | undefined
+  let remainingBeforeLock: number | undefined
+  let mustChangePassword = false
+  try {
+    const errJson = await res.json()
+    errText = errJson.error?.message || errJson.error || errJson.message || errText
+    if (typeof errJson.retryAfter === 'number') retryAfter = errJson.retryAfter
+    else if (typeof errJson.retryAfter === 'string') retryAfter = Number(errJson.retryAfter) || undefined
+    if (typeof errJson.resetHint === 'string') resetHint = errJson.resetHint
+    if (typeof errJson.remainingBeforeLock === 'number') remainingBeforeLock = errJson.remainingBeforeLock
+    if (errJson.mustChangePassword === true) mustChangePassword = true
+  } catch {
+    // The error body is not guaranteed to be JSON (proxy error pages,
+    // empty bodies); errText already carries the raw text for those.
+  }
+  const err = new Error(errText) as Error &
+    Pick<LoginResponse, 'retryAfter' | 'resetHint' | 'remainingBeforeLock' | 'mustChangePassword' | 'totpRequired'>
+  err.retryAfter = retryAfter
+  err.resetHint = resetHint
+  err.remainingBeforeLock = remainingBeforeLock
+  err.mustChangePassword = mustChangePassword
+  err.totpRequired = false
+  throw err
 }
 
 export interface SemanticCacheStats {
@@ -2829,45 +2878,14 @@ export const api = {
     } catch {}
     return { requireLogin: false }
   },
-  login: async (password: string, newPassword?: string): Promise<LoginResponse> => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password, ...(newPassword ? { newPassword } : {}) }),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      // The server sets the httpOnly auth_token cookie; this flag only drives
-      // the client-side gate (isAuthenticated) since JS cannot read it.
-      sessionStorage.setItem('9routerx_auth', 'true')
-      localStorage.setItem('9routerx_auth', 'true')
-      return { success: true, mustChangePassword: !!data.mustChangePassword }
-    }
-    let errText = 'Invalid password'
-    let retryAfter: number | undefined
-    let resetHint: string | undefined
-    let remainingBeforeLock: number | undefined
-    let mustChangePassword = false
-    try {
-      const errJson = await res.json()
-      errText = errJson.error?.message || errJson.error || errJson.message || errText
-      if (typeof errJson.retryAfter === 'number') retryAfter = errJson.retryAfter
-      else if (typeof errJson.retryAfter === 'string') retryAfter = Number(errJson.retryAfter) || undefined
-      if (typeof errJson.resetHint === 'string') resetHint = errJson.resetHint
-      if (typeof errJson.remainingBeforeLock === 'number') remainingBeforeLock = errJson.remainingBeforeLock
-      if (errJson.mustChangePassword === true) mustChangePassword = true
-    } catch {
-      // The error body is not guaranteed to be JSON (proxy error pages,
-      // empty bodies); errText already carries the raw text for those.
-    }
-    const err = new Error(errText) as Error &
-      Pick<LoginResponse, 'retryAfter' | 'resetHint' | 'remainingBeforeLock' | 'mustChangePassword'>
-    err.retryAfter = retryAfter
-    err.resetHint = resetHint
-    err.remainingBeforeLock = remainingBeforeLock
-    err.mustChangePassword = mustChangePassword
-    throw err
-  },
+  login: async (password: string, newPassword?: string): Promise<LoginResponse> =>
+    postLogin('/api/auth/login', { password, ...(newPassword ? { newPassword } : {}) }),
+  loginTotp: async (password: string, code: string, newPassword?: string): Promise<LoginResponse> =>
+    postLogin('/api/auth/login/totp', {
+      password,
+      code,
+      ...(newPassword ? { newPassword } : {}),
+    }),
     // Cache Analytics
     /**
      * `period` bounds the totals, the breakdowns and the hourly trend together.

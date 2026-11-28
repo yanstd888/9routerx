@@ -3,6 +3,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 )
 
@@ -69,5 +70,46 @@ func TestAuditChainTamperDetection(t *testing.T) {
 	}
 	if status.BrokenID == 0 {
 		t.Error("broken location not reported")
+	}
+}
+
+func TestEnsureAuditChainColumnsIsIdempotent(t *testing.T) {
+	repo := openEphemeralSchemaDB(t)
+	for i := 0; i < 2; i++ {
+		if err := EnsureAuditChainColumns(repo.RawDB()); err != nil {
+			t.Fatalf("call %d: %v", i, err)
+		}
+	}
+
+	rows, err := repo.RawDB().Query(`PRAGMA table_info(auditLog)`)
+	if err != nil {
+		t.Fatalf("table info: %v", err)
+	}
+	defer rows.Close()
+	found := map[string]bool{}
+	for rows.Next() {
+		var cid, notNull, pk int
+		var name, colType string
+		var dflt sql.NullString
+		if err := rows.Scan(&cid, &name, &colType, &notNull, &dflt, &pk); err != nil {
+			t.Fatalf("scan column: %v", err)
+		}
+		found[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("read table info: %v", err)
+	}
+	if !found["prevHash"] || !found["entryHash"] {
+		t.Fatalf("chain columns missing: %v", found)
+	}
+
+	var indexes int
+	if err := repo.RawDB().QueryRow(
+		`SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = 'idx_audit_prev_hash'`,
+	).Scan(&indexes); err != nil {
+		t.Fatalf("count index: %v", err)
+	}
+	if indexes != 1 {
+		t.Fatalf("prevHash index count = %d, want 1", indexes)
 	}
 }

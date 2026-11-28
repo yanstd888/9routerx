@@ -22,12 +22,24 @@ import (
 const resetHint = "Forgot password? Reset to default via 9RouterX CLI → Settings → Reset Password to Default."
 
 // HandleAuthLogin handles POST /api/auth/login: verify the dashboard password
-// and issue the session cookie. Mirrors upstream
+// and, when TOTP enrollment is enabled, require a second factor before a
+// session is issued. Mirrors upstream
 // src/app/api/auth/login/route.js: progressive per-client lockout (429 +
 // Retry-After), tunnel/tailscale gate, SSO-only gate, bcrypt hash first with
 // INITIAL_PASSWORD / "123456" fallback, and no session cookie for a remote
 // caller still on the well-known default password (CVE-2026-56679 class).
 func (h *DashboardHandler) HandleAuthLogin(w http.ResponseWriter, r *http.Request) {
+	h.handleLogin(w, r, false)
+}
+
+// HandleAuthLoginTOTP handles POST /api/auth/login/totp: the second step of a
+// password + TOTP sign-in. The password is checked again here, so a caller who
+// never passed the first factor cannot mint a session through this route.
+func (h *DashboardHandler) HandleAuthLoginTOTP(w http.ResponseWriter, r *http.Request) {
+	h.handleLogin(w, r, true)
+}
+
+func (h *DashboardHandler) handleLogin(w http.ResponseWriter, r *http.Request, secondFactorStep bool) {
 	ip := auth.LoginClientIP(r)
 	if locked, retryAfter := auth.LoginLocked(ip); locked {
 		writeLoginLocked(w, retryAfter)
@@ -44,6 +56,7 @@ func (h *DashboardHandler) HandleAuthLogin(w http.ResponseWriter, r *http.Reques
 	var payload struct {
 		Password    string `json:"password"`
 		NewPassword string `json:"newPassword"`
+		Code        string `json:"code"`
 	}
 	if err := json.Unmarshal(body, &payload); err != nil {
 		writePlainError(w, http.StatusBadRequest, "invalid JSON")
@@ -62,6 +75,64 @@ func (h *DashboardHandler) HandleAuthLogin(w http.ResponseWriter, r *http.Reques
 	}
 
 	if h.verifyDashboardPassword(payload.Password) {
+		if secondFactorStep && !h.readTOTPConfig().Enabled {
+			noStore(w)
+			handlerutil.WriteJSON(w, http.StatusBadRequest, map[string]any{
+				"success": false,
+				"error":   "Two-factor authentication is not enabled.",
+			})
+			return
+		}
+		secondFactorRequired, proceed := h.totpLoginGate(w, r, payload, ip)
+		if secondFactorRequired {
+			// Password was right; the caller still needs to supply a code. No
+			// session, no success audit record, and no failed-attempt penalty.
+			noStore(w)
+			handlerutil.WriteJSON(w, http.StatusOK, map[string]any{
+				"success":      false,
+				"totpRequired": true,
+			})
+			return
+		}
+		if !proceed {
+			// A wrong TOTP or backup code counts like a bad credential: the
+			// per-client lockout also bounds online code guessing.
+			auth.RecordLoginFail(ip)
+			if locked, retryAfter := auth.LoginLocked(ip); locked {
+				securitylog.Record(securitylog.Entry{
+					Type:      "login_locked",
+					Severity:  "warn",
+					IP:        ip,
+					Actor:     "dashboard",
+					Method:    "POST",
+					Path:      r.URL.Path,
+					Status:    http.StatusTooManyRequests,
+					Detail:    "Login locked after failed second factor",
+					UserAgent: r.UserAgent(),
+				})
+				writeLoginLocked(w, retryAfter)
+				return
+			}
+			securitylog.Record(securitylog.Entry{
+				Type:      "login_totp_failed",
+				Severity:  "warn",
+				IP:        ip,
+				Actor:     "dashboard",
+				Method:    "POST",
+				Path:      r.URL.Path,
+				Status:    http.StatusUnauthorized,
+				Detail:    "Invalid second factor",
+				UserAgent: r.UserAgent(),
+			})
+			h.recordAudit(r, AuditActionLoginFailed, ip, nil, map[string]any{"result": "totp_failure"})
+			noStore(w)
+			handlerutil.WriteJSON(w, http.StatusUnauthorized, map[string]any{
+				"success":      false,
+				"totpRequired": true,
+				"error":        "Authentication failed.",
+			})
+			return
+		}
 		auth.RecordLoginSuccess(ip)
 		if payload.NewPassword != "" {
 			if err := h.changeDashboardPassword(payload.Password, payload.NewPassword); err != nil {

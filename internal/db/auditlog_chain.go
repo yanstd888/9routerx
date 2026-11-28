@@ -4,6 +4,7 @@ package db
 import (
 	"context"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
 	"fmt"
 	"time"
@@ -34,10 +35,20 @@ func auditChainHash(prevHash, ts, actor, action, target, ip string) string {
 
 // EnsureAuditChainColumns adds prevHash and entryHash to the auditLog table.
 // Additive-only; entries written before the migration have empty hashes and
-// start the chain fresh.
-func EnsureAuditChainColumns(db interface {
-	Exec(string, ...any) (interface{}, error)
-}) error {
+// start the chain fresh. Safe to call on every boot: both the columns and the
+// lookup index are created only when missing.
+func EnsureAuditChainColumns(db *sql.DB) error {
+	for _, col := range []struct{ name, definition string }{
+		{"prevHash", "TEXT DEFAULT ''"},
+		{"entryHash", "TEXT DEFAULT ''"},
+	} {
+		if err := addColumnIfMissing(db, "auditLog", col.name, col.definition); err != nil {
+			return fmt.Errorf("audit chain: add %s: %w", col.name, err)
+		}
+	}
+	if _, err := db.ExecContext(context.Background(), `CREATE INDEX IF NOT EXISTS idx_audit_prev_hash ON auditLog(prevHash)`); err != nil {
+		return fmt.Errorf("audit chain: create prevHash index: %w", err)
+	}
 	return nil
 }
 

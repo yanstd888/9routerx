@@ -178,7 +178,16 @@ func (h *DashboardHandler) guardrailPolicyFromBody(w http.ResponseWriter, r *htt
 			"scope must be one of global, provider, model, chain, apikey")
 		return nil, false
 	}
-	if err := validateGuardrailConfig(req.Config); err != nil {
+	config := req.Config
+	if len(req.CustomPatterns) > 0 {
+		merged, err := mergeGuardrailCustomPatterns(config, req.CustomPatterns)
+		if err != nil {
+			handlerutil.WriteJSONError(w, http.StatusBadRequest, "config could not carry customPatterns")
+			return nil, false
+		}
+		config = merged
+	}
+	if err := validateGuardrailConfig(config); err != nil {
 		handlerutil.WriteJSONError(w, http.StatusBadRequest, err.Error())
 		return nil, false
 	}
@@ -193,12 +202,35 @@ func (h *DashboardHandler) guardrailPolicyFromBody(w http.ResponseWriter, r *htt
 		Scope:   req.Scope,
 		ScopeID: req.ScopeID,
 		Enabled: enabled,
-		Config:  req.Config,
+		Config:  config,
 	}
 	if id != nil {
 		p.ID = *id
 	}
 	return p, true
+}
+
+// mergeGuardrailCustomPatterns folds the request-level customPatterns into the
+// opaque config string the resolver reads. Without this, the API accepted the
+// field and silently dropped it, so a schema policy saved through the dashboard
+// never reached the engine.
+func mergeGuardrailCustomPatterns(raw string, extra []guardrails.CustomPattern) (string, error) {
+	var cfg struct {
+		Detectors      []string                   `json:"detectors"`
+		Action         string                     `json:"action"`
+		CustomPatterns []guardrails.CustomPattern `json:"customPatterns,omitempty"`
+	}
+	if strings.TrimSpace(raw) != "" {
+		if err := json.Unmarshal([]byte(raw), &cfg); err != nil {
+			return "", err
+		}
+	}
+	cfg.CustomPatterns = append(cfg.CustomPatterns, extra...)
+	merged, err := json.Marshal(cfg)
+	if err != nil {
+		return "", err
+	}
+	return string(merged), nil
 }
 
 // validateGuardrailConfig rejects a config the engine could not act on, so an
@@ -220,7 +252,7 @@ func validateGuardrailConfig(raw string) error {
 		return errGuardrailNoDetectors
 	}
 	for _, d := range probe.Detectors {
-		if d != "pii" && d != "injection" && d != "custom" {
+		if d != "pii" && d != "injection" && d != "custom" && d != "json_schema" {
 			return errGuardrailUnknownDetector
 		}
 	}
@@ -229,10 +261,17 @@ func validateGuardrailConfig(raw string) error {
 	default:
 		return errGuardrailUnknownAction
 	}
-	// Validate custom patterns
+	// Validate custom patterns. A json_schema pattern carries a schema document,
+	// not a regex — compiling it as one would reject every valid schema.
 	for _, cp := range probe.CustomPatterns {
 		if strings.TrimSpace(cp.Regex) == "" {
 			return errGuardrailCustomPatternEmptyRegex
+		}
+		if cp.Name == "json_schema" {
+			if err := guardrails.ValidateJSONSchema(cp.Regex); err != nil {
+				return errGuardrailSchemaPatternInvalid
+			}
+			continue
 		}
 		if _, err := regexp.Compile(cp.Regex); err != nil {
 			return errGuardrailCustomPatternInvalidRegex
@@ -258,7 +297,8 @@ const (
 	errGuardrailConfigJSON                = guardrailConfigError("config must be a JSON object")
 	errGuardrailNoDetectors               = guardrailConfigError("config.detectors must list at least one detector or customPatterns must be provided")
 	errGuardrailUnknownAction             = guardrailConfigError("config.action must be one of allow, log_only, warn, mask, block")
-	errGuardrailUnknownDetector           = guardrailConfigError("config.detectors may only contain pii, injection, and custom")
+	errGuardrailUnknownDetector           = guardrailConfigError("config.detectors may only contain pii, injection, custom, and json_schema")
 	errGuardrailCustomPatternEmptyRegex   = guardrailConfigError("custom pattern regex cannot be empty")
 	errGuardrailCustomPatternInvalidRegex = guardrailConfigError("custom pattern regex is invalid")
+	errGuardrailSchemaPatternInvalid      = guardrailConfigError("json_schema pattern must be a valid JSON Schema document")
 )

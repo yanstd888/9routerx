@@ -98,6 +98,13 @@ model → chain → API key, most-specific wins, and actions are
 `log_only` / `warn` / `mask` / `block`. Policy CRUD and the audit log live behind
 `/api/guardrails/policies` and `/api/guardrails/logs`.
 
+A `json_schema` custom pattern carries a JSON Schema document in place of a
+regex. It is enforced on inbound JSON bodies and buffered responses; a request
+that violates it is refused with the offending field named in the 400 response.
+A schema-only policy is active without any other detector, while streaming
+responses stay unblocked because bytes are already on the wire before the whole
+answer exists to validate.
+
 > **Guardrails and Persona pull in opposite directions.** Persona can instruct a
 > model to ignore its own rules; guardrails inspect what leaves your gateway for
 > exactly that. Turning guardrails off does not stop the provider from seeing

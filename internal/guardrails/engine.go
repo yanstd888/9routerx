@@ -73,9 +73,12 @@ func NewEngineWithCustom(detectors []string, action Action, customPatterns []Cus
 }
 
 // Enabled reports whether the engine runs anything at all. A disabled engine
-// must not rewrite content, so callers check this before touching a body.
+// must not rewrite content, so callers check this before touching a body. A
+// schema-only policy has no detectors and no regex patterns, yet still has to
+// run: its findings come from ScanJSON's structural check.
 func (e *Engine) Enabled() bool {
-	return e != nil && (len(e.detectors) > 0 || len(e.customDetectors) > 0) && e.action != ActionAllow
+	return e != nil && e.action != ActionAllow &&
+		(len(e.detectors) > 0 || len(e.customDetectors) > 0 || len(e.jsonSchemas) > 0)
 }
 
 func (e *Engine) runs(name string) bool {

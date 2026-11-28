@@ -106,7 +106,7 @@ func Inbound(store PolicyStore, audit Audit, sw Switch) func(http.Handler) http.
 			if decision.Blocked() {
 				handlerutil.WriteJSONError(
 					w, http.StatusBadRequest,
-					"Request blocked by a configured guardrail policy.",
+					guardrailBlockMessage(decision),
 				)
 				return
 			}
@@ -138,6 +138,27 @@ func Inbound(store PolicyStore, audit Audit, sw Switch) func(http.Handler) http.
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// guardrailBlockMessage names the offending schema fields in the 400 response.
+// A schema mismatch is not a secret: the client sent those fields and needs
+// to know which one violated the configured shape. Other detectors keep the
+// original generic wording.
+func guardrailBlockMessage(d *Decision) string {
+	const generic = "Request blocked by a configured guardrail policy."
+	if d == nil {
+		return generic
+	}
+	var fields []string
+	for _, f := range d.Findings {
+		if f.Detector == "json_schema" && f.Entity != "" {
+			fields = append(fields, f.Entity)
+		}
+	}
+	if len(fields) == 0 {
+		return generic
+	}
+	return generic + " Invalid fields: " + strings.Join(fields, "; ") + "."
 }
 
 // apiKeyID reads the authenticated key id without importing the middleware

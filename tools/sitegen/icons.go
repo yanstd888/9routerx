@@ -114,7 +114,7 @@ var headingIcons = map[string]string{
 	"screenshots":                     "camera",
 	"supported-ai-coding-clients":     "monitor",
 	"free-ai-providers-and-keyless-models-catalog": "gift",
-	"provider-categories-breakdown-154-providers":  "globe",
+	"provider-categories-breakdown":                "globe",
 	"embedded-dashboard-overview":                  "monitor",
 	"setup-guide-summary-and-wiki-documentation":   "settings",
 	"9routerx-vs-9router-vs-omniroute":             "arrow-left-right",

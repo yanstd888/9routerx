@@ -97,6 +97,14 @@ func pathLabel(path string) string {
 	return path
 }
 
+// ValidateJSONSchema checks a schema carried by a json_schema custom pattern.
+// The dashboard uses it before saving a policy so an invalid document cannot
+// become a silently skipped detector at runtime.
+func ValidateJSONSchema(schemaJSON string) error {
+	_, err := parseSchemaNode(schemaJSON)
+	return err
+}
+
 // parseSchemaNode decodes the schema JSON a custom pattern carries.
 func parseSchemaNode(schemaJSON string) (*jsonSchemaNode, error) {
 	var node jsonSchemaNode
