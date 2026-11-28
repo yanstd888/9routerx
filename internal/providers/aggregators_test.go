@@ -75,6 +75,13 @@ func TestAggregatorProviders(t *testing.T) {
 			modelsList: "https://ai.sumopod.com/v1/models", wantFetcher: true,
 		},
 		{
+			// MartLLM — OpenAI-compatible API with vendor-prefixed ids; the
+			// /v1/models catalogue is public, so the live fetch needs no key.
+			id: "martllm", baseURL: "https://api.martllm.com/v1/chat/completions",
+			models:     []string{"anthropic/claude-sonnet-5.5", "anthropic/claude-haiku-5.5", "anthropic/claude-opus-5.5", "google/gemini-3.8-flash", "google/gemini-3.1-flash-lite", "deepseek/deepseek-v4-flash", "deepseek/deepseek-v4-pro", "z-ai/glm-5.3", "moonshotai/kimi-k3", "qwen/qwen3.8-omni-flash", "minimax/minimax-m3-1-flash"},
+			modelsList: "https://api.martllm.com/v1/models", wantFetcher: true,
+		},
+		{
 			id: "tinyfish", baseURL: "https://api.tinyfish.ai",
 			authHeader: "x-api-key", authScheme: "raw",
 		},
