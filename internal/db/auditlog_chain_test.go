@@ -96,6 +96,9 @@ func TestEnsureAuditChainColumnsIsIdempotent(t *testing.T) {
 		}
 		found[name] = true
 	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("read table info: %v", err)
+	}
 	if !found["prevHash"] || !found["entryHash"] {
 		t.Fatalf("chain columns missing: %v", found)
 	}

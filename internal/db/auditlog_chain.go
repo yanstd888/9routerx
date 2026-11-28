@@ -46,7 +46,7 @@ func EnsureAuditChainColumns(db *sql.DB) error {
 			return fmt.Errorf("audit chain: add %s: %w", col.name, err)
 		}
 	}
-	if _, err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_audit_prev_hash ON auditLog(prevHash)`); err != nil {
+	if _, err := db.ExecContext(context.Background(), `CREATE INDEX IF NOT EXISTS idx_audit_prev_hash ON auditLog(prevHash)`); err != nil {
 		return fmt.Errorf("audit chain: create prevHash index: %w", err)
 	}
 	return nil
