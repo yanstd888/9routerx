@@ -110,14 +110,17 @@ func (h *DashboardHandler) HandleGetCache(w http.ResponseWriter, r *http.Request
 	sc := h.getSemanticCache()
 	semanticStats := sc.Stats()
 
-	promptMetrics, err := h.Repo.GetPromptCacheMetrics(r.Context(), win)
+	// R7: the metrics and the trend ride the window cache — built once per
+	// window shape, advanced by delta from the usageHistory watermark, instead
+	// of a per-row JSON-extracting scan of the whole window per poll.
+	promptMetrics, err := h.Repo.GetPromptCacheMetricsCached(win, raw)
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	promptMetrics.Period = win.Label(raw)
 
-	trend, err := h.Repo.GetPromptCacheTrend(r.Context(), win)
+	trend, err := h.Repo.GetPromptCacheTrendCached(win)
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return

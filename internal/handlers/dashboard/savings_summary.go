@@ -34,12 +34,12 @@ func (h *DashboardHandler) HandleGetSavingsSummary(w http.ResponseWriter, r *htt
 	}
 	win := analyticsrange.Resolve(raw, time.Now())
 
-	cache, err := h.Repo.GetPromptCacheMetrics(r.Context(), win)
+	cache, err := h.Repo.GetPromptCacheMetricsCached(win, raw)
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	comp, err := h.Repo.GetCompressionAnalyticsSummary(r.Context(), win)
+	comp, err := h.Repo.GetCompressionAnalyticsSummaryCached(r.Context(), win, raw)
 	if err != nil {
 		handlerutil.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		return
